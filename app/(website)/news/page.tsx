@@ -2,8 +2,8 @@ import type { Metadata } from "next"
 
 import { PageImageHero } from "@/components/layout/PageImageHero"
 import { NewsArchiveExplorer } from "@/components/news/NewsArchiveExplorer"
-import { mockNewsSummaries } from "@/data/mock"
 import { homeHeroDesign } from "@/data/mock/homepage-visual"
+import { getPublishedNewsSummariesPublic } from "@/lib/data/news-public"
 
 export const metadata: Metadata = {
   title: "News & Insights",
@@ -11,12 +11,12 @@ export const metadata: Metadata = {
     "Euromiti news — forecourt upgrades, fuels, hospitality, and community programmes across Kosovo.",
 }
 
-function newestFirst(items: typeof mockNewsSummaries) {
-  return [...items].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
-}
+export const revalidate = 120
 
-export default function NewsPage() {
-  const chronological = newestFirst(mockNewsSummaries)
+export default async function NewsPage() {
+  const items = await getPublishedNewsSummariesPublic()
+
+  const chronological = [...items].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
 
   return (
     <>

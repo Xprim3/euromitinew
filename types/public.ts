@@ -28,6 +28,14 @@ export interface LocationSummary {
   googleMapsUrl: string
 }
 
+/** Network-level desk details from CMS (`restaurant_content`), shown on `/restaurant`. */
+export type RestaurantDeskInfo = {
+  openingHours: string
+  phone: string
+  email: string
+  notes: string
+}
+
 export interface ServiceHighlight {
   id: string
   name: string
@@ -50,6 +58,8 @@ export interface NewsSummary {
   imageAlt: string
   /** Editorial category for archive filters (defaults in UI when absent). */
   category?: string
+  /** Homepage / archive badge text from `news_posts.teaser_label`. */
+  teaserLabel?: string
 }
 
 /** Full article for `/news/[slug]` (mock/CMS later). */

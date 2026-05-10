@@ -1,6 +1,7 @@
 import { cache } from "react"
 
 import { homeStrategicNetworkDesign } from "@/data/mock/homepage-visual"
+import { slugLegacyKey } from "@/lib/data/location-visual-fallback"
 import { createPublicSupabaseServerClient } from "@/lib/supabase/public-server-client"
 import type { HomepageContentRow } from "@/types/supabase-cms"
 
@@ -59,7 +60,7 @@ export const getHomeLocationPreviewsPublic = cache(async (): Promise<{ cards: Ho
 
   const cards = locs.map((loc: { id: string; slug: string; city: string; address: string; main_media_id: string | null }) => {
     const m = loc.main_media_id ? urlById[loc.main_media_id] : undefined
-    const slugKey = slugToLegacy(loc.slug)
+    const slugKey = slugLegacyKey(loc.slug)
     const mockStation = slugKey ? homeStrategicNetworkDesign.find((x) => x.locationId === slugKey) : undefined
     const imageSrc = (m?.public_url || "").trim() || mockStation?.imageSrc || homeStrategicNetworkDesign[0]?.imageSrc
     const imageAlt = m?.alt_text?.trim() || mockStation?.imageAlt || `Euromiti ${loc.city}`
@@ -83,15 +84,6 @@ export const getHomeLocationPreviewsPublic = cache(async (): Promise<{ cards: Ho
 function shorten(s: string, max: number) {
   if (s.length <= max) return s
   return `${s.slice(0, Math.max(0, max - 1))}…`
-}
-
-/** Map kosovo slugs to legacy mock IDs when filenames match patterns. */
-function slugToLegacy(slug: string): "prishtina" | "ferizaj" | "gjilan" | null {
-  const s = slug.toLowerCase()
-  if (s.includes("pri") || s === "prishtina" || s === "pristina") return "prishtina"
-  if (s.includes("feriz")) return "ferizaj"
-  if (s.includes("gjilan") || s.includes("gjil")) return "gjilan"
-  return null
 }
 
 function mockFallbackCards(): HomeLocationPreviewCard[] {

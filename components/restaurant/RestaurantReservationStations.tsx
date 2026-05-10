@@ -4,7 +4,7 @@ import { Container } from "@/components/layout/Container"
 import { EuromitiMotionClasses, Reveal } from "@/components/motion"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import type { LocationSummary } from "@/types/public"
+import type { LocationSummary, RestaurantDeskInfo } from "@/types/public"
 
 import {
   LOCATION_HOSPITALITY_EMAIL,
@@ -15,6 +15,8 @@ import type { RestaurantReservationStationsSectionMock } from "@/data/mock/resta
 
 type RestaurantReservationStationsProps = {
   section: RestaurantReservationStationsSectionMock
+  /** Network-level restaurant desk info from CMS (`restaurant_content`). */
+  deskInfo?: RestaurantDeskInfo | null
   className?: string
 }
 
@@ -22,7 +24,7 @@ function sanitizeTel(phone: string) {
   return phone.replace(/\s+/g, "")
 }
 
-export function RestaurantReservationStations({ section, className }: RestaurantReservationStationsProps) {
+export function RestaurantReservationStations({ section, deskInfo, className }: RestaurantReservationStationsProps) {
   const stations: LocationSummary[] = LOCATION_IDS_ORDERED.map((id) =>
     mockLocations.find((loc) => loc.id === id)
   ).filter((loc): loc is LocationSummary => loc != null)
@@ -41,6 +43,67 @@ export function RestaurantReservationStations({ section, className }: Restaurant
               {title}
             </h2>
             <p className="mt-5 font-sans text-[0.9375rem] font-light leading-[1.75] text-muted-foreground md:text-base">{subtitle}</p>
+            {deskInfo ? (
+              <div className="mx-auto mt-8 max-w-2xl rounded-xl border border-primary/18 bg-background/80 px-5 py-5 text-left shadow-(--shadow-euromiti-soft) backdrop-blur-sm md:mt-10 md:px-7 md:py-6">
+                <p className="font-heading text-[0.58rem] font-semibold uppercase tracking-[0.28em] text-secondary">
+                  Restaurant desk
+                </p>
+                <dl className="mt-4 space-y-4 font-sans text-[0.875rem] font-light md:text-[0.92rem]">
+                  <div>
+                    <dt className="font-heading text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-primary">
+                      Opening hours
+                    </dt>
+                    <dd className="mt-1.5 whitespace-pre-wrap leading-relaxed text-muted-foreground">
+                      {deskInfo.openingHours}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="font-heading text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-primary">
+                      Phone
+                    </dt>
+                    <dd className="mt-1.5">
+                      {deskInfo.phone !== "—" ? (
+                        <a
+                          href={`tel:${sanitizeTel(deskInfo.phone)}`}
+                          className="text-muted-foreground transition-colors hover:text-primary"
+                        >
+                          {deskInfo.phone}
+                        </a>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="font-heading text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-primary">
+                      Email
+                    </dt>
+                    <dd className="mt-1.5 break-all">
+                      {deskInfo.email !== "—" ? (
+                        <a
+                          href={`mailto:${deskInfo.email}`}
+                          className="text-muted-foreground transition-colors hover:text-secondary"
+                        >
+                          {deskInfo.email}
+                        </a>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </dd>
+                  </div>
+                  {deskInfo.notes.trim().length > 0 ? (
+                    <div>
+                      <dt className="font-heading text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-primary">
+                        Notes
+                      </dt>
+                      <dd className="mt-1.5 whitespace-pre-wrap leading-relaxed text-muted-foreground">
+                        {deskInfo.notes}
+                      </dd>
+                    </div>
+                  ) : null}
+                </dl>
+              </div>
+            ) : null}
           </header>
         </Reveal>
 

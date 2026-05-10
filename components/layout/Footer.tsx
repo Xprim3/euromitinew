@@ -1,7 +1,9 @@
+import Image from "next/image"
 import Link from "next/link"
 
 import { Container } from "./Container"
 
+import { getSiteFooterPublic, type SiteFooterPublic } from "@/lib/data/site-contact-public"
 import { TOPBAR_NAV_LINKS } from "@/lib/navigation"
 
 const legalLinks = [
@@ -12,7 +14,10 @@ const legalLinks = [
 const footerLinkClass =
   "text-[0.7rem] font-bold uppercase tracking-[0.16em] text-white/68 transition-colors duration-200 hover:text-brand-accent-soft"
 
-export function Footer() {
+const socialClass =
+  "text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-white/55 transition-colors hover:text-brand-accent-soft"
+
+function FooterView({ data }: { data: SiteFooterPublic }) {
   const year = new Date().getFullYear()
 
   return (
@@ -22,14 +27,31 @@ export function Footer() {
           <div className="lg:col-span-5">
             <Link
               href="/"
-              className="inline-block font-[family-name:var(--font-montserrat)] text-xl font-extrabold tracking-tighter text-white uppercase transition hover:text-brand-accent-soft"
+              className="inline-flex max-w-full items-center gap-3 font-[family-name:var(--font-montserrat)] text-xl font-extrabold tracking-tighter text-white uppercase transition hover:text-brand-accent-soft"
             >
-              Euromiti
+              {data.logoUrl ? (
+                <span className="relative block h-9 w-28 shrink-0">
+                  <Image
+                    src={data.logoUrl}
+                    alt={data.logoAlt}
+                    fill
+                    sizes="7rem"
+                    className="object-contain object-left"
+                  />
+                </span>
+              ) : null}
+              <span className="min-w-0 leading-tight">{data.companyName}</span>
             </Link>
-            <p className="mt-5 max-w-md text-[0.9375rem] leading-[1.65] text-white/58">
-              Pioneering transit fuel and hospitality experiences in Kosovo — built on safety, brightness, and craft
-              across Prishtina, Ferizaj, and Gjilan.
-            </p>
+            <p className="mt-5 max-w-md whitespace-pre-line text-[0.9375rem] leading-[1.65] text-white/58">{data.footerBody}</p>
+            {data.socialLinks.length ? (
+              <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2">
+                {data.socialLinks.map((s) => (
+                  <a key={`${s.platform}-${s.url}`} href={s.url} className={socialClass} target="_blank" rel="noopener noreferrer">
+                    {s.platform}
+                  </a>
+                ))}
+              </div>
+            ) : null}
           </div>
 
           <div className="lg:col-span-7">
@@ -48,7 +70,9 @@ export function Footer() {
         </div>
 
         <div className="mt-14 flex flex-col gap-5 border-white/8 border-t pt-8 md:mt-16 md:flex-row md:items-center md:justify-between md:gap-6">
-          <p className="text-[0.7rem] font-medium tracking-[0.04em] text-white/42">© {year} Euromiti Kosovo</p>
+          <p className="text-[0.7rem] font-medium tracking-[0.04em] text-white/42">
+            © {year} {data.footerCopyrightLine}
+          </p>
           <nav aria-label="Legal" className="flex flex-wrap gap-x-6 gap-y-2">
             {legalLinks.map(({ href, label }) => (
               <Link
@@ -64,4 +88,9 @@ export function Footer() {
       </Container>
     </footer>
   )
+}
+
+export async function Footer() {
+  const data = await getSiteFooterPublic()
+  return <FooterView data={data} />
 }

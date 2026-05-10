@@ -10,6 +10,7 @@ import { contactPageMock } from "@/data/mock/contact"
 import { LOCATION_HOSPITALITY_EMAIL } from "@/data/mock/locations"
 import { homeHeroDesign, homeStrategicNetworkDesign } from "@/data/mock/homepage-visual"
 import { mockLocations } from "@/data/mock"
+import { getContactDetailsPublic, type SocialLinkItem } from "@/lib/data/site-contact-public"
 import { cn } from "@/lib/utils"
 import type { LocationSummary } from "@/types/public"
 
@@ -18,6 +19,8 @@ export const metadata: Metadata = {
   description:
     "Euromiti headquarters in Prishtina — phone, email, hours, forecourt locations across Kosovo, and careers.",
 }
+
+export const revalidate = 120
 
 function telHref(phone: string) {
   return `tel:${phone.replace(/\s/g, "")}`
@@ -32,10 +35,31 @@ function visualForLocation(id: string) {
   return homeStrategicNetworkDesign.find((v) => v.locationId === id)
 }
 
-export default function ContactPage() {
+function socialLinkClass() {
+  return "text-sm font-semibold text-foreground underline-offset-4 hover:text-brand-red-vivid hover:underline"
+}
+
+function SocialRow({ links }: { links: readonly SocialLinkItem[] }) {
+  if (!links.length) return null
+  return (
+    <div className="mt-8 flex flex-wrap gap-x-5 gap-y-2 border-border/60 border-t pt-8">
+      <p className="w-full text-[0.6rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">Connect</p>
+      {links.map((s) => (
+        <a key={`${s.platform}-${s.url}`} href={s.url} className={socialLinkClass()} target="_blank" rel="noopener noreferrer">
+          {s.platform}
+        </a>
+      ))}
+    </div>
+  )
+}
+
+export default async function ContactPage() {
+  const c = await getContactDetailsPublic()
   const m = contactPageMock
-  const mailHref = `mailto:${m.email}`
-  const careersMailHref = `mailto:${m.careersEmail}?subject=Career%20enquiry%20%E2%80%94%20Euromiti`
+  const mailHref = `mailto:${c.email}`
+  const careersEmail = c.careersEmail?.trim() || m.careersEmail
+  const careersMailHref = `mailto:${careersEmail}?subject=Career%20enquiry%20%E2%80%94%20Euromiti`
+  const careersCtaLabel = c.careersApplyCtaLabel?.trim() || m.careersCtaApplyByEmail
 
   return (
     <>
@@ -106,7 +130,20 @@ export default function ContactPage() {
                     <MaterialSymbol name="location_on" className="mt-0.5 shrink-0 text-xl! text-muted-foreground" aria-hidden />
                     <div>
                       <dt className="text-[0.6rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">Address</dt>
-                      <dd className="mt-1 max-w-sm text-muted-foreground text-[0.8125rem] leading-snug">{m.hqAddressCompact}</dd>
+                      <dd className="mt-1 max-w-sm text-muted-foreground text-[0.8125rem] leading-snug">
+                        {c.mapLink.trim() ? (
+                          <a
+                            href={c.mapLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-medium text-foreground underline-offset-4 hover:text-brand-red-vivid hover:underline"
+                          >
+                            {c.hqAddress}
+                          </a>
+                        ) : (
+                          c.hqAddress
+                        )}
+                      </dd>
                     </div>
                   </div>
                   <div className="flex gap-3">
@@ -114,8 +151,8 @@ export default function ContactPage() {
                     <div>
                       <dt className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">Phone</dt>
                       <dd className="mt-1">
-                        <a className="font-semibold text-foreground text-lg hover:text-brand-red-vivid" href={telHref(m.phone)}>
-                          {m.phone}
+                        <a className="font-semibold text-foreground text-lg hover:text-brand-red-vivid" href={telHref(c.phone)}>
+                          {c.phone}
                         </a>
                       </dd>
                     </div>
@@ -126,7 +163,7 @@ export default function ContactPage() {
                       <dt className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">Email</dt>
                       <dd className="mt-1">
                         <a className="break-all font-semibold text-foreground text-lg hover:text-brand-red-vivid" href={mailHref}>
-                          {m.email}
+                          {c.email}
                         </a>
                       </dd>
                     </div>
@@ -135,17 +172,19 @@ export default function ContactPage() {
                     <MaterialSymbol name="schedule" className="mt-0.5 shrink-0 text-xl! text-muted-foreground" aria-hidden />
                     <div>
                       <dt className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">Weekdays</dt>
-                      <dd className="mt-1 text-foreground">{m.weekdayHours}</dd>
+                      <dd className="mt-1 text-foreground">{c.weekdayHours ?? m.weekdayHours}</dd>
                     </div>
                   </div>
                   <div className="flex gap-3">
                     <MaterialSymbol name="today" className="mt-0.5 shrink-0 text-xl! text-muted-foreground" aria-hidden />
                     <div>
                       <dt className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">Weekend</dt>
-                      <dd className="mt-1 text-foreground">{m.weekendHours}</dd>
+                      <dd className="mt-1 text-foreground">{c.weekendHours ?? m.weekendHours}</dd>
                     </div>
                   </div>
                 </dl>
+
+                <SocialRow links={c.socialLinks} />
               </div>
             </div>
           </SectionReveal>
@@ -263,10 +302,10 @@ export default function ContactPage() {
                 variant="default"
                 size="lg"
                 className="min-h-14 rounded-full px-8 text-lg shadow-xl transition hover:brightness-105 sm:min-w-50 sm:px-10"
-                render={<a href={telHref(m.phone)} />}
+                render={<a href={telHref(c.phone)} />}
               >
                 <MaterialSymbol name="call" className="text-xl!" />
-                {m.phone}
+                {c.phone}
               </Button>
               <Button
                 variant="outline"
@@ -278,7 +317,7 @@ export default function ContactPage() {
                 render={<a href={careersMailHref} />}
               >
                 <MaterialSymbol name="mail" className="text-xl!" />
-                {m.careersCtaApplyByEmail}
+                {careersCtaLabel}
               </Button>
             </div>
           </SectionReveal>

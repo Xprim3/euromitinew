@@ -5,7 +5,7 @@ import { HomeAboutIntro } from "@/components/home/HomeAboutIntro"
 import { FuelPricesSkeletonSection } from "@/components/home/FuelPricesSkeletonSection"
 import { HomeFuelPricesGlass } from "@/components/home/HomeFuelPricesGlass"
 import { HomeHero, HomeHeroSkeleton } from "@/components/home/HomeHero"
-import { HomeNewsInsights } from "@/components/home/HomeNewsInsights"
+import { HomeNewsInsights, HomeNewsInsightsSkeleton } from "@/components/home/HomeNewsInsights"
 import { HomeRestaurantLuxury, HomeRestaurantLuxurySkeleton } from "@/components/home/HomeRestaurantLuxury"
 import { HomeServicesIntro, HomeServicesIntroSkeleton } from "@/components/home/HomeServicesIntro"
 import { HomeStrategicNetwork, HomeStrategicNetworkSkeleton } from "@/components/home/HomeStrategicNetwork"
@@ -50,7 +50,9 @@ export default function HomePage() {
         <HomeStrategicNetwork />
       </Suspense>
       <HomeAboutIntro />
-      <HomeNewsInsights />
+      <Suspense fallback={<HomeNewsInsightsSkeleton />}>
+        <HomeNewsInsights />
+      </Suspense>
     </div>
   )
 }

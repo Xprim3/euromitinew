@@ -6,6 +6,7 @@ import {
   BookOpen,
   Flame,
   Fuel,
+  Globe,
   Home,
   ImageIcon,
   LayoutDashboard,
@@ -28,6 +29,7 @@ const NAV = [
   { href: "/admin/homepage", label: "Homepage", icon: Home },
   { href: "/admin/restaurant", label: "Restaurant", icon: UtensilsCrossed },
   { href: "/admin/media", label: "Media", icon: ImageIcon },
+  { href: "/admin/site", label: "Site & contact", icon: Globe },
 ] as const
 
 export function AdminSidebar() {

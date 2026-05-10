@@ -58,7 +58,7 @@ export function HomepageContentForm({ initial, mediaPreviews }: HomepageContentF
     "block w-full max-w-lg border border-zinc-700 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-100 file:mr-4 file:rounded-md file:border-0 file:bg-zinc-700 file:px-3 file:py-2 file:text-sm file:text-white"
 
   return (
-    <form action={formAction} className="max-w-4xl space-y-10" encType="multipart/form-data">
+    <form action={formAction} className="max-w-4xl space-y-10">
       {state.ok === true ? (
         <p
           role="status"

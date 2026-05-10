@@ -10,7 +10,13 @@ import { cn } from "@/lib/utils"
 import { SectionReveal } from "@/components/motion/SectionReveal"
 import { Stagger } from "@/components/motion/Stagger"
 
+import type { NewsFilterTab } from "@/lib/constants/news-archive"
+import { NEWS_FILTER_TABS } from "@/lib/constants/news-archive"
+
 import { NewsArchiveCard } from "./NewsArchiveCard"
+
+/** Re-export for callers that depended on `./NewsArchiveExplorer`. */
+export { NEWS_FILTER_TABS }
 
 /** Desktop: 3 columns × 2 rows — keeps the archive visually compact before pagination */
 const NEWS_PAGE_SIZE = 6
@@ -30,21 +36,13 @@ function visiblePageNumbers(totalPages: number, current: number): (number | "gap
   return out
 }
 
-export const NEWS_FILTER_TABS = [
-  "All News",
-  "Company Updates",
-  "Sustainability",
-  "Innovation",
-  "Community",
-] as const
-
 type NewsArchiveExplorerProps = {
   items: readonly NewsSummary[]
   className?: string
 }
 
 export function NewsArchiveExplorer({ items, className }: NewsArchiveExplorerProps) {
-  const [active, setActive] = useState<(typeof NEWS_FILTER_TABS)[number]>("All News")
+  const [active, setActive] = useState<NewsFilterTab>("All News")
   const [query, setQuery] = useState("")
   const [page, setPage] = useState(1)
   const gridAnchorRef = useRef<HTMLDivElement>(null)

@@ -6,18 +6,16 @@ import { notFound } from "next/navigation"
 import { Container } from "@/components/layout/Container"
 import { SectionReveal } from "@/components/motion/SectionReveal"
 import { PageHeader } from "@/components/layout/PageHeader"
-import { getNewsArticleBySlug, mockNewsArticles } from "@/data/mock"
+import { getNewsArticleBySlugPublic } from "@/lib/data/news-public"
 import { formatNewsDate } from "@/lib/format-news-date"
 
 type Props = { params: Promise<{ slug: string }> }
 
-export function generateStaticParams() {
-  return mockNewsArticles.map((a) => ({ slug: a.slug }))
-}
+export const revalidate = 120
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const article = getNewsArticleBySlug(slug)
+  const article = await getNewsArticleBySlugPublic(slug)
   if (!article) {
     return { title: "News" }
   }
@@ -29,14 +27,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: article.excerpt,
       type: "article",
       publishedTime: article.publishedAt,
-      images: [{ url: article.imageSrc }],
+      ...(article.imageSrc.startsWith("https://")
+        ? { images: [{ url: article.imageSrc }] }
+        : {}),
     },
   }
 }
 
 export default async function NewsArticlePage({ params }: Props) {
   const { slug } = await params
-  const article = getNewsArticleBySlug(slug)
+  const article = await getNewsArticleBySlugPublic(slug)
   if (!article) {
     notFound()
   }
@@ -76,7 +76,7 @@ export default async function NewsArticlePage({ params }: Props) {
 
           <article className="mx-auto mt-12 max-w-3xl">
             <div className="space-y-6 text-base leading-relaxed text-muted-foreground md:text-[1.0625rem]">
-              {article.contentParagraphs.map((paragraph, i) => (
+              {[...article.contentParagraphs].map((paragraph, i) => (
                 <p key={i}>{paragraph}</p>
               ))}
             </div>

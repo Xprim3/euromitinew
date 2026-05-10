@@ -83,3 +83,85 @@ export type ServicesContentRow = {
   updated_at: string
   updated_by: string | null
 }
+
+/** `public.restaurant_content` singleton — Phase 10. */
+export type RestaurantContentRow = {
+  id: number
+  hero_title: string
+  hero_subtitle: string
+  hero_description: string
+  hero_image_media_id: string | null
+  opening_hours: string
+  contact_phone: string | null
+  contact_email: string | null
+  contact_notes: string | null
+  menu_highlights_json: unknown
+  gallery_media_ids: string[] | null
+  updated_at: string
+  updated_by: string | null
+}
+
+/** Row from `public.locations` (Phase 10 + marketing copy migration). */
+export type LocationRow = {
+  id: string
+  slug: string
+  city: string
+  address: string
+  phone: string
+  opening_hours: string
+  services: string[]
+  google_maps_url: string
+  contact_email: string | null
+  main_media_id: string | null
+  sort_order: number
+  is_active: boolean
+  page_heading: string
+  page_summary: string
+  created_at: string
+  updated_at: string
+}
+
+/** Row from `public.news_posts`. */
+export type NewsPostRow = {
+  id: string
+  slug: string
+  status: string
+  title: string
+  excerpt: string
+  category: string | null
+  teaser_label: string | null
+  published_at: string | null
+  hero_media_id: string | null
+  hero_image_alt: string | null
+  body: unknown
+  created_at: string
+  updated_at: string
+}
+
+/** Singleton `public.site_settings` (id = 1). */
+export type SiteSettingsRow = {
+  id: number
+  logo_media_id: string | null
+  company_name: string
+  social_links: unknown
+  footer_body: string
+  footer_copyright_line: string | null
+  updated_at: string
+  updated_by: string | null
+}
+
+/** Singleton `public.contact_info` (id = 1). */
+export type ContactInfoRow = {
+  id: number
+  phone: string
+  email: string
+  hq_address: string
+  map_link: string
+  social_links: unknown
+  weekday_hours: string | null
+  weekend_hours: string | null
+  careers_email: string | null
+  careers_apply_instructions: string | null
+  updated_at: string
+  updated_by: string | null
+}

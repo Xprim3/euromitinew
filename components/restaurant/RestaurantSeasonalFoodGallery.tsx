@@ -52,7 +52,7 @@ export function RestaurantSeasonalFoodGallery({ data, className }: RestaurantSea
         >
           {items.map((item, index) => (
             <article
-              key={item.title}
+              key={`${index}-${item.title}`}
               className={cn(
                 "flex flex-col",
                 index % 2 === 1 && "motion-safe:md:translate-y-7 motion-safe:lg:translate-y-8"
