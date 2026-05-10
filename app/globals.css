@@ -1,26 +1,521 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
+
+/* Euromiti Phase 2 — brand palette + DESIGN.md structure (radii / rhythm) */
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  --font-serif-display: var(--font-playfair), ui-serif, Georgia, serif;
   --font-mono: var(--font-geist-mono);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: var(--rounded-sm);
+  --radius-md: var(--rounded-md);
+  --radius-lg: var(--rounded-lg);
+  --radius-xl: var(--rounded-xl);
+  --radius-2xl: calc(var(--rounded-lg) * 1.2);
+  --radius-3xl: calc(var(--rounded-xl) + 0.125rem);
+  --radius: var(--rounded-DEFAULT);
+  --shadow-euromiti-sm: var(--shadow-sm);
+  --shadow-euromiti-soft: var(--shadow-soft);
+  --shadow-euromiti-soft-hover: var(--shadow-soft-hover);
+  --shadow-euromiti-primary: var(--shadow-primary);
+  --shadow-euromiti-primary-sm: var(--shadow-primary-sm);
+  --shadow-euromiti-secondary-sm: var(--shadow-secondary-sm);
+  --shadow-euromiti-accent-sm: var(--shadow-accent-sm);
+
+  /* Euromiti marketing tokens — prefer these over arbitrary hex in components */
+  --color-brand-shell: var(--brand-shell);
+  --color-brand-shell-deep: var(--brand-shell-deep);
+  --color-brand-shell-mid: var(--brand-shell-mid);
+  --color-brand-shell-elevated: var(--brand-shell-elevated);
+  --color-brand-accent-soft: var(--brand-accent-soft);
+  --color-brand-red-vivid: var(--brand-red-vivid);
+  --color-brand-primary-hover: var(--brand-primary-hover);
+  --color-brand-border-muted: var(--brand-border-muted);
+  --color-brand-border-accent: var(--brand-border-accent);
+  --color-brand-body-soft: var(--brand-body-soft);
+  --color-brand-neutrals-mid: var(--brand-neutrals-mid);
+  --color-brand-text: var(--brand-text);
+  --color-brand-secondary: var(--brand-secondary);
+  --color-brand-surface-soft: var(--brand-surface-soft);
+  --color-brand-surface-tinted: var(--brand-surface-tinted);
+  --color-brand-success: var(--brand-success);
+  --color-brand-accent-gold: var(--brand-accent-gold);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  /* DESIGN.md rounded scale */
+  --rounded-sm: 0.25rem;
+  --rounded-DEFAULT: 0.5rem;
+  --rounded-md: 0.75rem;
+  --rounded-lg: 1rem;
+  --rounded-xl: 1.5rem;
+
+  --brand-primary: #0f172a;
+  --brand-text: #111827;
+  --brand-secondary: #b91c1c;
+  --brand-accent-gold: #f59e0b;
+  --brand-surface-soft: #f8fafc;
+  --brand-surface-tinted: #f9f9ff;
+  --brand-inverse-surface: #0f172a;
+  --brand-inverse-on-surface: #f8fafc;
+  --brand-success: #16a34a;
+  /** Deep navy editorial sections (About, insights bands) — matches DESIGN.md stacks */
+  --brand-shell: #0d1526;
+  --brand-shell-deep: #0a1120;
+  /** Card / panel stops on shell gradient (news, dark UI) */
+  --brand-shell-mid: #151f33;
+  --brand-shell-elevated: #1a2438;
+  /** Warm headline accent on inverse / footer / nav active */
+  --brand-accent-soft: #ffb4ab;
+  /** Primary CTA / emphasis red (distinct from canonical secondary slug) */
+  --brand-red-vivid: #d9352f;
+  --brand-primary-hover: #0b1220;
+  --brand-border-muted: #e1e8fd;
+  --brand-border-accent: #e9edff;
+  --brand-body-soft: #45464d;
+  --brand-neutrals-mid: #76777d;
+
+  --background: #ffffff;
+  --foreground: var(--brand-text);
+  --card: #ffffff;
+  --card-foreground: var(--brand-text);
+  --popover: #ffffff;
+  --popover-foreground: var(--brand-text);
+
+  --primary: var(--brand-primary);
+  --primary-foreground: #ffffff;
+
+  --secondary: var(--brand-secondary);
+  --secondary-foreground: #ffffff;
+
+  --accent: var(--brand-accent-gold);
+  --accent-foreground: var(--brand-text);
+
+  --muted: var(--brand-surface-soft);
+  --muted-foreground: #4b5563;
+
+  --destructive: #ba1a1a;
+  --destructive-foreground: #ffffff;
+
+  --border: #e2e8f0;
+  --input: #cbd5e1;
+  --ring: rgb(15 23 42 / 0.45);
+
+  --success: var(--brand-success);
+  --success-foreground: #ffffff;
+
+  /* Legacy section tokens — prefer Container gutters (px-4 / sm:px-6 / lg:px-12). */
+  --section-px: 1rem;
+  --section-px-sm: 1rem;
+  --section-px-lg: 1.5rem;
+  --section-y-tight: 2rem;
+  --section-y: 3.35rem;
+  --section-y-loose: 4.25rem;
+  --section-header-y: clamp(2rem, 4.2vw, 2.85rem);
+  --section-cta-y: clamp(2.35rem, 5vw, 4rem);
+
+  /*
+   * Euromiti motion tokens — premium, subtle; consumed by .euromiti-* utilities.
+   * Prefer these durations/easings over ad-hoc transitions in new work.
+   */
+  --euromiti-ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  --euromiti-ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --euromiti-reveal-distance: 14px;
+  --euromiti-reveal-duration: 600ms;
+  --euromiti-micro-duration: 210ms;
+  --euromiti-zoom-duration: 720ms;
+  --euromiti-stagger-step: 55ms;
+
+  /* DESIGN.md — card ambient shadow */
+  --shadow-sm: 0 1px 3px rgb(15 23 42 / 0.06);
+  --shadow-soft: 0 4px 20px rgb(15 23 42 / 0.08);
+  --shadow-soft-hover: 0 8px 32px rgb(15 23 42 / 0.12);
+  --shadow-primary: 0 4px 24px rgb(15 23 42 / 0.18);
+  --shadow-primary-sm: 0 2px 8px rgb(15 23 42 / 0.12);
+  --shadow-secondary-sm: 0 2px 12px rgb(185 28 28 / 0.35);
+  --shadow-accent-sm: 0 2px 14px rgb(245 158 11 / 0.32);
+
+  --chart-1: #0f172a;
+  --chart-2: #b91c1c;
+  --chart-3: #f59e0b;
+  --chart-4: #565e74;
+  --chart-5: #76777d;
+  --sidebar: var(--brand-surface-tinted);
+  --sidebar-foreground: var(--brand-text);
+  --sidebar-primary: var(--brand-primary);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e9edff;
+  --sidebar-accent-foreground: var(--brand-text);
+  --sidebar-border: #dce2f7;
+  --sidebar-ring: var(--ring);
+}
+
+.dark {
+  --background: #0b1120;
+  --foreground: #edf0ff;
+  --card: #131c2f;
+  --card-foreground: #edf0ff;
+  --popover: #131c2f;
+  --popover-foreground: #edf0ff;
+  --primary: #bec6e0;
+  --primary-foreground: #0f172a;
+  --secondary: #ffb4ab;
+  --secondary-foreground: #410002;
+  --accent: #ffb95f;
+  --accent-foreground: #2a1700;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --destructive: #ffdad6;
+  --destructive-foreground: #93000a;
+  --border: rgb(255 255 255 / 12%);
+  --input: rgb(255 255 255 / 14%);
+  --ring: rgb(190 198 224 / 0.45);
+  --success: #22c55e;
+  --success-foreground: #052e15;
+}
+
+@layer utilities {
+  .euromiti-glass-card {
+    background: rgb(255 255 255 / 0.72);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgb(255 255 255 / 0.32);
+  }
+
+  .euromiti-home-hero-media {
+    animation: euromiti-home-kenburns 12s ease-in-out infinite;
+  }
+
+  @keyframes euromiti-home-kenburns {
+    0%,
+    100% {
+      transform: scale(1.05);
+    }
+    50% {
+      transform: scale(1.08);
+    }
+  }
+
+  .euromiti-section-tight {
+    padding-block: var(--section-y-tight);
+  }
+
+  .euromiti-section {
+    padding-block: var(--section-y);
+  }
+
+  .euromiti-section-loose {
+    padding-block: var(--section-y-loose);
+  }
+
+  .euromiti-surface-muted {
+    background-color: color-mix(in oklab, var(--muted) 94%, transparent);
+  }
+
+  .euromiti-type-display {
+    letter-spacing: -0.02em;
+    font-size: clamp(1.85rem, 3.6vw, 2.65rem);
+    line-height: 1.18;
+  }
+
+  .euromiti-footer-surface {
+    background-color: var(--brand-inverse-surface);
+    color: var(--brand-inverse-on-surface);
+  }
+
+  .font-playfair {
+    font-family: var(--font-serif-display);
+  }
+
+  /* --- Euromiti motion system (opt-in classes; respects reduced motion) --- */
+
+  @media (max-width: 767px) {
+    :root {
+      --euromiti-reveal-distance: 10px;
+      --euromiti-reveal-duration: 420ms;
+      --euromiti-zoom-duration: 520ms;
+      --euromiti-stagger-step: 40ms;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --euromiti-reveal-distance: 0px;
+      --euromiti-reveal-duration: 1ms;
+      --euromiti-micro-duration: 1ms;
+      --euromiti-zoom-duration: 1ms;
+      --euromiti-stagger-step: 0ms;
+    }
+  }
+
+  /** Scroll / mount reveal: pair with client `Reveal` (adds --visible modifier). */
+  .euromiti-reveal {
+    opacity: 0;
+    transition: opacity var(--euromiti-reveal-duration) var(--euromiti-ease-out-soft);
+  }
+
+  .euromiti-reveal--fade-up {
+    transform: translate3d(0, var(--euromiti-reveal-distance), 0);
+    transition:
+      opacity var(--euromiti-reveal-duration) var(--euromiti-ease-out-soft),
+      transform var(--euromiti-reveal-duration) var(--euromiti-ease-out-soft);
+  }
+
+  .euromiti-reveal--visible {
+    opacity: 1;
+  }
+
+  .euromiti-reveal--visible.euromiti-reveal--fade-up {
+    transform: translate3d(0, 0, 0);
+  }
+
+  /** Section-scale reveal: same tokens, optional class on wrappers */
+  .euromiti-section-reveal {
+    opacity: 0;
+    transform: translate3d(0, var(--euromiti-reveal-distance), 0);
+    transition:
+      opacity var(--euromiti-reveal-duration) var(--euromiti-ease-smooth),
+      transform var(--euromiti-reveal-duration) var(--euromiti-ease-smooth);
+  }
+
+  .euromiti-section-reveal--visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  /** Staggered direct children; parent gets `--active` from `<Stagger>` when in view */
+  .euromiti-stagger-group > * {
+    opacity: 0;
+    transform: translate3d(0, var(--euromiti-reveal-distance), 0);
+    transition:
+      opacity calc(var(--euromiti-reveal-duration) * 0.95) var(--euromiti-ease-out-soft),
+      transform calc(var(--euromiti-reveal-duration) * 0.95) var(--euromiti-ease-out-soft);
+  }
+
+  .euromiti-stagger-group.euromiti-stagger-group--active > * {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .euromiti-stagger-group.euromiti-stagger-group--active > *:nth-child(1) {
+    transition-delay: calc(var(--euromiti-stagger-step) * 0);
+  }
+  .euromiti-stagger-group.euromiti-stagger-group--active > *:nth-child(2) {
+    transition-delay: calc(var(--euromiti-stagger-step) * 1);
+  }
+  .euromiti-stagger-group.euromiti-stagger-group--active > *:nth-child(3) {
+    transition-delay: calc(var(--euromiti-stagger-step) * 2);
+  }
+  .euromiti-stagger-group.euromiti-stagger-group--active > *:nth-child(4) {
+    transition-delay: calc(var(--euromiti-stagger-step) * 3);
+  }
+  .euromiti-stagger-group.euromiti-stagger-group--active > *:nth-child(5) {
+    transition-delay: calc(var(--euromiti-stagger-step) * 4);
+  }
+  .euromiti-stagger-group.euromiti-stagger-group--active > *:nth-child(6) {
+    transition-delay: calc(var(--euromiti-stagger-step) * 5);
+  }
+  .euromiti-stagger-group.euromiti-stagger-group--active > *:nth-child(7) {
+    transition-delay: calc(var(--euromiti-stagger-step) * 6);
+  }
+  .euromiti-stagger-group.euromiti-stagger-group--active > *:nth-child(8) {
+    transition-delay: calc(var(--euromiti-stagger-step) * 7);
+  }
+  .euromiti-stagger-group.euromiti-stagger-group--active > *:nth-child(9) {
+    transition-delay: calc(var(--euromiti-stagger-step) * 8);
+  }
+  .euromiti-stagger-group.euromiti-stagger-group--active > *:nth-child(10) {
+    transition-delay: calc(var(--euromiti-stagger-step) * 9);
+  }
+  .euromiti-stagger-group.euromiti-stagger-group--active > *:nth-child(11) {
+    transition-delay: calc(var(--euromiti-stagger-step) * 10);
+  }
+  .euromiti-stagger-group.euromiti-stagger-group--active > *:nth-child(12) {
+    transition-delay: calc(var(--euromiti-stagger-step) * 11);
+  }
+
+  /*
+   * Mobile: intersection-based reveals frequently stay at opacity 0 in Safari / in-app browsers.
+   * Force visible typography with no transitions; optional hero intros use separate animations below.
+   */
+  @media (max-width: 767px) {
+    .euromiti-reveal,
+    .euromiti-reveal--fade-up,
+    .euromiti-section-reveal,
+    .euromiti-stagger-group > * {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+  }
+
+  @keyframes euromiti-home-hero-intro-mobile {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 10px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
+    .euromiti-home-hero-intro-copy {
+      animation: euromiti-home-hero-intro-mobile 0.54s var(--euromiti-ease-out-soft) both;
+    }
+
+    .euromiti-home-hero-intro-actions {
+      opacity: 0;
+      animation: euromiti-home-hero-intro-mobile 0.5s var(--euromiti-ease-out-soft) 0.1s both;
+    }
+  }
+
+  /** Compose on buttons/links when you opt in */
+  .euromiti-btn-hover {
+    transition:
+      transform var(--euromiti-micro-duration) var(--euromiti-ease-out-soft),
+      box-shadow var(--euromiti-micro-duration) var(--euromiti-ease-out-soft),
+      filter var(--euromiti-micro-duration) var(--euromiti-ease-out-soft);
+  }
+
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .euromiti-btn-hover:hover {
+      transform: translate3d(0, -1px, 0);
+    }
+    .euromiti-btn-hover:active {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  /** Subtle card / tile scale — opt-in only */
+  .euromiti-hover-scale {
+    transition: transform var(--euromiti-micro-duration) var(--euromiti-ease-out-soft);
+  }
+
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .euromiti-hover-scale:hover {
+      transform: scale(1.01);
+    }
+  }
+
+  /** Image zoom — wrapper only; `img` descendant avoids next/image SSR/hydrate class mismatches */
+  .euromiti-img-zoom {
+    overflow: hidden;
+  }
+
+  .euromiti-img-zoom img {
+    transition: transform var(--euromiti-zoom-duration) var(--euromiti-ease-smooth);
+  }
+
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .euromiti-img-zoom:hover img {
+      transform: scale(1.035);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .euromiti-reveal,
+    .euromiti-reveal--fade-up,
+    .euromiti-section-reveal,
+    .euromiti-stagger-group > * {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+
+    .euromiti-home-hero-intro-copy,
+    .euromiti-home-hero-intro-actions {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+
+    .euromiti-img-zoom img {
+      transition: none !important;
+      transform: none !important;
+    }
+
+    .euromiti-hover-scale:hover {
+      transform: none !important;
+    }
+
+    .euromiti-btn-hover:hover,
+    .euromiti-btn-hover:active {
+      transform: none !important;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .euromiti-home-hero-media {
+      animation: none !important;
+      transform: none !important;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-border outline-ring/45;
+  }
+  html {
+    @apply scroll-smooth font-sans;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-size: 1rem;
+    line-height: 1.5;
+    text-rendering: optimizeLegibility;
+  }
+  .material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+    font-style: normal;
+    line-height: 1;
+    letter-spacing: normal;
+    white-space: nowrap;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-heading text-pretty font-bold tracking-tight;
+  }
 }

@@ -1,0 +1,202 @@
+import { cache } from "react"
+
+import { homeBeyondDesign, homeHeroDesign } from "@/data/mock/homepage-visual"
+import { createPublicSupabaseServerClient } from "@/lib/supabase/public-server-client"
+import type { HomepageContentRow } from "@/types/supabase-cms"
+
+/** Media rows keyed by UUID for resolving homepage_image fields. */
+export type HomepageMediaLookup = Record<string, { public_url: string; alt_text: string | null }>
+
+/** Coerce partially-known `homepage_content` JSON (e.g. before optional migration columns exist) into a full row shape. */
+export function homepageContentRowFromUnknown(raw: Record<string, unknown>): HomepageContentRow {
+  return hydrateRow(raw as Partial<HomepageContentRow> & Pick<HomepageContentRow, "id" | "updated_at">)
+}
+
+function hydrateRow(raw: Partial<HomepageContentRow> & Pick<HomepageContentRow, "id" | "updated_at">): HomepageContentRow {
+  const e = ""
+  return {
+    id: raw.id,
+    hero_headline_line1: raw.hero_headline_line1 ?? e,
+    hero_headline_line2: raw.hero_headline_line2 ?? e,
+    hero_subtitle: raw.hero_subtitle ?? e,
+    hero_image_media_id: raw.hero_image_media_id ?? null,
+    hero_cta_primary_label: raw.hero_cta_primary_label ?? e,
+    hero_cta_primary_href: raw.hero_cta_primary_href ?? "/services",
+    hero_cta_secondary_label: raw.hero_cta_secondary_label ?? e,
+    hero_cta_secondary_href: raw.hero_cta_secondary_href ?? "/locations",
+    about_preview_text: raw.about_preview_text ?? e,
+    restaurant_highlight_text: raw.restaurant_highlight_text ?? e,
+    carwash_intro_text: raw.carwash_intro_text ?? e,
+    mini_market_intro_text: raw.mini_market_intro_text ?? e,
+    services_intro_title: raw.services_intro_title ?? e,
+    services_intro_body: raw.services_intro_body ?? e,
+    services_intro_media_id: raw.services_intro_media_id ?? null,
+    restaurant_home_headline_primary: raw.restaurant_home_headline_primary ?? e,
+    restaurant_home_headline_accent: raw.restaurant_home_headline_accent ?? e,
+    restaurant_home_main_media_id: raw.restaurant_home_main_media_id ?? null,
+    restaurant_home_float_1_media_id: raw.restaurant_home_float_1_media_id ?? null,
+    restaurant_home_float_2_media_id: raw.restaurant_home_float_2_media_id ?? null,
+    carwash_intro_media_id: raw.carwash_intro_media_id ?? null,
+    mini_market_intro_media_id: raw.mini_market_intro_media_id ?? null,
+    locations_band_kicker: raw.locations_band_kicker ?? e,
+    locations_band_heading: raw.locations_band_heading ?? e,
+    locations_band_subtitle: raw.locations_band_subtitle ?? e,
+    updated_at: raw.updated_at,
+    updated_by: raw.updated_by ?? null,
+  }
+}
+
+/**
+ * Loads `homepage_content` + related `media_uploads` URLs for anon RLS-approved reads.
+ * One React request caches to a single fetch (called from multiple Suspense shells).
+ */
+export const getPublicHomepageSingleton = cache(async (): Promise<{ row: HomepageContentRow | null; media: HomepageMediaLookup }> => {
+  const supabase = createPublicSupabaseServerClient()
+  if (!supabase) {
+    return { row: null, media: {} }
+  }
+
+  const { data: rawRow, error } = await supabase.from("homepage_content").select("*").eq("id", 1).maybeSingle()
+  if (error) {
+    console.warn("[getPublicHomepageSingleton] Falling back:", error.message)
+    return { row: null, media: {} }
+  }
+  if (!rawRow) {
+    return { row: null, media: {} }
+  }
+
+  const base = homepageContentRowFromUnknown(rawRow as Record<string, unknown>)
+  const idList = [
+    base.hero_image_media_id,
+    base.services_intro_media_id,
+    base.restaurant_home_main_media_id,
+    base.restaurant_home_float_1_media_id,
+    base.restaurant_home_float_2_media_id,
+    base.carwash_intro_media_id,
+    base.mini_market_intro_media_id,
+  ].filter((x): x is string => typeof x === "string" && x.length > 0)
+
+  let media: HomepageMediaLookup = {}
+  if (idList.length > 0) {
+    const { data: uploads, error: mErr } = await supabase
+      .from("media_uploads")
+      .select("id, public_url, alt_text")
+      .in("id", idList)
+    if (mErr) {
+      console.warn("[getPublicHomepageSingleton] Media lookup failed:", mErr.message)
+    } else {
+      media = Object.fromEntries(
+        (uploads ?? []).map((u: { id: string; public_url: string | null; alt_text: string | null }) => [
+          u.id,
+          { public_url: u.public_url ?? "", alt_text: u.alt_text },
+        ])
+      )
+    }
+  }
+
+  return { row: base, media }
+})
+
+/** Merged hero props for `HomeHeroView` (URLs from CMS can be any public string). */
+export type HomeHeroResolved = {
+  imageSrc: string
+  imageAlt: string
+  badge: string
+  titleLine1: string
+  titleLine2: string
+  subtitle: string
+  primaryCta: { label: string; href: string }
+  secondaryCta: { label: string; href: string }
+}
+
+export function heroFromHomepageCMS(row: HomepageContentRow | null, media: HomepageMediaLookup): HomeHeroResolved {
+  const heroId = row?.hero_image_media_id
+  const dm = heroId ? media[heroId] : undefined
+  const img = dm?.public_url?.trim() || homeHeroDesign.imageSrc
+  const imgAlt = dm?.alt_text?.trim() || homeHeroDesign.imageAlt
+
+  const secondaryLabelRaw = row?.hero_cta_secondary_label?.trim() ?? ""
+
+  return {
+    imageSrc: img,
+    imageAlt: imgAlt,
+    badge: homeHeroDesign.badge,
+    titleLine1: row?.hero_headline_line1?.trim() || homeHeroDesign.titleLine1,
+    titleLine2: row?.hero_headline_line2?.trim() || homeHeroDesign.titleLine2,
+    subtitle: row?.hero_subtitle?.trim() || homeHeroDesign.subtitle,
+    primaryCta: {
+      label: row?.hero_cta_primary_label?.trim() || homeHeroDesign.primaryCta.label,
+      href: row?.hero_cta_primary_href?.trim() || homeHeroDesign.primaryCta.href,
+    },
+    secondaryCta: {
+      label:
+        row === null ? homeHeroDesign.secondaryCta.label : secondaryLabelRaw,
+      href: secondaryLabelRaw
+        ? (row!.hero_cta_secondary_href?.trim() || homeHeroDesign.secondaryCta.href)
+        : row === null
+          ? homeHeroDesign.secondaryCta.href
+          : "/locations",
+    },
+  }
+}
+
+/** Dark-band services intro (“Elite fueling”) copy + imagery. */
+export function servicesIntroEliteFromCMS(row: HomepageContentRow | null, media: HomepageMediaLookup) {
+  const mock = homeBeyondDesign.elite
+  const mid = row?.services_intro_media_id
+  const dm = mid ? media[mid] : undefined
+  return {
+    title: row?.services_intro_title?.trim() || mock.title,
+    body: row?.services_intro_body?.trim() || mock.body,
+    imageSrc: dm?.public_url?.trim() || mock.imageSrc,
+    imageAlt: dm?.alt_text?.trim() || mock.imageAlt,
+    chips: [...mock.chips] as typeof mock.chips,
+  }
+}
+
+/** Carwash / Mini market teaser cards beneath the elite band — playground stays mocked. */
+export function secondaryHomeServiceCardsFromCMS(row: HomepageContentRow | null, media: HomepageMediaLookup) {
+  const carwashMock = homeBeyondDesign.secondaryServices.find((s) => s.key === "detailing")!
+  const marketMock = homeBeyondDesign.secondaryServices.find((s) => s.key === "market")!
+  const cMedia = row?.carwash_intro_media_id ? media[row.carwash_intro_media_id] : undefined
+  const mMedia = row?.mini_market_intro_media_id ? media[row.mini_market_intro_media_id] : undefined
+
+  const carwash = {
+    ...carwashMock,
+    body: row?.carwash_intro_text?.trim() || carwashMock.body,
+    imageSrc: cMedia?.public_url?.trim() || carwashMock.imageSrc,
+    imageAlt: cMedia?.alt_text?.trim() || carwashMock.imageAlt,
+  }
+
+  const market = {
+    ...marketMock,
+    body: row?.mini_market_intro_text?.trim() || marketMock.body,
+    imageSrc: mMedia?.public_url?.trim() || marketMock.imageSrc,
+    imageAlt: mMedia?.alt_text?.trim() || marketMock.imageAlt,
+  }
+
+  return { carwash, market }
+}
+
+/** Homepage restaurant luxury block merged with singleton + media. */
+export function restaurantLuxuryFromCMS(row: HomepageContentRow | null, media: HomepageMediaLookup) {
+  const r = homeBeyondDesign.restaurant
+  const mm = row?.restaurant_home_main_media_id ? media[row.restaurant_home_main_media_id] : undefined
+  const f1 = row?.restaurant_home_float_1_media_id ? media[row.restaurant_home_float_1_media_id] : undefined
+  const f2 = row?.restaurant_home_float_2_media_id ? media[row.restaurant_home_float_2_media_id] : undefined
+
+  return {
+    headlinePrimary:
+      row?.restaurant_home_headline_primary?.trim() || "Curated Dining.",
+    headlineAccent:
+      row?.restaurant_home_headline_accent?.trim() || "Refined Pause.",
+    body: row?.restaurant_highlight_text?.trim() || r.body,
+    ctaHref: r.ctaHref,
+    mainImage: mm?.public_url?.trim() || r.mainImage,
+    mainImageAlt: mm?.alt_text?.trim() || r.mainImageAlt,
+    float1: f1?.public_url?.trim() || r.float1,
+    float1Alt: f1?.alt_text?.trim() || r.float1Alt,
+    float2: f2?.public_url?.trim() || r.float2,
+    float2Alt: f2?.alt_text?.trim() || r.float2Alt,
+  }
+}
