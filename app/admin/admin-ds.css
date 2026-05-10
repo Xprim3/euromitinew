@@ -1,0 +1,51 @@
+/**
+ * Euromiti Admin Design System (Phase 1).
+ * Scoped to `[data-admin-design-system]` so tokens apply under the admin panel layout
+ * without affecting the public site. `.euromiti-admin-ds` is an optional alias for the same scope.
+ */
+[data-admin-design-system],
+.euromiti-admin-ds {
+  --admin-canvas: #f1f5f9;
+  --admin-sidebar: #0f172a;
+  --admin-sidebar-foreground: #f8fafc;
+  --admin-sidebar-muted: #94a3b8;
+  --admin-sidebar-hover: rgba(255, 255, 255, 0.06);
+  --admin-sidebar-active-bg: rgba(255, 255, 255, 0.08);
+  --admin-accent-active: #b91c1c;
+  --admin-accent-gold: #b8860b;
+  --admin-surface: #ffffff;
+  --admin-border: #e2e8f0;
+  --admin-border-strong: #cbd5e1;
+  --admin-text: #0f172a;
+  --admin-text-muted: #64748b;
+  --admin-shadow-card: 0 1px 3px rgba(15, 23, 42, 0.08);
+  --admin-shadow-hover: 0 10px 15px -3px rgba(15, 23, 42, 0.12);
+  --admin-radius-input: 0.5rem;
+  --admin-radius-card: 0.5rem;
+  --admin-space-unit: 8px;
+  --admin-sidebar-width: 280px;
+  --admin-content-max: 1440px;
+  --admin-focus-ring: #0f172a;
+}
+
+[data-admin-design-system] {
+  color: var(--admin-text);
+  background-color: var(--admin-canvas);
+}
+
+[data-admin-design-system] *,
+[data-admin-design-system] *::before,
+[data-admin-design-system] *::after {
+  box-sizing: border-box;
+}
+
+.euromiti-admin-ds {
+  color: var(--admin-text);
+  background-color: var(--admin-canvas);
+}
+
+.euromiti-admin-ds *,
+.euromiti-admin-ds *::before,
+.euromiti-admin-ds *::after {
+  box-sizing: border-box;
+}

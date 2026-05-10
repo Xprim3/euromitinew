@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 
-import { AdminPageHeader } from "@/components/admin/AdminPageHeader"
 import { Button } from "@/components/ui/button"
 import { listNewsPostsAdmin } from "@/lib/data/news-admin"
 import { formatNewsDate } from "@/lib/format-news-date"
@@ -21,17 +20,12 @@ export default async function AdminNewsPage() {
   const rows = await listNewsPostsAdmin()
 
   return (
-    <>
-      <AdminPageHeader
-        title="News"
-        description="Create and manage posts for `/news` and `/news/[slug]`. Published items appear on the public site."
-        actions={
-          <Button type="button" size="sm" variant="secondary" render={<Link href="/admin/news/new" />}>
-            New article
-          </Button>
-        }
-      />
-      <div className="flex-1 space-y-6 px-6 py-8 md:px-8 lg:px-10">
+    <div className="space-y-6">
+      <div className="flex flex-wrap justify-end gap-2">
+        <Button type="button" size="sm" variant="secondary" render={<Link href="/admin/news/new" />}>
+          New article
+        </Button>
+      </div>
         <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/45">
           <table className="w-full border-collapse text-left text-sm">
             <thead className="border-zinc-800 border-b bg-zinc-900/70 text-xs text-zinc-400 uppercase tracking-wide">
@@ -105,7 +99,6 @@ export default async function AdminNewsPage() {
             </tbody>
           </table>
         </div>
-      </div>
-    </>
+    </div>
   )
 }

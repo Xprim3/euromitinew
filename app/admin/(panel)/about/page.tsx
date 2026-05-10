@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 
 import { AboutContentForm, type AboutMediaPreviews } from "@/components/admin/AboutContentForm"
-import { AdminPageHeader } from "@/components/admin/AdminPageHeader"
 import {
   normalizeAboutRow,
   valueCardsFromDb,
@@ -86,38 +85,30 @@ export default async function AdminAboutPage() {
   const result = await loadAbout()
 
   return (
-    <>
-      <AdminPageHeader
-        title="About Us page"
-        description="Marketing copy & images at `/about` — singleton `about_content` (id = 1)."
-      />
-      <div className="flex-1 space-y-6 px-6 py-8 md:px-8 lg:px-10">
-        {!result.ok ? (
-          <p
-            role="alert"
-            className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-amber-100 text-sm"
-          >
-            {result.message}
+    <div className="space-y-6">
+      {!result.ok ? (
+        <p
+          role="alert"
+          className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-amber-100 text-sm"
+        >
+          {result.message}
+        </p>
+      ) : (
+        <>
+          <p className="rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-4 py-3 text-emerald-100/95 text-sm">
+            Saves revalidate <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">/about</code> automatically.
           </p>
-        ) : (
-          <>
-            <p className="rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-4 py-3 text-emerald-100/95 text-sm">
-              Saves revalidate{" "}
-              <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">/about</code> automatically.
-            </p>
-            <p className="text-sm text-zinc-500">
-              Last updated{" "}
-              <span className="text-zinc-400">{formatNewsDate(result.row.updated_at)}</span>
-            </p>
-            <AboutContentForm
-              key={result.row.updated_at}
-              initial={result.row}
-              previews={result.previews}
-              valueSlots={result.valueSlots}
-            />
-          </>
-        )}
-      </div>
-    </>
+          <p className="text-sm text-zinc-500">
+            Last updated <span className="text-zinc-400">{formatNewsDate(result.row.updated_at)}</span>
+          </p>
+          <AboutContentForm
+            key={result.row.updated_at}
+            initial={result.row}
+            previews={result.previews}
+            valueSlots={result.valueSlots}
+          />
+        </>
+      )}
+    </div>
   )
 }

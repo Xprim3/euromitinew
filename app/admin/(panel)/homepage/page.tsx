@@ -1,6 +1,5 @@
 import type { Metadata } from "next"
 
-import { AdminPageHeader } from "@/components/admin/AdminPageHeader"
 import type { HomepageMediaPreviews } from "@/components/admin/HomepageContentForm"
 import { HomepageContentForm } from "@/components/admin/HomepageContentForm"
 import { homepageContentRowFromUnknown } from "@/lib/data/homepage-singleton-public"
@@ -86,12 +85,7 @@ export default async function AdminHomepagePage() {
   const result = await loadHomepage()
 
   return (
-    <>
-      <AdminPageHeader
-        title="Homepage content"
-        description="Marketing homepage singleton (id = 1) — synced to `/` hero, services intro, teaser cards, restaurant band, locations copy, plus live fuel SKUs."
-      />
-      <div className="flex-1 space-y-6 px-6 py-8 md:px-8 lg:px-10">
+    <div className="space-y-6">
         <p className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-emerald-100/95 text-sm">
           The public homepage reads from <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">homepage_content</code>,{" "}
           <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">fuel_prices</code>, and{" "}
@@ -114,7 +108,6 @@ export default async function AdminHomepagePage() {
             <HomepageContentForm key={result.row.updated_at} initial={result.row} mediaPreviews={result.previews} />
           </>
         )}
-      </div>
-    </>
+    </div>
   )
 }

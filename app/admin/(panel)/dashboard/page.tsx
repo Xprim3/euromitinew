@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowUpRight, Flame, MapPin } from "lucide-react"
 
-import { AdminPageHeader } from "@/components/admin/AdminPageHeader"
 import { Button } from "@/components/ui/button"
 import {
   mockAdminActivity,
@@ -17,12 +16,7 @@ export const metadata: Metadata = {
 
 export default function AdminDashboardPage() {
   return (
-    <>
-      <AdminPageHeader
-        title="Dashboard"
-        description="High-level overview — all data below is mocked for Phase 5 UI."
-      />
-      <div className="flex-1 space-y-10 px-6 py-8 md:px-8 lg:px-10">
+    <div className="space-y-10">
         <section>
           <h2 className="sr-only">Key metrics</h2>
           <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -122,7 +116,6 @@ export default function AdminDashboardPage() {
             </ul>
           </div>
         </section>
-      </div>
-    </>
+    </div>
   )
 }

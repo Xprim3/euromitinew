@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 import Link from "next/link"
 
 import { DeleteLocationForm } from "@/components/admin/DeleteLocationForm"
-import { AdminPageHeader } from "@/components/admin/AdminPageHeader"
 import { Button } from "@/components/ui/button"
 import { normalizeLocationRow } from "@/lib/data/locations-admin-shared"
 import { formatNewsDate } from "@/lib/format-news-date"
@@ -32,17 +31,12 @@ export default async function AdminLocationsPage() {
   }
 
   return (
-    <>
-      <AdminPageHeader
-        title="Locations"
-        description="Forecourt records for `/locations` — backed by Supabase `locations` and `location_images`."
-        actions={
-          <Button type="button" size="sm" variant="secondary" render={<Link href="/admin/locations/new" />}>
-            Add location
-          </Button>
-        }
-      />
-      <div className="flex-1 space-y-6 px-6 py-8 md:px-8 lg:px-10">
+    <div className="space-y-6">
+      <div className="flex flex-wrap justify-end gap-2">
+        <Button type="button" size="sm" variant="secondary" render={<Link href="/admin/locations/new" />}>
+          Add location
+        </Button>
+      </div>
         <p className="rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-4 py-3 text-emerald-100/95 text-sm">
           Saving or deleting revalidates the public{" "}
           <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">/locations</code> route.
@@ -113,7 +107,6 @@ export default async function AdminLocationsPage() {
             ))}
           </ul>
         ) : null}
-      </div>
-    </>
+    </div>
   )
 }

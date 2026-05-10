@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 
 import { saveRestaurantContent } from "@/app/admin/(panel)/restaurant/actions"
-import { AdminPageHeader } from "@/components/admin/AdminPageHeader"
 import { RestaurantContentForm } from "@/components/admin/RestaurantContentForm"
 import { galleryDraftsFromRow, menuDraftsFromRow } from "@/lib/data/restaurant-admin-slots"
 import { normalizeRestaurantContentRow } from "@/lib/data/restaurant-content-public"
@@ -19,23 +18,21 @@ export default async function AdminRestaurantPage() {
 
     if (error) {
       return (
-        <>
-          <AdminPageHeader title="Restaurant content" />
-          <p role="alert" className="mx-8 mt-6 text-red-300 text-sm">
+        <div className="space-y-6">
+          <p role="alert" className="text-red-300 text-sm">
             {error.message}
           </p>
-        </>
+        </div>
       )
     }
 
     if (!raw) {
       return (
-        <>
-          <AdminPageHeader title="Restaurant content" />
-          <p role="alert" className="mx-8 mt-6 text-amber-100 text-sm">
+        <div className="space-y-6">
+          <p role="alert" className="text-amber-100 text-sm">
             No <code className="rounded bg-zinc-800 px-1">restaurant_content</code> row — run Phase 10 migrations.
           </p>
-        </>
+        </div>
       )
     }
 
@@ -71,40 +68,33 @@ export default async function AdminRestaurantPage() {
     const galleryDrafts = galleryDraftsFromRow(row, urlMap)
 
     return (
-      <>
-        <AdminPageHeader
-          title="Restaurant content"
-          description="Singleton `restaurant_content` (id = 1) — hero, story, menu highlights, atmosphere gallery, desk contact."
+      <div className="space-y-6">
+        <p className="rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-4 py-3 text-emerald-100/95 text-sm">
+          Saves revalidate <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">/restaurant</code>. Digital menu
+          (Skanom), experience pillars, and per-city cards stay static; the “Restaurant desk” band uses hours, phone,
+          email, and notes below.
+        </p>
+        <p className="text-sm text-zinc-500">
+          Last updated <span className="text-zinc-400">{formatNewsDate(row.updated_at)}</span>
+        </p>
+        <RestaurantContentForm
+          key={row.updated_at}
+          submitAction={saveRestaurantContent}
+          initial={row}
+          heroPreviewUrl={heroPreviewUrl}
+          menuDrafts={menuDrafts}
+          galleryDrafts={galleryDrafts}
         />
-        <div className="flex-1 space-y-6 px-6 py-8 md:px-8 lg:px-10">
-          <p className="rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-4 py-3 text-emerald-100/95 text-sm">
-            Saves revalidate <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">/restaurant</code>. Digital
-            menu (Skanom), experience pillars, and per-city cards stay static; the “Restaurant desk” band uses hours,
-            phone, email, and notes below.
-          </p>
-          <p className="text-sm text-zinc-500">
-            Last updated <span className="text-zinc-400">{formatNewsDate(row.updated_at)}</span>
-          </p>
-          <RestaurantContentForm
-            key={row.updated_at}
-            submitAction={saveRestaurantContent}
-            initial={row}
-            heroPreviewUrl={heroPreviewUrl}
-            menuDrafts={menuDrafts}
-            galleryDrafts={galleryDrafts}
-          />
-        </div>
-      </>
+      </div>
     )
   } catch {
     return (
-      <>
-        <AdminPageHeader title="Restaurant content" />
-        <p role="alert" className="mx-8 mt-6 text-amber-100 text-sm">
+      <div className="space-y-6">
+        <p role="alert" className="text-amber-100 text-sm">
           Supabase is not configured. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to{" "}
           <code className="rounded bg-zinc-800 px-1">.env.local</code>.
         </p>
-      </>
+      </div>
     )
   }
 }

@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 
 import { saveSiteContactAction } from "@/app/admin/(panel)/site/actions"
-import { AdminPageHeader } from "@/components/admin/AdminPageHeader"
 import { SiteContactForm } from "@/components/admin/SiteContactForm"
 import { getContactInfoAdmin, getLogoPreviewUrlAdmin, getSiteSettingsAdmin } from "@/lib/data/site-contact-admin"
 import type { ContactInfoRow, SiteSettingsRow } from "@/types/supabase-cms"
@@ -43,14 +42,8 @@ export default async function AdminSiteContactPage() {
   const logoPreviewUrl = await getLogoPreviewUrlAdmin(site.logo_media_id)
 
   return (
-    <>
-      <AdminPageHeader
-        title="Site & contact"
-        description="Footer copy, logo, social URLs, and the headquarters block on `/contact` (singleton rows in Supabase)."
-      />
-      <div className="flex-1 px-6 py-8 md:px-8 lg:px-10">
-        <SiteContactForm site={site} contact={contact} logoPreviewUrl={logoPreviewUrl} submitAction={saveSiteContactAction} />
-      </div>
-    </>
+    <div className="space-y-6">
+      <SiteContactForm site={site} contact={contact} logoPreviewUrl={logoPreviewUrl} submitAction={saveSiteContactAction} />
+    </div>
   )
 }

@@ -1,6 +1,5 @@
 import type { Metadata } from "next"
 
-import { AdminPageHeader } from "@/components/admin/AdminPageHeader"
 import { MockPersistHint } from "@/components/admin/MockPersistHint"
 import { Button } from "@/components/ui/button"
 import { mockAdminMediaAssets } from "@/data/mock/admin"
@@ -13,20 +12,15 @@ export const metadata: Metadata = {
 
 export default function AdminMediaPage() {
   return (
-    <>
-      <AdminPageHeader
-        title="Media library"
-        description="Uploaded photography and collateral — wire to storage in Phase 6+."
-        actions={
-          <Button type="button" size="sm" variant="secondary" disabled>
-            Upload files (mock)
-          </Button>
-        }
-      />
-      <div className="flex-1 space-y-6 px-6 py-8 md:px-8 lg:px-10">
-        <MockPersistHint />
+    <div className="space-y-6">
+      <div className="flex flex-wrap justify-end gap-2">
+        <Button type="button" size="sm" variant="secondary" disabled>
+          Upload files (mock)
+        </Button>
+      </div>
+      <MockPersistHint />
 
-        <div
+      <div
           role="presentation"
           className="flex min-h-[8rem] flex-col items-center justify-center rounded-xl border border-zinc-800 border-dashed bg-zinc-900/35 px-6 py-10 text-center"
         >
@@ -76,8 +70,7 @@ export default function AdminMediaPage() {
               ))}
             </tbody>
           </table>
-        </div>
       </div>
-    </>
+    </div>
   )
 }

@@ -1,6 +1,5 @@
 import type { Metadata } from "next"
 
-import { AdminPageHeader } from "@/components/admin/AdminPageHeader"
 import { ServicesContentForm, type ServicesMediaPreviews } from "@/components/admin/ServicesContentForm"
 import { normalizeServicesRow } from "@/lib/data/services-content-public"
 import { formatNewsDate } from "@/lib/format-news-date"
@@ -74,12 +73,7 @@ export default async function AdminServicesPage() {
   const result = await loadServices()
 
   return (
-    <>
-      <AdminPageHeader
-        title="Services page"
-        description="Marketing copy & images at `/services` — singleton `services_content` (id = 1)."
-      />
-      <div className="flex-1 space-y-6 px-6 py-8 md:px-8 lg:px-10">
+    <div className="space-y-6">
         {!result.ok ? (
           <p
             role="alert"
@@ -101,7 +95,6 @@ export default async function AdminServicesPage() {
             <ServicesContentForm key={result.row.updated_at} initial={result.row} previews={result.previews} />
           </>
         )}
-      </div>
-    </>
+    </div>
   )
 }

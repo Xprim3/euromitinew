@@ -3,7 +3,6 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 
 import { updateLocationAction } from "@/app/admin/(panel)/locations/actions"
-import { AdminPageHeader } from "@/components/admin/AdminPageHeader"
 import { LocationEditorForm } from "@/components/admin/LocationEditorForm"
 import { Button } from "@/components/ui/button"
 import {
@@ -70,10 +69,11 @@ export default async function AdminEditLocationPage({ params }: PageProps) {
     supabase = await createSupabaseServerClient()
   } catch {
     return (
-      <>
-        <AdminPageHeader title="Edit location" />
-        <p className="px-10 py-6 text-sm text-red-300">Supabase is not configured in this environment.</p>
-      </>
+      <div className="space-y-6">
+        <p className="text-sm text-red-300" role="alert">
+          Supabase is not configured in this environment.
+        </p>
+      </div>
     )
   }
 
@@ -81,12 +81,11 @@ export default async function AdminEditLocationPage({ params }: PageProps) {
 
   if (error) {
     return (
-      <>
-        <AdminPageHeader title="Edit location" />
-        <p className="px-10 py-6 text-sm text-red-300" role="alert">
+      <div className="space-y-6">
+        <p className="text-sm text-red-300" role="alert">
           {error.message}
         </p>
-      </>
+      </div>
     )
   }
 
@@ -98,24 +97,18 @@ export default async function AdminEditLocationPage({ params }: PageProps) {
   const gallerySlots = "error" in g ? emptyGalleryDraft() : g.draft
 
   return (
-    <>
-      <AdminPageHeader
-        title={`Edit · ${row.city}`}
-        description="Changes apply immediately after save (RLS + public revalidation)."
-        actions={
-          <Button type="button" size="sm" variant="outline" render={<Link href="/admin/locations" />}>
-            Back to list
-          </Button>
-        }
-      />
+    <div className="space-y-6">
+      <div className="flex flex-wrap justify-end gap-2">
+        <Button type="button" size="sm" variant="outline" render={<Link href="/admin/locations" />}>
+          Back to list
+        </Button>
+      </div>
       {"error" in g ? (
-        <p className="mx-10 mt-6 rounded-lg border border-amber-500/35 bg-amber-500/10 px-4 py-3 text-amber-100 text-sm">
+        <p className="rounded-lg border border-amber-500/35 bg-amber-500/10 px-4 py-3 text-amber-100 text-sm">
           Gallery thumbnails could not be loaded ({g.error}). Slots are empty—you can re-upload images.
         </p>
       ) : null}
-      <div className="flex-1 px-6 py-8 md:px-8 lg:px-10">
-        <LocationEditorForm key={row.updated_at} mode="edit" submitAction={updateLocationAction} initial={row} gallerySlots={gallerySlots} />
-      </div>
-    </>
+      <LocationEditorForm key={row.updated_at} mode="edit" submitAction={updateLocationAction} initial={row} gallerySlots={gallerySlots} />
+    </div>
   )
 }

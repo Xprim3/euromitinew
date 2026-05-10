@@ -1,6 +1,5 @@
 import type { Metadata } from "next"
 
-import { AdminPageHeader } from "@/components/admin/AdminPageHeader"
 import { MockPersistHint } from "@/components/admin/MockPersistHint"
 import { adminInputClass } from "@/components/admin/cn-admin"
 import { Button } from "@/components/ui/button"
@@ -13,20 +12,15 @@ export const metadata: Metadata = {
 
 export default function AdminFuelPricesPage() {
   return (
-    <>
-      <AdminPageHeader
-        title="Fuel prices"
-        description="Retail pump prices surfaced on the marketing homepage (“Today’s Fuel Rates”)."
-        actions={
-          <Button type="button" size="sm" variant="secondary" disabled>
-            Publish snapshot
-          </Button>
-        }
-      />
-      <div className="flex-1 space-y-6 px-6 py-8 md:px-8 lg:px-10">
-        <MockPersistHint />
+    <div className="space-y-6">
+      <div className="flex flex-wrap justify-end gap-2">
+        <Button type="button" size="sm" variant="secondary" disabled>
+          Publish snapshot
+        </Button>
+      </div>
+      <MockPersistHint />
 
-        <form className="space-y-4" aria-label="Fuel price editor (mock)">
+      <form className="space-y-4" aria-label="Fuel price editor (mock)">
           <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/45">
             <table className="w-full border-collapse text-left text-sm">
               <thead className="border-zinc-800 border-b bg-zinc-900/70 text-xs text-zinc-400 uppercase tracking-wide">
@@ -82,8 +76,7 @@ export default function AdminFuelPricesPage() {
               Save draft (mock)
             </Button>
           </div>
-        </form>
-      </div>
-    </>
+      </form>
+    </div>
   )
 }
