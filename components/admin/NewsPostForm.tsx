@@ -1,12 +1,21 @@
 "use client"
 
-import Image from "next/image"
-import { useActionState, useEffect } from "react"
+import { useActionState, useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 
 import type { NewsPostSaveState } from "@/app/admin/(panel)/news/actions"
-import { adminInputClass, adminLabelClass } from "@/components/admin/cn-admin"
-import { ServicesSaveSubmitButton } from "@/components/admin/ServicesSaveSubmitButton"
+import {
+  AdminContentGrid,
+  AdminSectionCard,
+  ErrorMessage,
+  FileUploadInput,
+  SaveBar,
+  SelectInput,
+  SuccessMessage,
+  TextareaInput,
+  TextInput,
+  ToggleInput,
+} from "@/components/admin/design-system"
 import { bodyParagraphsFromJson } from "@/lib/data/news-public"
 import { NEWS_ADMIN_CATEGORIES } from "@/lib/validations/news-admin"
 import type { NewsPostRow } from "@/types/supabase-cms"
@@ -20,8 +29,17 @@ type NewsPostFormProps = {
   heroPreviewUrl: string | null
 }
 
+function toDatetimeLocal(value: string | null | undefined) {
+  if (!value) return ""
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return ""
+  const offsetMs = date.getTimezoneOffset() * 60_000
+  return new Date(date.getTime() - offsetMs).toISOString().slice(0, 16)
+}
+
 export function NewsPostForm({ mode, submitAction, initial, heroPreviewUrl }: NewsPostFormProps) {
   const router = useRouter()
+  const formRef = useRef<HTMLFormElement>(null)
   const [state, formAction] = useActionState(submitAction, initialSave)
 
   const fieldErrors = state.ok === false && "fieldErrors" in state ? state.fieldErrors : undefined
@@ -38,191 +56,145 @@ export function NewsPostForm({ mode, submitAction, initial, heroPreviewUrl }: Ne
 
   const statusDefault =
     initial?.status === "published" ? "published" : initial?.status === "archived" ? "archived" : "draft"
+  const [published, setPublished] = useState(statusDefault === "published")
 
   const cats = NEWS_ADMIN_CATEGORIES as readonly string[]
   const categoryDefault =
     initial?.category && cats.includes(initial.category) ? initial.category : NEWS_ADMIN_CATEGORIES[0]
+  const categoryOptions = NEWS_ADMIN_CATEGORIES.map((category) => ({ value: category, label: category }))
 
   return (
-    <form action={formAction} className="max-w-4xl space-y-10 pb-24">
+    <form ref={formRef} action={formAction} className="space-y-6 pb-24">
       {mode === "edit" && initial ? <input type="hidden" name="id" value={initial.id} /> : null}
+      <input type="hidden" name="status" value={published ? "published" : "draft"} />
 
       {state.ok === true ? (
-        <p
-          role="status"
-          className="rounded-lg border border-emerald-500/35 bg-emerald-500/15 px-4 py-3 text-emerald-100 text-sm"
-        >
+        <SuccessMessage title="Post saved">
           {state.message}
-        </p>
+        </SuccessMessage>
       ) : null}
       {state.ok === false && "message" in state ? (
-        <p
-          role="alert"
-          className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-red-100 text-sm"
-        >
+        <ErrorMessage title="Could not save post">
           {state.message}
-        </p>
+        </ErrorMessage>
       ) : null}
       {hasFieldErrors ? (
-        <p className="rounded-lg border border-zinc-700 bg-zinc-900/80 px-4 py-3 text-sm text-zinc-400">
+        <ErrorMessage title="Check the highlighted fields">
           Fix the highlighted fields and try again.
-        </p>
+        </ErrorMessage>
       ) : null}
 
-      <section className="space-y-5 rounded-xl border border-zinc-800 bg-zinc-900/40 p-6">
-        <h2 className="font-heading font-semibold text-lg text-white">Metadata</h2>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="md:col-span-2">
-            <label className={adminLabelClass} htmlFor="title">
-              Title
-            </label>
-            <input
-              id="title"
-              name="title"
-              required
-              defaultValue={initial?.title ?? ""}
-              className={adminInputClass}
-            />
-            {fieldErrors?.title?.[0] ? <p className="mt-1 text-red-400 text-xs">{fieldErrors.title[0]}</p> : null}
-          </div>
-          <div>
-            <label className={adminLabelClass} htmlFor="slug">
-              URL slug (for /news/[slug])
-            </label>
-            <input
-              id="slug"
+      <AdminSectionCard title="Article details" description="Create the public news card and article page content.">
+        <div className="space-y-5">
+          <TextInput
+            label="Title"
+            name="title"
+            required
+            defaultValue={initial?.title ?? ""}
+            error={fieldErrors?.title?.[0]}
+          />
+          <AdminContentGrid columns={2}>
+            <TextInput
+              label="Slug"
               name="slug"
               required
               defaultValue={initial?.slug ?? ""}
               placeholder="my-announcement"
-              className={`${adminInputClass} font-mono text-xs`}
+              helperText="Used for /news/[slug]. Lowercase letters, numbers, and hyphens only."
+              error={fieldErrors?.slug?.[0]}
             />
-            {fieldErrors?.slug?.[0] ? <p className="mt-1 text-red-400 text-xs">{fieldErrors.slug[0]}</p> : null}
-          </div>
-          <div>
-            <label className={adminLabelClass} htmlFor="category">
-              Category
-            </label>
-            <select
-              id="category"
+            <SelectInput
+              label="Category"
               name="category"
               required
-              className={adminInputClass}
+              options={categoryOptions}
               defaultValue={categoryDefault}
-            >
-              {NEWS_ADMIN_CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-            {fieldErrors?.category?.[0] ? <p className="mt-1 text-red-400 text-xs">{fieldErrors.category[0]}</p> : null}
-          </div>
-          <div className="md:col-span-2">
-            <label className={adminLabelClass} htmlFor="excerpt">
-              Excerpt
-            </label>
-            <textarea
-              id="excerpt"
-              name="excerpt"
-              required
-              rows={3}
-              defaultValue={initial?.excerpt ?? ""}
-              className={adminInputClass}
+              error={fieldErrors?.category?.[0]}
             />
-            {fieldErrors?.excerpt?.[0] ? <p className="mt-1 text-red-400 text-xs">{fieldErrors.excerpt[0]}</p> : null}
-          </div>
-          <div>
-            <label className={adminLabelClass} htmlFor="teaser_label">
-              Homepage / archive badge (optional)
-            </label>
-            <input
-              id="teaser_label"
-              name="teaser_label"
-              defaultValue={initial?.teaser_label ?? ""}
-              placeholder='e.g. "Network update"'
-              className={adminInputClass}
-            />
-          </div>
-          <div>
-            <label className={adminLabelClass} htmlFor="status">
-              Status
-            </label>
-            <select id="status" name="status" required className={adminInputClass} defaultValue={statusDefault}>
-              <option value="draft">Draft</option>
-              <option value="published">Published</option>
-              <option value="archived">Archived (hidden)</option>
-            </select>
-            <p className="mt-1 text-xs text-zinc-500">Only Published posts appear on the public site.</p>
-          </div>
-        </div>
-      </section>
-
-      <section className="space-y-5 rounded-xl border border-zinc-800 bg-zinc-900/40 p-6">
-        <h2 className="font-heading font-semibold text-lg text-white">Featured image</h2>
-        {heroPreviewUrl ? (
-          <div className="relative aspect-video w-full max-w-xl overflow-hidden rounded-lg border border-zinc-700">
-            <Image src={heroPreviewUrl} alt="" fill className="object-cover" sizes="(max-width: 768px) 100vw, 36rem" />
-          </div>
-        ) : null}
-
-        {mode === "edit" && (heroPreviewUrl || initial?.hero_media_id) ? (
-          <label className="flex items-center gap-2 text-sm text-zinc-300">
-            <input type="checkbox" name="clear_hero_image" className="size-4 rounded border-zinc-600" />
-            Remove featured image (after save)
-          </label>
-        ) : null}
-
-        <div>
-          <label className={adminLabelClass} htmlFor="hero_image">
-            Upload hero image
-          </label>
-          <input
-            id="hero_image"
-            name="hero_image"
-            type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif"
-            className="block w-full max-w-lg border border-zinc-700 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-100 file:mr-4 file:rounded-md file:border-0 file:bg-zinc-700 file:px-3 file:py-2 file:text-sm file:text-white"
+          </AdminContentGrid>
+          <TextareaInput
+            label="Excerpt"
+            name="excerpt"
+            required
+            rows={4}
+            defaultValue={initial?.excerpt ?? ""}
+            maxLength={2000}
+            showCharacterCount
+            error={fieldErrors?.excerpt?.[0]}
           />
-          <p className="mt-1 text-xs text-zinc-500">JPEG / PNG / WebP / GIF, up to 5 MB.</p>
+          <TextInput
+            label="Homepage / archive badge"
+            name="teaser_label"
+            defaultValue={initial?.teaser_label ?? ""}
+            placeholder='e.g. "Network update"'
+            helperText="Optional short label shown on cards."
+          />
         </div>
+      </AdminSectionCard>
 
-        <div>
-          <label className={adminLabelClass} htmlFor="hero_image_alt">
-            Hero image alt text
-          </label>
-          <input
-            id="hero_image_alt"
+      <AdminSectionCard title="Publishing" description="Draft posts stay hidden from the public News page.">
+        <AdminContentGrid columns={2}>
+          <ToggleInput
+            label="Publish article"
+            checkedLabel="Published"
+            uncheckedLabel="Draft"
+            checked={published}
+            onChange={(event) => setPublished(event.target.checked)}
+            helperText="Published posts appear on /news and their article page."
+          />
+          <TextInput
+            label="Publish date"
+            name="published_at"
+            type="datetime-local"
+            defaultValue={toDatetimeLocal(initial?.published_at)}
+            disabled={!published}
+            helperText={published ? "Leave empty to publish with the current time." : "Enable publishing to set a date."}
+          />
+        </AdminContentGrid>
+      </AdminSectionCard>
+
+      <AdminSectionCard title="Featured image" description="Used on the news archive card and article hero.">
+        <div className="space-y-5">
+          <FileUploadInput
+            label="Image upload"
+            name="hero_image"
+            previewUrl={heroPreviewUrl}
+            previewAlt={initial?.hero_image_alt ?? initial?.title ?? "News featured image"}
+            removeInputName="clear_hero_image"
+          />
+          <TextInput
+            label="Image alt text"
             name="hero_image_alt"
             defaultValue={initial?.hero_image_alt ?? ""}
-            className={adminInputClass}
+            placeholder="Describe the featured image"
           />
         </div>
-      </section>
+      </AdminSectionCard>
 
-      <section className="space-y-5 rounded-xl border border-zinc-800 bg-zinc-900/40 p-6">
-        <h2 className="font-heading font-semibold text-lg text-white">Article body</h2>
-        <div>
-          <label className={adminLabelClass} htmlFor="body_paragraphs">
-            Paragraphs
-          </label>
-          <textarea
-            id="body_paragraphs"
-            name="body_paragraphs"
-            required
-            rows={14}
-            defaultValue={bodyDefault}
-            placeholder="First paragraph...\n\nSecond paragraph..."
-            className={adminInputClass}
-          />
-          {fieldErrors?.body_paragraphs?.[0] ? (
-            <p className="mt-1 text-red-400 text-xs">{fieldErrors.body_paragraphs[0]}</p>
-          ) : null}
-          <p className="mt-1 text-xs text-zinc-500">Separate paragraphs with a blank line.</p>
-        </div>
-      </section>
+      <AdminSectionCard title="Full content" description="The article body shown on the detail page.">
+        <TextareaInput
+          label="Full content"
+          name="body_paragraphs"
+          required
+          rows={16}
+          defaultValue={bodyDefault}
+          placeholder="First paragraph...\n\nSecond paragraph..."
+          helperText="Separate paragraphs with a blank line."
+          error={fieldErrors?.body_paragraphs?.[0]}
+        />
+      </AdminSectionCard>
 
-      <ServicesSaveSubmitButton label={saveLabel} pendingLabel="Saving…" />
+      <SaveBar
+        hasUnsavedChanges
+        unsavedLabel={mode === "create" ? "New post draft" : "Review post changes"}
+        cancelLabel="Reset changes"
+        onCancel={() => {
+          formRef.current?.reset()
+          setPublished(statusDefault === "published")
+        }}
+        submitLabel={saveLabel}
+        submitPendingLabel="Saving…"
+      />
     </form>
   )
 }

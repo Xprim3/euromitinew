@@ -3,9 +3,9 @@ import { getHomepageFuelPrices } from "@/lib/data/get-homepage-fuel-prices"
 
 import { FuelPricesHomeGrid } from "./FuelPricesHomeGrid"
 
-/** Homepage fuel cards — Phase 7 step 1: reads Supabase `fuel_prices` when env vars are set, else mocked data. */
+/** Homepage fuel cards — Supabase `fuel_prices` is the source of truth. */
 export async function HomeFuelPricesGlass() {
-  const items = await getHomepageFuelPrices()
+  const result = await getHomepageFuelPrices()
 
   return (
     <section
@@ -24,7 +24,20 @@ export async function HomeFuelPricesGlass() {
           </h2>
           <SectionAccentRule className="mt-4 md:mt-5" />
         </div>
-        <FuelPricesHomeGrid items={items} />
+        {result.status === "empty" ? (
+          <div className="rounded-[1.25rem] border border-brand-border-muted bg-white px-5 py-8 text-sm text-brand-body-soft">
+            No active fuel prices are configured yet.
+          </div>
+        ) : (
+          <>
+            {result.source === "fallback" ? (
+              <p className="rounded-[1.25rem] border border-amber-500/25 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                {result.message}
+              </p>
+            ) : null}
+            <FuelPricesHomeGrid items={result.items} />
+          </>
+        )}
       </div>
     </section>
   )

@@ -2,6 +2,8 @@
 
 import { useFormStatus } from "react-dom"
 import type { ReactNode } from "react"
+import Link from "next/link"
+import { AlertCircle, CheckCircle2 } from "lucide-react"
 
 import { cnDs } from "./cn-ds"
 import { dsBtnGhost, dsBtnPrimary } from "./ds-button-classes"
@@ -21,7 +23,11 @@ export type SaveBarProps = {
   /** Extra buttons before Cancel (e.g. “Preview”). */
   middle?: ReactNode
   onCancel?: () => void
+  cancelHref?: string
   cancelLabel?: string
+  hasUnsavedChanges?: boolean
+  unsavedLabel?: string
+  savedLabel?: string
   /** When inside `<form action={serverAction}>`, omit and use default submit. */
   submitLabel?: string
   submitPendingLabel?: string
@@ -38,12 +44,30 @@ export function SaveBar({
   leading,
   middle,
   onCancel,
+  cancelHref,
   cancelLabel = "Cancel",
+  hasUnsavedChanges = false,
+  unsavedLabel = "Unsaved changes",
+  savedLabel = "No unsaved changes",
   submitLabel = "Save changes",
   submitPendingLabel,
   showSubmit = true,
   className,
 }: SaveBarProps) {
+  const status = leading ?? (
+    <span
+      className={cnDs(
+        "inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-semibold",
+        hasUnsavedChanges
+          ? "bg-amber-100 text-amber-800"
+          : "bg-emerald-100 text-emerald-800"
+      )}
+    >
+      {hasUnsavedChanges ? <AlertCircle className="size-3.5" aria-hidden /> : <CheckCircle2 className="size-3.5" aria-hidden />}
+      {hasUnsavedChanges ? unsavedLabel : savedLabel}
+    </span>
+  )
+
   return (
     <div
       className={cnDs(
@@ -52,10 +76,14 @@ export function SaveBar({
       )}
     >
       <div className="mx-auto flex w-full max-w-[var(--admin-content-max)] flex-wrap items-center justify-between gap-3">
-        <div className="min-w-0 flex-1 text-sm text-[var(--admin-text-muted)]">{leading}</div>
+        <div className="min-w-0 flex-1 text-sm text-[var(--admin-text-muted)]">{status}</div>
         <div className="flex flex-wrap items-center justify-end gap-2">
           {middle}
-          {onCancel ? (
+          {cancelHref ? (
+            <Link href={cancelHref} className={cnDs(dsBtnGhost)}>
+              {cancelLabel}
+            </Link>
+          ) : onCancel ? (
             <button type="button" className={cnDs(dsBtnGhost)} onClick={onCancel}>
               {cancelLabel}
             </button>

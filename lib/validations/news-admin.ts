@@ -28,6 +28,12 @@ export const newsPostAdminFieldsSchema = z.object({
     .optional()
     .transform((s) => (s && s.length > 0 ? s : undefined)),
   status: z.enum(["draft", "published", "archived"]),
+  published_at: z
+    .string()
+    .trim()
+    .max(80)
+    .optional()
+    .transform((s) => (s && s.length > 0 ? s : undefined)),
   hero_image_alt: z.string().trim().max(500).transform((s) => (s.length ? s : undefined)),
   /** Plain textarea: paragraphs separated by a blank line. */
   body_paragraphs: z.string().max(80000),

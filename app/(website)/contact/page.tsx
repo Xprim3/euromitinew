@@ -7,12 +7,10 @@ import { SectionAccentRule } from "@/components/ui/SectionAccentRule"
 import { Button } from "@/components/ui/button"
 import { MaterialSymbol } from "@/components/ui/MaterialSymbol"
 import { contactPageMock } from "@/data/mock/contact"
-import { LOCATION_HOSPITALITY_EMAIL } from "@/data/mock/locations"
-import { homeHeroDesign, homeStrategicNetworkDesign } from "@/data/mock/homepage-visual"
-import { mockLocations } from "@/data/mock"
+import { homeHeroDesign } from "@/data/mock/homepage-visual"
+import { getLocationsPublicCached } from "@/lib/data/locations-public"
 import { getContactDetailsPublic, type SocialLinkItem } from "@/lib/data/site-contact-public"
 import { cn } from "@/lib/utils"
-import type { LocationSummary } from "@/types/public"
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -24,15 +22,6 @@ export const revalidate = 120
 
 function telHref(phone: string) {
   return `tel:${phone.replace(/\s/g, "")}`
-}
-
-function hospitalityMailHref(locId: LocationSummary["id"]) {
-  const email = LOCATION_HOSPITALITY_EMAIL[locId as keyof typeof LOCATION_HOSPITALITY_EMAIL]
-  return email ? `mailto:${email}` : null
-}
-
-function visualForLocation(id: string) {
-  return homeStrategicNetworkDesign.find((v) => v.locationId === id)
 }
 
 function socialLinkClass() {
@@ -54,12 +43,13 @@ function SocialRow({ links }: { links: readonly SocialLinkItem[] }) {
 }
 
 export default async function ContactPage() {
-  const c = await getContactDetailsPublic()
+  const [c, locationsResult] = await Promise.all([getContactDetailsPublic(), getLocationsPublicCached()])
+  const locations = locationsResult.ok ? locationsResult.rows : []
   const m = contactPageMock
   const mailHref = `mailto:${c.email}`
-  const careersEmail = c.careersEmail?.trim() || m.careersEmail
+  const careersEmail = c.careersEmail.trim()
   const careersMailHref = `mailto:${careersEmail}?subject=Career%20enquiry%20%E2%80%94%20Euromiti`
-  const careersCtaLabel = c.careersApplyCtaLabel?.trim() || m.careersCtaApplyByEmail
+  const careersCtaLabel = c.careersApplyCtaLabel.trim()
 
   return (
     <>
@@ -172,14 +162,14 @@ export default async function ContactPage() {
                     <MaterialSymbol name="schedule" className="mt-0.5 shrink-0 text-xl! text-muted-foreground" aria-hidden />
                     <div>
                       <dt className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">Weekdays</dt>
-                      <dd className="mt-1 text-foreground">{c.weekdayHours ?? m.weekdayHours}</dd>
+                      <dd className="mt-1 text-foreground">{c.weekdayHours}</dd>
                     </div>
                   </div>
                   <div className="flex gap-3">
                     <MaterialSymbol name="today" className="mt-0.5 shrink-0 text-xl! text-muted-foreground" aria-hidden />
                     <div>
                       <dt className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">Weekend</dt>
-                      <dd className="mt-1 text-foreground">{c.weekendHours ?? m.weekendHours}</dd>
+                      <dd className="mt-1 text-foreground">{c.weekendHours}</dd>
                     </div>
                   </div>
                 </dl>
@@ -196,31 +186,30 @@ export default async function ContactPage() {
         <Container>
           <SectionReveal once variant="fade-up">
             <div className="grid gap-6 md:grid-cols-3 lg:gap-8">
-              {mockLocations.map((loc) => {
-                const viz = visualForLocation(loc.id)
-                const guestMailHref = hospitalityMailHref(loc.id)
-                const src = viz?.imageSrc ?? homeHeroDesign.imageSrc
-                const alt = viz?.imageAlt ?? `${loc.city} Euromiti`
-                const routeHint = viz?.addressLine ?? null
+              {locations.map((loc) => {
+                const guestMailHref =
+                  loc.contactEmailDisplay && loc.contactEmailDisplay !== "—" ? `mailto:${loc.contactEmailDisplay}` : null
+                const routeHint = loc.pageHeading && loc.pageHeading !== `${loc.city} station` ? loc.pageHeading : null
                 return (
                   <article
                     key={loc.id}
                     className="flex flex-col overflow-hidden rounded-xl border border-border/80 bg-background shadow-sm transition-[box-shadow,transform] hover:shadow-xl"
                   >
                     <div className="relative aspect-4/3 h-52 w-full shrink-0 md:aspect-auto md:h-52">
-                      <Image src={src} alt={alt} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
-                      {viz?.hubBadge ? (
-                        <span className="absolute top-3 left-3 rounded-md bg-black/72 px-2.5 py-1 font-semibold text-[0.65rem] text-white uppercase tracking-[0.12em] backdrop-blur-sm">
-                          {viz.hubBadge}
-                        </span>
-                      ) : null}
+                      <Image
+                        src={loc.mainImageSrc}
+                        alt={loc.mainImageAlt}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-cover"
+                      />
                     </div>
                     <div className="flex flex-1 flex-col px-6 pt-6 pb-5">
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div>
                           <h3 className="font-heading text-xl font-bold text-foreground">{loc.city}</h3>
-                          {viz?.title ? (
-                            <p className="mt-1 text-sm leading-snug font-medium text-brand-body-soft">{viz.title}</p>
+                          {loc.pageSummary ? (
+                            <p className="mt-1 text-sm leading-snug font-medium text-brand-body-soft">{loc.pageSummary}</p>
                           ) : null}
                         </div>
                       </div>
@@ -266,7 +255,7 @@ export default async function ContactPage() {
                               </dt>
                               <dd className="mt-1">
                                 <a className="break-all font-medium text-foreground hover:text-brand-red-vivid" href={guestMailHref}>
-                                  {LOCATION_HOSPITALITY_EMAIL[loc.id as keyof typeof LOCATION_HOSPITALITY_EMAIL]}
+                                  {loc.contactEmailDisplay}
                                 </a>
                               </dd>
                             </div>

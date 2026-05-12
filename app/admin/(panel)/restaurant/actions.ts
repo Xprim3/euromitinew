@@ -20,6 +20,32 @@ function truthyCheckbox(v: FormDataEntryValue | null) {
   return v === "on" || v === "true"
 }
 
+async function ensureAdminProfile(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  user: { id: string; email?: string | null }
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  const { data: existing, error: existingErr } = await supabase
+    .from("admins")
+    .select("user_id")
+    .eq("user_id", user.id)
+    .maybeSingle()
+
+  if (existingErr) return { ok: false, message: existingErr.message }
+  if (existing) return { ok: true }
+
+  const { error: insertErr } = await supabase
+    .from("admins")
+    .insert({ user_id: user.id, display_name: user.email ?? null })
+
+  if (!insertErr) return { ok: true }
+
+  return {
+    ok: false,
+    message:
+      "Your signed-in user is not in the admins table. Apply the latest RLS repair migration, then save again, or add this user to public.admins.",
+  }
+}
+
 type OptionalUuid = string | null | undefined
 
 function dedupeIds(ids: string[]) {
@@ -139,6 +165,8 @@ export async function saveRestaurantContent(
     }
 
     const editorId = user.id
+    const adminReady = await ensureAdminProfile(supabase, user)
+    if (!adminReady.ok) return { ok: false, message: adminReady.message }
 
     const parsed = restaurantContentFormSchema.safeParse({
       hero_title: formData.get("hero_title"),
@@ -171,6 +199,7 @@ export async function saveRestaurantContent(
     const notesTrim = v.contact_notes?.trim() ?? ""
 
     const patch: Record<string, unknown> = {
+      id: 1,
       hero_title: v.hero_title,
       hero_subtitle: v.hero_subtitle,
       hero_description: v.hero_description,
@@ -185,7 +214,7 @@ export async function saveRestaurantContent(
 
     if (heroR.next !== undefined) patch.hero_image_media_id = heroR.next
 
-    const { error: upErr } = await supabase.from("restaurant_content").update(patch).eq("id", 1)
+    const { error: upErr } = await supabase.from("restaurant_content").upsert(patch, { onConflict: "id" })
     if (upErr) return { ok: false, message: upErr.message }
 
     revalidatePath("/restaurant")

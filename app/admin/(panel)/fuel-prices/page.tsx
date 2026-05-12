@@ -1,82 +1,70 @@
 import type { Metadata } from "next"
 
-import { MockPersistHint } from "@/components/admin/MockPersistHint"
-import { adminInputClass } from "@/components/admin/cn-admin"
-import { Button } from "@/components/ui/button"
-import { mockFuelPrices } from "@/data/mock"
-import { formatNewsDate } from "@/lib/format-news-date"
+import { FuelPricesAdminClient, type AdminFuelPriceRow } from "@/components/admin/FuelPricesAdminClient"
+import { AdminSectionCard, ErrorMessage } from "@/components/admin/design-system"
+import { createSupabaseServerClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
-  title: "Fuel prices",
+  title: "Fuel Prices",
 }
 
-export default function AdminFuelPricesPage() {
+async function loadFuelPrices(): Promise<
+  | { ok: true; rows: AdminFuelPriceRow[] }
+  | { ok: false; message: string }
+> {
+  try {
+    const supabase = await createSupabaseServerClient()
+    const { data, error } = await supabase
+      .from("fuel_prices")
+      .select("id, product_key, fuel_type, price_numeric, currency, label_status, is_active, updated_at")
+      .order("product_key", { ascending: true })
+
+    if (error) return { ok: false, message: error.message }
+
+    return {
+      ok: true,
+      rows: (data ?? []).map((row) => {
+        const r = row as Record<string, unknown>
+        return {
+          id: String(r.id ?? ""),
+          product_key: String(r.product_key ?? ""),
+          fuel_type: String(r.fuel_type ?? ""),
+          price_numeric: typeof r.price_numeric === "number" || typeof r.price_numeric === "string" ? r.price_numeric : 0,
+          currency: String(r.currency ?? "EUR"),
+          label_status: String(r.label_status ?? "active"),
+          is_active: r.is_active !== false,
+          updated_at: String(r.updated_at ?? new Date().toISOString()),
+        }
+      }),
+    }
+  } catch {
+    return {
+      ok: false,
+      message:
+        "Supabase is not configured. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to .env.local.",
+    }
+  }
+}
+
+export default async function AdminFuelPricesPage() {
+  const result = await loadFuelPrices()
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap justify-end gap-2">
-        <Button type="button" size="sm" variant="secondary" disabled>
-          Publish snapshot
-        </Button>
-      </div>
-      <MockPersistHint />
+      <AdminSectionCard
+        title="Fuel prices"
+        description="Update fuel prices shown on the public homepage. Active rows are read by the existing homepage widget."
+      >
+        <p className="text-sm text-[var(--admin-text-muted)]">
+          This page writes to <code className="rounded bg-slate-100 px-1 py-0.5 text-xs">fuel_prices</code> and keeps the public fuel price widgets unchanged.
+        </p>
+      </AdminSectionCard>
 
-      <form className="space-y-4" aria-label="Fuel price editor (mock)">
-          <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/45">
-            <table className="w-full border-collapse text-left text-sm">
-              <thead className="border-zinc-800 border-b bg-zinc-900/70 text-xs text-zinc-400 uppercase tracking-wide">
-                <tr>
-                  <th className="px-4 py-3 font-semibold">Product</th>
-                  <th className="px-4 py-3 font-semibold">Price (€/L)</th>
-                  <th className="hidden px-4 py-3 font-semibold md:table-cell">Status</th>
-                  <th className="hidden px-4 py-3 font-semibold lg:table-cell">Last updated</th>
-                </tr>
-              </thead>
-              <tbody>
-                {mockFuelPrices.map((row) => (
-                  <tr key={row.id} className="border-zinc-800/80 border-b last:border-none">
-                    <td className="px-4 py-3">
-                      <label className="sr-only" htmlFor={`fuel-${row.id}`}>
-                        {row.fuelType}
-                      </label>
-                      <div className="font-medium text-zinc-200">{row.fuelType}</div>
-                      <div className="font-mono text-xs text-zinc-500">{row.id}</div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <input
-                        id={`fuel-${row.id}`}
-                        name={`price_${row.id}`}
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        defaultValue={row.price}
-                        className={`max-w-[8rem] ${adminInputClass}`}
-                      />
-                    </td>
-                    <td className="hidden px-4 py-3 md:table-cell">
-                      <span
-                        className={
-                          row.labelStatus === "active"
-                            ? "inline-flex rounded-full bg-emerald-500/15 px-2 py-1 font-semibold text-emerald-400 text-[0.7rem]"
-                            : "inline-flex rounded-full bg-zinc-500/15 px-2 py-1 font-semibold text-zinc-300 text-[0.7rem]"
-                        }
-                      >
-                        {row.labelStatus}
-                      </span>
-                    </td>
-                    <td className="hidden px-4 py-3 text-zinc-500 lg:table-cell whitespace-nowrap">
-                      {formatNewsDate(row.lastUpdated)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button type="button" disabled variant="outline" className="border-zinc-600 text-zinc-300">
-              Save draft (mock)
-            </Button>
-          </div>
-      </form>
+      {!result.ok ? (
+        <ErrorMessage title="Fuel prices could not load">{result.message}</ErrorMessage>
+      ) : (
+        <FuelPricesAdminClient rows={result.rows} />
+      )}
     </div>
   )
 }

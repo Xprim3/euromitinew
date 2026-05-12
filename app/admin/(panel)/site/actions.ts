@@ -20,6 +20,43 @@ function truthyCheckbox(v: FormDataEntryValue | null) {
   return v === "on" || v === "true"
 }
 
+async function ensureAdminProfile(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  user: { id: string; email?: string | null }
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  const { data: existing, error: existingErr } = await supabase
+    .from("admins")
+    .select("user_id")
+    .eq("user_id", user.id)
+    .maybeSingle()
+
+  if (existingErr) return { ok: false, message: existingErr.message }
+  if (existing) return { ok: true }
+
+  const { error: insertErr } = await supabase
+    .from("admins")
+    .insert({ user_id: user.id, display_name: user.email ?? null })
+
+  if (!insertErr) return { ok: true }
+
+  return {
+    ok: false,
+    message:
+      "Your signed-in user is not in the admins table. Apply the latest RLS repair migration, then save again, or add this user to public.admins.",
+  }
+}
+
+function revalidateContactSurfaces() {
+  revalidatePath("/")
+  revalidatePath("/about")
+  revalidatePath("/services")
+  revalidatePath("/restaurant")
+  revalidatePath("/locations")
+  revalidatePath("/news")
+  revalidatePath("/contact")
+  revalidatePath("/admin/site")
+}
+
 export async function saveSiteContactAction(
   _prev: SiteContactSaveState,
   formData: FormData
@@ -33,6 +70,8 @@ export async function saveSiteContactAction(
     if (authErr || !user) return { ok: false, message: "You must be signed in as an admin." }
 
     const editorId = user.id
+    const adminReady = await ensureAdminProfile(supabase, user)
+    if (!adminReady.ok) return { ok: false, message: adminReady.message }
 
     const parsed = siteContactFormSchema.safeParse({
       phone: formData.get("phone"),
@@ -76,6 +115,7 @@ export async function saveSiteContactAction(
     }
 
     const sitePatch: Record<string, unknown> = {
+      id: 1,
       company_name: v.company_name,
       footer_body: v.footer_body,
       footer_copyright_line: v.footer_copyright_line,
@@ -84,10 +124,11 @@ export async function saveSiteContactAction(
     }
     if (logo_media_id !== undefined) sitePatch.logo_media_id = logo_media_id
 
-    const { error: siteErr } = await supabase.from("site_settings").update(sitePatch).eq("id", 1)
+    const { error: siteErr } = await supabase.from("site_settings").upsert(sitePatch, { onConflict: "id" })
     if (siteErr) return { ok: false, message: siteErr.message }
 
     const contactPatch = {
+      id: 1,
       phone: v.phone,
       email: v.email,
       hq_address: v.hq_address,
@@ -100,12 +141,10 @@ export async function saveSiteContactAction(
       updated_by: editorId,
     }
 
-    const { error: contactErr } = await supabase.from("contact_info").update(contactPatch).eq("id", 1)
+    const { error: contactErr } = await supabase.from("contact_info").upsert(contactPatch, { onConflict: "id" })
     if (contactErr) return { ok: false, message: contactErr.message }
 
-    revalidatePath("/")
-    revalidatePath("/contact")
-    revalidatePath("/admin/site")
+    revalidateContactSurfaces()
 
     return { ok: true, message: "Site contact and footer saved." }
   } catch (e) {

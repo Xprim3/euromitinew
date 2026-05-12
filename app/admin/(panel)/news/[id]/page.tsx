@@ -5,7 +5,7 @@ import { notFound } from "next/navigation"
 import { updateNewsPostAction } from "@/app/admin/(panel)/news/actions"
 import { DeleteNewsPostForm } from "@/components/admin/DeleteNewsPostForm"
 import { NewsPostForm } from "@/components/admin/NewsPostForm"
-import { Button } from "@/components/ui/button"
+import { AdminSectionCard, cnDs, dsBtnSecondary, dsBtnTertiary } from "@/components/admin/design-system"
 import { getMediaPublicUrlAdmin, getNewsPostByIdAdmin } from "@/lib/data/news-admin"
 
 type Props = { params: Promise<{ id: string }> }
@@ -28,17 +28,25 @@ export default async function AdminEditNewsPage({ params }: Props) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap justify-end gap-2">
-        {previewHref ? (
-          <Button type="button" size="sm" variant="secondary" render={<Link href={previewHref} target="_blank" />}>
-            View live
-          </Button>
-        ) : null}
-        <DeleteNewsPostForm id={row.id} slug={row.slug} label={row.title} />
-        <Button type="button" size="sm" variant="outline" render={<Link href="/admin/news" />}>
-          Back to list
-        </Button>
-      </div>
+      <AdminSectionCard
+        title="Edit news post"
+        description={row.status === "published" ? "This post is visible on the public News page." : "This post is currently hidden from the public News page."}
+        headerActions={
+          <>
+            {previewHref ? (
+              <Link href={previewHref} target="_blank" className={cnDs(dsBtnSecondary, "min-h-10 px-4 text-xs")}>
+                View live
+              </Link>
+            ) : null}
+            <DeleteNewsPostForm id={row.id} slug={row.slug} label={row.title} redirectOnSuccess />
+            <Link href="/admin/news" className={cnDs(dsBtnTertiary, "min-h-10 px-4 text-xs")}>
+              Back to list
+            </Link>
+          </>
+        }
+      >
+        <p className="text-sm text-[var(--admin-text-muted)]">Update the fields below and save to revalidate public News pages.</p>
+      </AdminSectionCard>
       <NewsPostForm
         mode="edit"
         submitAction={updateNewsPostAction}

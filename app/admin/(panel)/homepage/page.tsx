@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 
 import type { HomepageMediaPreviews } from "@/components/admin/HomepageContentForm"
 import { HomepageContentForm } from "@/components/admin/HomepageContentForm"
+import { AdminSectionCard, ErrorMessage, SuccessMessage } from "@/components/admin/design-system"
 import { homepageContentRowFromUnknown } from "@/lib/data/homepage-singleton-public"
 import { formatNewsDate } from "@/lib/format-news-date"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
@@ -86,25 +87,24 @@ export default async function AdminHomepagePage() {
 
   return (
     <div className="space-y-6">
-        <p className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-emerald-100/95 text-sm">
+        <SuccessMessage title="CMS connection">
           The public homepage reads from <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">homepage_content</code>,{" "}
           <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">fuel_prices</code>, and{" "}
           <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">locations</code> (preview cards). Saving here
           revalidates the home route.
-        </p>
+        </SuccessMessage>
 
         {!result.ok ? (
-          <p
-            role="alert"
-            className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-amber-100 text-sm"
-          >
+          <ErrorMessage title="Homepage content could not load">
             {result.message}
-          </p>
+          </ErrorMessage>
         ) : (
           <>
-            <p className="text-sm text-zinc-500">
-              Last updated in CMS <span className="text-zinc-400">{formatNewsDate(result.row.updated_at)}</span>
-            </p>
+            <AdminSectionCard>
+              <p className="text-sm text-[var(--admin-text-muted)]">
+                Last updated in CMS <span className="font-medium text-[var(--admin-text)]">{formatNewsDate(result.row.updated_at)}</span>
+              </p>
+            </AdminSectionCard>
             <HomepageContentForm key={result.row.updated_at} initial={result.row} mediaPreviews={result.previews} />
           </>
         )}

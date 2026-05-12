@@ -2,7 +2,8 @@ import type { Metadata } from "next"
 import Link from "next/link"
 
 import { DeleteLocationForm } from "@/components/admin/DeleteLocationForm"
-import { Button } from "@/components/ui/button"
+import { AdminSectionCard, ErrorMessage, StatusBadge, SuccessMessage } from "@/components/admin/design-system"
+import { dsBtnPrimary, dsBtnTertiary } from "@/components/admin/design-system/ds-button-classes"
 import { normalizeLocationRow } from "@/lib/data/locations-admin-shared"
 import { formatNewsDate } from "@/lib/format-news-date"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
@@ -32,81 +33,105 @@ export default async function AdminLocationsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap justify-end gap-2">
-        <Button type="button" size="sm" variant="secondary" render={<Link href="/admin/locations/new" />}>
-          Add location
-        </Button>
-      </div>
-        <p className="rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-4 py-3 text-emerald-100/95 text-sm">
-          Saving or deleting revalidates the public{" "}
-          <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">/locations</code> route.
+      <AdminSectionCard
+        title="Locations management"
+        description="Manage Prishtina, Ferizaj, and Gjilan location content, contact details, service availability, and media."
+        headerActions={
+          <Link href="/admin/locations/new" className={dsBtnPrimary}>
+            Add location
+          </Link>
+        }
+      >
+        <p className="text-sm text-[var(--admin-text-muted)]">
+          Each card opens a full editor with services, map link, main image, gallery, and active/inactive visibility.
         </p>
+      </AdminSectionCard>
 
-        {message ? (
-          <p
-            role="alert"
-            className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-amber-100 text-sm"
-          >
-            {message}
-          </p>
-        ) : null}
+      <SuccessMessage title="Public revalidation">
+          Saving or deleting revalidates the public{" "}
+          <code className="rounded bg-emerald-100 px-1 py-0.5 text-xs">/locations</code> route and homepage
+          preview.
+      </SuccessMessage>
 
-        {!message && rows.length === 0 ? (
-          <p className="text-sm text-zinc-400">
+      {message ? (
+        <ErrorMessage title="Locations could not load">
+          {message}
+        </ErrorMessage>
+      ) : null}
+
+      {!message && rows.length === 0 ? (
+        <AdminSectionCard>
+          <p className="text-sm text-[var(--admin-text-muted)]">
             No locations yet.&nbsp;
-            <Link href="/admin/locations/new" className="text-emerald-300 underline underline-offset-2 hover:text-emerald-200">
+            <Link href="/admin/locations/new" className="font-medium text-[var(--admin-text)] underline underline-offset-2">
               Create the first station
             </Link>
             .
           </p>
-        ) : null}
+        </AdminSectionCard>
+      ) : null}
 
-        {!message && rows.length > 0 ? (
-          <ul className="grid gap-5 lg:grid-cols-2">
-            {rows.map((loc) => (
-              <li key={loc.id} className="rounded-xl border border-zinc-800 bg-zinc-900/45 p-5 shadow-sm">
-                <div className="flex flex-wrap items-start justify-between gap-3 border-zinc-800 border-b pb-4">
+      {!message && rows.length > 0 ? (
+        <div className="grid gap-5 xl:grid-cols-3">
+          {rows.map((loc) => (
+            <AdminSectionCard
+              key={loc.id}
+              title={loc.city}
+              description={loc.page_heading?.trim() || loc.slug}
+              headerActions={
+                <StatusBadge tone={loc.is_active ? "success" : "neutral"}>
+                  {loc.is_active ? "Active" : "Inactive"}
+                </StatusBadge>
+              }
+            >
+              <div className="space-y-5">
+                <dl className="space-y-3 text-sm">
                   <div>
-                    <h2 className="font-heading text-lg font-semibold text-white">{loc.city}</h2>
-                    <p className="mt-0.5 font-mono text-xs text-zinc-500">{loc.slug}</p>
-                    <p className="mt-2 text-xs text-zinc-500">
-                      Updated <span className="text-zinc-400">{formatNewsDate(loc.updated_at)}</span>
-                    </p>
+                    <dt className="text-[var(--admin-text-muted)] text-xs uppercase tracking-wide">Address</dt>
+                    <dd className="mt-1 whitespace-pre-wrap text-[var(--admin-text)]">{loc.address}</dd>
                   </div>
-                  <div className="flex flex-col items-end gap-2">
-                    <span
-                      className={`rounded-full px-2.5 py-1 font-medium text-xs ${
-                        loc.is_active ? "bg-emerald-500/15 text-emerald-200" : "bg-zinc-800 text-zinc-400"
-                      }`}
-                    >
-                      {loc.is_active ? "Active" : "Inactive"}
-                    </span>
-                  </div>
-                </div>
-                <dl className="mt-4 space-y-2 text-sm text-zinc-300">
-                  <div>
-                    <dt className="text-zinc-500 text-xs uppercase tracking-wide">Address</dt>
-                    <dd className="mt-1 whitespace-pre-wrap">{loc.address}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-zinc-500 text-xs uppercase tracking-wide">Phone</dt>
-                    <dd className="mt-1">{loc.phone}</dd>
+                  <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+                    <div>
+                      <dt className="text-[var(--admin-text-muted)] text-xs uppercase tracking-wide">Phone</dt>
+                      <dd className="mt-1 text-[var(--admin-text)]">{loc.phone}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-[var(--admin-text-muted)] text-xs uppercase tracking-wide">Email</dt>
+                      <dd className="mt-1 text-[var(--admin-text)]">{loc.contact_email?.trim() || "—"}</dd>
+                    </div>
                   </div>
                   <div>
-                    <dt className="text-zinc-500 text-xs uppercase tracking-wide">Email</dt>
-                    <dd className="mt-1">{loc.contact_email?.trim() || "—"}</dd>
+                    <dt className="text-[var(--admin-text-muted)] text-xs uppercase tracking-wide">Updated</dt>
+                    <dd className="mt-1 text-[var(--admin-text)]">{formatNewsDate(loc.updated_at)}</dd>
                   </div>
                 </dl>
-                <div className="mt-5 flex flex-wrap gap-2">
-                  <Button type="button" size="sm" variant="outline" render={<Link href={`/admin/locations/${loc.id}`} />}>
-                    Edit
-                  </Button>
+
+                <div>
+                  <p className="mb-2 text-[var(--admin-text-muted)] text-xs uppercase tracking-wide">Services</p>
+                  <div className="flex flex-wrap gap-2">
+                    {loc.services.length ? (
+                      loc.services.map((service) => (
+                        <span key={service} className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
+                          {service.replace("_", " ")}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-sm text-[var(--admin-text-muted)]">No services selected</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2 border-[var(--admin-border)] border-t pt-4">
+                  <Link href={`/admin/locations/${loc.id}`} className={dsBtnTertiary}>
+                    Edit location
+                  </Link>
                   <DeleteLocationForm id={loc.id} label={loc.city} />
                 </div>
-              </li>
-            ))}
-          </ul>
-        ) : null}
+              </div>
+            </AdminSectionCard>
+          ))}
+        </div>
+      ) : null}
     </div>
   )
 }

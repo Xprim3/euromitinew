@@ -3,7 +3,8 @@ import Link from "next/link"
 
 import { createLocationAction } from "@/app/admin/(panel)/locations/actions"
 import { LocationEditorForm } from "@/components/admin/LocationEditorForm"
-import { Button } from "@/components/ui/button"
+import { AdminSectionCard } from "@/components/admin/design-system"
+import { dsBtnTertiary } from "@/components/admin/design-system/ds-button-classes"
 import { emptyGalleryDraft } from "@/lib/data/locations-admin-shared"
 
 export const metadata: Metadata = {
@@ -13,16 +14,18 @@ export const metadata: Metadata = {
 export default function AdminNewLocationPage() {
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap justify-end gap-2">
-        <Button type="button" size="sm" variant="outline" render={<Link href="/admin/locations" />}>
+      <AdminSectionCard>
+        <Link href="/admin/locations" className={dsBtnTertiary}>
           Back to list
-        </Button>
-      </div>
+        </Link>
+      </AdminSectionCard>
       <LocationEditorForm
         mode="create"
         submitAction={createLocationAction}
         initial={null}
         gallerySlots={emptyGalleryDraft()}
+        mainPreviewUrl={null}
+        mainImageAlt=""
       />
     </div>
   )

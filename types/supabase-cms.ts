@@ -138,6 +138,43 @@ export type NewsPostRow = {
   updated_at: string
 }
 
+/** Row from `public.jobs`. */
+export type JobRow = {
+  id: string
+  title: string
+  slug: string
+  location_city: string | null
+  summary: string | null
+  description: unknown
+  requirements: unknown
+  is_active: boolean
+  apply_channel: string
+  apply_email: string | null
+  apply_phone: string | null
+  apply_url: string | null
+  apply_instructions: string | null
+  hero_media_id: string | null
+  posted_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+/** Row from `public.media_uploads`. */
+export type MediaUploadRow = {
+  id: string
+  storage_bucket: string
+  object_path: string
+  public_url: string | null
+  mime_type: string
+  byte_size: number
+  original_filename: string | null
+  alt_text: string | null
+  uploaded_by: string | null
+  category: string | null
+  usage_section: string | null
+  created_at: string
+}
+
 /** Singleton `public.site_settings` (id = 1). */
 export type SiteSettingsRow = {
   id: number

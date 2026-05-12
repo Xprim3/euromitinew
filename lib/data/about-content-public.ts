@@ -121,6 +121,9 @@ export const getAboutContentPublic = cache(async (): Promise<{
   const ids = [
     row.hero_media_id,
     row.story_media_id,
+    row.gallery_strip_media_id,
+    row.gallery_why_us_media_id,
+    row.gallery_partnerships_media_id,
     ...(row.gallery_media_ids ?? []),
   ].filter((x): x is string => typeof x === "string" && x.length > 0)
 
@@ -157,13 +160,13 @@ function paragraphTextFromStoryItem(item: unknown): string | null {
 
 /** Parse `company_story` JSON — array of strings or objects with paragraph/text/body keys. */
 export function storyParagraphsFromDb(raw: unknown): string[] {
-  if (!Array.isArray(raw)) return [...aboutPageMock.introParagraphs]
+  if (!Array.isArray(raw)) return []
   const out = raw.map(paragraphTextFromStoryItem).filter((x): x is string => !!x && x.length > 0)
-  return out.length > 0 ? out : [...aboutPageMock.introParagraphs]
+  return out
 }
 
 export function valueCardsFromDb(raw: unknown): AboutValueCard[] {
-  if (!Array.isArray(raw) || raw.length === 0) return MOCK_VALUES
+  if (!Array.isArray(raw) || raw.length === 0) return []
   const out: AboutValueCard[] = []
   for (const item of raw) {
     if (!item || typeof item !== "object") continue
@@ -180,7 +183,7 @@ export function valueCardsFromDb(raw: unknown): AboutValueCard[] {
     if (!title || !body) continue
     out.push({ title, body, icon_material })
   }
-  return out.length > 0 ? out : MOCK_VALUES
+  return out
 }
 
 function lookup(media: AboutMediaLookup, id: string | null, fallbackSrc: string, fallbackAlt: string) {
@@ -194,6 +197,30 @@ function lookup(media: AboutMediaLookup, id: string | null, fallbackSrc: string,
 }
 
 export function resolveAboutPage(row: AboutContentRow | null, media: AboutMediaLookup): ResolvedAboutPage {
+  if (!row) {
+    return {
+      heroTitle: "About Euromiti",
+      heroSubtitle:
+        "A disciplined roadside network anchored in Prishtina, Ferizaj, and Gjilan - blending premium fuels with dining, convenience, and car care.",
+      heroImageSrc: homeHeroDesign.imageSrc,
+      heroImageAlt: homeHeroDesign.imageAlt,
+      storyParagraphs: [...aboutPageMock.introParagraphs],
+      storyImageSrc: homeStrategicNetworkDesign[0].imageSrc,
+      storyImageAlt: homeStrategicNetworkDesign[0].imageAlt,
+      missionTitle: aboutPageMock.mission.title,
+      missionBody: aboutPageMock.mission.body,
+      visionTitle: aboutPageMock.vision.title,
+      visionBody: aboutPageMock.vision.body,
+      missionStripSrc: homeStrategicNetworkDesign[1].imageSrc,
+      missionStripAlt: homeStrategicNetworkDesign[1].imageAlt,
+      whyUsAsideSrc: homeHeroDesign.imageSrc,
+      whyUsAsideAlt: "Euromiti forecourt experience",
+      partnershipAsideSrc: homeBeyondDesign.restaurant.float2,
+      partnershipAsideAlt: "Euromiti hospitality and partnership support",
+      values: MOCK_VALUES,
+    }
+  }
+
   const fallbackStrip = row?.gallery_media_ids?.[0] ?? null
   const fallbackWhy = row?.gallery_media_ids?.[1] ?? null
   const fallbackPartner = row?.gallery_media_ids?.[2] ?? null
@@ -203,33 +230,29 @@ export function resolveAboutPage(row: AboutContentRow | null, media: AboutMediaL
   const g2 = row?.gallery_partnerships_media_id ?? fallbackPartner
 
   return {
-    heroTitle:
-      row?.hero_title?.trim() || "About Euromiti",
-    heroSubtitle:
-      row?.hero_subtitle?.trim() ||
-      "A disciplined roadside network anchored in Prishtina, Ferizaj, and Gjilan - blending premium fuels with dining, convenience, and car care.",
+    heroTitle: row.hero_title.trim(),
+    heroSubtitle: row.hero_subtitle.trim(),
     ...(() => {
-      const h = lookup(media, row?.hero_media_id ?? null, homeHeroDesign.imageSrc, homeHeroDesign.imageAlt)
+      const h = lookup(media, row.hero_media_id, homeHeroDesign.imageSrc, homeHeroDesign.imageAlt)
       return {
         heroImageSrc: h.src,
         heroImageAlt: h.alt,
       }
     })(),
-    storyParagraphs: storyParagraphsFromDb(row?.company_story ?? null),
+    storyParagraphs: storyParagraphsFromDb(row.company_story),
     ...(() => {
       const m = lookup(
         media,
-        row?.story_media_id ?? null,
+        row.story_media_id,
         homeStrategicNetworkDesign[0].imageSrc,
         homeStrategicNetworkDesign[0].imageAlt
       )
       return { storyImageSrc: m.src, storyImageAlt: m.alt }
     })(),
-    missionTitle:
-      row?.mission_title?.trim() || aboutPageMock.mission.title,
-    missionBody: row?.mission_body?.trim() || aboutPageMock.mission.body,
-    visionTitle: row?.vision_title?.trim() || aboutPageMock.vision.title,
-    visionBody: row?.vision_body?.trim() || aboutPageMock.vision.body,
+    missionTitle: row.mission_title.trim(),
+    missionBody: row.mission_body.trim(),
+    visionTitle: row.vision_title.trim(),
+    visionBody: row.vision_body.trim(),
     ...(() => {
       const s = lookup(
         media,
@@ -252,7 +275,7 @@ export function resolveAboutPage(row: AboutContentRow | null, media: AboutMediaL
       )
       return { partnershipAsideSrc: s.src, partnershipAsideAlt: s.alt }
     })(),
-    values: valueCardsFromDb(row?.values_json ?? null),
+    values: valueCardsFromDb(row.values_json),
   }
 }
 

@@ -21,11 +21,11 @@ export type ContactDetailsPublic = {
   email: string
   hqAddress: string
   mapLink: string
-  weekdayHours: string | null
-  weekendHours: string | null
-  careersEmail: string | null
+  weekdayHours: string
+  weekendHours: string
+  careersEmail: string
   /** Label for the careers CTA button (e.g. “Apply by Email”). */
-  careersApplyCtaLabel: string | null
+  careersApplyCtaLabel: string
   socialLinks: SocialLinkItem[]
 }
 
@@ -84,13 +84,10 @@ function normalizeSiteSettings(raw: Record<string, unknown>): SiteSettingsRow {
   return {
     id: Number(raw.id) || 1,
     logo_media_id: typeof raw.logo_media_id === "string" && raw.logo_media_id ? raw.logo_media_id : null,
-    company_name: typeof raw.company_name === "string" && raw.company_name.trim() ? raw.company_name.trim() : "Euromiti",
+    company_name: typeof raw.company_name === "string" ? raw.company_name.trim() : "",
     social_links: raw.social_links ?? [],
     footer_body: typeof raw.footer_body === "string" ? raw.footer_body : "",
-    footer_copyright_line:
-      typeof raw.footer_copyright_line === "string" && raw.footer_copyright_line.trim()
-        ? raw.footer_copyright_line.trim()
-        : "Euromiti Kosovo",
+    footer_copyright_line: typeof raw.footer_copyright_line === "string" ? raw.footer_copyright_line.trim() : "",
     updated_at: typeof raw.updated_at === "string" ? raw.updated_at : "",
     updated_by: typeof raw.updated_by === "string" ? raw.updated_by : null,
   }
@@ -135,15 +132,12 @@ export const getSiteFooterPublic = cache(async (): Promise<SiteFooterPublic> => 
     }
   }
 
-  const body = row.footer_body.trim() || fb.footerBody
-  const copyright = row.footer_copyright_line?.trim() || fb.footerCopyrightLine
-
   return {
     companyName: row.company_name,
     logoUrl,
     logoAlt,
-    footerBody: body,
-    footerCopyrightLine: copyright,
+    footerBody: row.footer_body,
+    footerCopyrightLine: row.footer_copyright_line ?? "",
     socialLinks: parseSocialLinks(row.social_links),
   }
 })
@@ -161,14 +155,14 @@ export const getContactDetailsPublic = cache(async (): Promise<ContactDetailsPub
 
   const row = normalizeContactInfo(data as Record<string, unknown>)
   return {
-    phone: row.phone.trim() || fb.phone,
-    email: row.email.trim() || fb.email,
-    hqAddress: row.hq_address.trim() || fb.hqAddress,
-    mapLink: row.map_link.trim() || fb.mapLink,
-    weekdayHours: row.weekday_hours?.trim() || fb.weekdayHours,
-    weekendHours: row.weekend_hours?.trim() || fb.weekendHours,
-    careersEmail: row.careers_email?.trim() || fb.careersEmail,
-    careersApplyCtaLabel: row.careers_apply_instructions?.trim() || fb.careersApplyCtaLabel,
+    phone: row.phone.trim(),
+    email: row.email.trim(),
+    hqAddress: row.hq_address.trim(),
+    mapLink: row.map_link.trim(),
+    weekdayHours: row.weekday_hours?.trim() ?? "",
+    weekendHours: row.weekend_hours?.trim() ?? "",
+    careersEmail: row.careers_email?.trim() ?? "",
+    careersApplyCtaLabel: row.careers_apply_instructions?.trim() ?? "",
     socialLinks: parseSocialLinks(row.social_links),
   }
 })

@@ -33,7 +33,7 @@ export function AdminHeader({
   showMobileNavTrigger = true,
   className,
 }: AdminHeaderProps) {
-  const { toggleMobile } = useAdminSidebarState()
+  const { mobileOpen, toggleMobile } = useAdminSidebarState()
 
   return (
     <header
@@ -49,6 +49,7 @@ export function AdminHeader({
               type="button"
               className="mt-0.5 inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--admin-radius-input)] border border-[var(--admin-border)] bg-white text-[var(--admin-text)] shadow-sm outline-none hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-[var(--admin-focus-ring)] focus-visible:ring-offset-2 lg:hidden"
               aria-controls="admin-ds-sidebar"
+              aria-expanded={mobileOpen}
               aria-label="Open navigation menu"
               onClick={toggleMobile}
             >

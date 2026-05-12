@@ -28,14 +28,14 @@ import { AdminSidebar, type AdminSidebarNavItem } from "./AdminSidebar"
 const NAV_ITEMS: readonly AdminSidebarNavItem[] = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/homepage", label: "Homepage", icon: Home },
-  { href: "/admin/fuel-prices", label: "Fuel prices", icon: Flame },
+  { href: "/admin/fuel-prices", label: "Fuel Prices", icon: Flame },
   { href: "/admin/locations", label: "Locations", icon: MapPin },
   { href: "/admin/services", label: "Services", icon: Fuel },
   { href: "/admin/restaurant", label: "Restaurant", icon: UtensilsCrossed },
   { href: "/admin/news", label: "News", icon: Newspaper },
   { href: "/admin/careers", label: "Careers", icon: Briefcase },
-  { href: "/admin/site", label: "Contact info", icon: Globe },
-  { href: "/admin/media", label: "Media library", icon: ImageIcon },
+  { href: "/admin/site", label: "Contact Info", icon: Globe },
+  { href: "/admin/media", label: "Media Library", icon: ImageIcon },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ] as const
 

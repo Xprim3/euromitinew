@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect } from "react"
+import { X } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
 import { useAdminSidebarState } from "./AdminSidebarState"
@@ -44,6 +45,23 @@ export function AdminSidebar({
     setMobileOpen(false)
   }, [pathname, setMobileOpen])
 
+  useEffect(() => {
+    if (!mobileOpen) return undefined
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setMobileOpen(false)
+    }
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    window.addEventListener("keydown", onKeyDown)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener("keydown", onKeyDown)
+    }
+  }, [mobileOpen, setMobileOpen])
+
   const bar =
     activeAccent === "gold"
       ? "bg-[var(--admin-accent-gold)]"
@@ -79,21 +97,24 @@ export function AdminSidebar({
       {mobileOpen ? (
         <button
           type="button"
-          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
-          aria-label="Close menu"
+          className="fixed inset-0 z-40 bg-slate-950/55 backdrop-blur-sm transition-opacity lg:hidden"
+          aria-label="Close admin navigation"
           onClick={() => setMobileOpen(false)}
         />
       ) : null}
 
       <aside
         id="admin-ds-sidebar"
+        aria-label="Admin navigation"
+        aria-modal={mobileOpen ? "true" : undefined}
+        role={mobileOpen ? "dialog" : undefined}
         className={cnDs(
-          "fixed inset-y-0 left-0 z-50 flex w-[var(--admin-sidebar-width)] -translate-x-full flex-col border-[var(--admin-border)] border-r bg-[var(--admin-sidebar)] shadow-xl transition-transform duration-200 lg:static lg:z-0 lg:translate-x-0 lg:shadow-none",
+          "fixed inset-y-0 left-0 z-50 flex w-[var(--admin-sidebar-width)] -translate-x-full flex-col border-[var(--admin-border)] border-r bg-[var(--admin-sidebar)] shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] lg:static lg:z-0 lg:translate-x-0 lg:shadow-none",
           mobileOpen && "translate-x-0",
           className
         )}
       >
-        <div className="border-white/10 border-b px-5 py-5">
+        <div className="flex items-center justify-between gap-3 border-white/10 border-b px-5 py-5">
           <Link
             href={brandHref}
             className="block font-[family-name:var(--font-montserrat)] text-lg font-extrabold tracking-tight text-[var(--admin-sidebar-foreground)]"
@@ -101,6 +122,14 @@ export function AdminSidebar({
             {brandTitle}{" "}
             <span className="font-semibold text-[var(--admin-sidebar-muted)]">{brandSubtitle}</span>
           </Link>
+          <button
+            type="button"
+            className="inline-flex size-10 items-center justify-center rounded-[var(--admin-radius-input)] text-[var(--admin-sidebar-muted)] transition-colors hover:bg-[var(--admin-sidebar-hover)] hover:text-white focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:outline-none lg:hidden"
+            aria-label="Close admin navigation"
+            onClick={() => setMobileOpen(false)}
+          >
+            <X className="size-5" aria-hidden />
+          </button>
         </div>
         {nav}
         {footer ? <div className="mt-auto border-white/10 border-t p-3">{footer}</div> : null}

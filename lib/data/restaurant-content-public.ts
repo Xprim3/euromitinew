@@ -90,15 +90,6 @@ function menuCardsFromDb(json: unknown, media: MediaMap): { title: string; descr
   return out
 }
 
-function defaultMenuItems() {
-  return restaurantSeasonalFoodGalleryMock.items.map((it) => ({
-    title: it.title,
-    description: it.description,
-    src: it.src,
-    alt: it.alt,
-  }))
-}
-
 function atmosphereSlotsFromGallery(ids: string[] | null | undefined, media: MediaMap) {
   const mockSlots = [...restaurantAtmosphereGalleryMock.slots].map((s) => ({ src: s.src, alt: s.alt }))
   const fromDb: { src: string; alt: string }[] = []
@@ -177,16 +168,29 @@ export function resolveRestaurantPage(row: RestaurantContentRow | null, media: M
   const defaultHeroSrc = homeBeyondDesign.restaurant.mainImage
   const defaultHeroAlt = homeBeyondDesign.restaurant.mainImageAlt
 
-  const heroId = row?.hero_image_media_id ?? null
+  if (!row) {
+    return {
+      pageHeroTitle: "Restaurant",
+      pageHeroSubtitle:
+        "Chef-led dining, curated menus, and hospitality standards designed to elevate every Euromiti stop.",
+      pageHeroImageSrc: defaultHeroSrc,
+      pageHeroImageAlt: defaultHeroAlt,
+      editorialHero: restaurantEditorialHeroMock,
+      editorialIntro: restaurantEditorialIntroMock,
+      seasonalGallery: restaurantSeasonalFoodGalleryMock,
+      atmosphereGallery: restaurantAtmosphereGalleryMock,
+      deskInfo: null,
+    }
+  }
+
+  const heroId = row.hero_image_media_id
   const heroM = heroId ? media[heroId] : undefined
   const heroUrl = heroM?.public_url?.trim()
   const pageHeroImageSrc = heroUrl && heroUrl.length > 0 ? heroUrl : defaultHeroSrc
   const pageHeroImageAlt = heroM?.alt_text?.trim() || defaultHeroAlt
 
-  const pageHeroTitle = row?.hero_title?.trim() || "Restaurant"
-  const pageHeroSubtitle =
-    row?.hero_subtitle?.trim() ||
-    "Chef-led dining, curated menus, and hospitality standards designed to elevate every Euromiti stop."
+  const pageHeroTitle = row.hero_title
+  const pageHeroSubtitle = row.hero_subtitle
 
   const editorialHero = {
     ...restaurantEditorialHeroMock,
@@ -194,36 +198,33 @@ export function resolveRestaurantPage(row: RestaurantContentRow | null, media: M
     imageAlt: pageHeroImageAlt,
   } as RestaurantEditorialHeroMock
 
-  const desc = row?.hero_description?.trim() ?? ""
+  const desc = row.hero_description.trim()
   const cmsParas = paragraphsFromDescription(desc)
-  const introParagraphs =
-    cmsParas.length > 0 ? cmsParas : [...restaurantEditorialIntroMock.paragraphs]
 
   const editorialIntro = {
     ...restaurantEditorialIntroMock,
-    paragraphs: introParagraphs as readonly string[],
+    paragraphs: cmsParas as readonly string[],
     imageSrc: pageHeroImageSrc,
     imageAlt: pageHeroImageAlt,
   } as RestaurantEditorialIntroMock
 
-  const menuResolved = menuCardsFromDb(row?.menu_highlights_json, media)
-  const menuItems = menuResolved.length > 0 ? menuResolved : defaultMenuItems()
+  const menuItems = menuCardsFromDb(row.menu_highlights_json, media)
 
   const seasonalGallery = {
     ...restaurantSeasonalFoodGalleryMock,
     items: menuItems,
   } as unknown as RestaurantSeasonalFoodGalleryMock
 
-  const slots = atmosphereSlotsFromGallery(row?.gallery_media_ids ?? null, media)
+  const slots = atmosphereSlotsFromGallery(row.gallery_media_ids, media)
   const atmosphereGallery = {
     ...restaurantAtmosphereGalleryMock,
     slots,
   } as unknown as RestaurantAtmosphereGalleryMock
 
-  const phone = row?.contact_phone?.trim() ?? ""
-  const email = row?.contact_email?.trim() ?? ""
-  const notes = row?.contact_notes?.trim() ?? ""
-  const hours = row?.opening_hours?.trim() ?? ""
+  const phone = row.contact_phone?.trim() ?? ""
+  const email = row.contact_email?.trim() ?? ""
+  const notes = row.contact_notes?.trim() ?? ""
+  const hours = row.opening_hours.trim()
 
   const deskInfo: RestaurantDeskInfo | null =
     hours || phone || email || notes

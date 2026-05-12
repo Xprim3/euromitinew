@@ -1,18 +1,28 @@
 import type { Metadata } from "next"
 
-import { EmptyState } from "@/components/admin/design-system"
+import { CareersManagementClient } from "@/components/admin/CareersManagementClient"
+import { ErrorMessage } from "@/components/admin/design-system"
+import { listJobsAdmin } from "@/lib/data/careers-admin"
 
 export const metadata: Metadata = {
   title: "Careers",
 }
 
-export default function AdminCareersPlaceholderPage() {
-  return (
-    <div className="space-y-6">
-      <EmptyState
-        title="Careers admin is coming soon"
-        description="Job openings will be managed here. No database wiring in this phase."
-      />
-    </div>
-  )
+async function loadJobs(): Promise<{ ok: true; rows: Awaited<ReturnType<typeof listJobsAdmin>> } | { ok: false; message: string }> {
+  try {
+    const rows = await listJobsAdmin()
+    return { ok: true, rows }
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : "Unexpected error loading jobs." }
+  }
+}
+
+export default async function AdminCareersPage() {
+  const result = await loadJobs()
+
+  if (!result.ok) {
+    return <ErrorMessage title="Careers content could not load">{result.message}</ErrorMessage>
+  }
+
+  return <CareersManagementClient rows={result.rows} />
 }

@@ -100,10 +100,26 @@ export function adminRouteHeaderMeta(pathname: string): AdminRouteHeaderMeta {
     }
   }
 
+  if (p === "/admin/careers/new") {
+    return {
+      title: "New job",
+      subtitle: "Create a careers opening.",
+      breadcrumbs: [crumbAdmin, { label: "Careers", href: "/admin/careers" }, { label: "New" }],
+    }
+  }
+
+  if (p.startsWith("/admin/careers/")) {
+    return {
+      title: "Edit job",
+      subtitle: "Update job details and visibility.",
+      breadcrumbs: [crumbAdmin, { label: "Careers", href: "/admin/careers" }, { label: "Edit" }],
+    }
+  }
+
   if (p === "/admin/careers") {
     return {
       title: "Careers",
-      subtitle: "Job openings (coming soon).",
+      subtitle: "Manage job openings.",
       breadcrumbs: [crumbAdmin, { label: "Careers" }],
     }
   }
@@ -127,7 +143,7 @@ export function adminRouteHeaderMeta(pathname: string): AdminRouteHeaderMeta {
   if (p === "/admin/settings") {
     return {
       title: "Settings",
-      subtitle: "Console preferences (coming soon).",
+      subtitle: "Admin profile, account, and logout.",
       breadcrumbs: [crumbAdmin, { label: "Settings" }],
     }
   }

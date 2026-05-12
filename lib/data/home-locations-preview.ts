@@ -11,6 +11,10 @@ const FALLBACK_BLURBS: Record<string, string> = {
   gjilan: "Eastern city station for reliable refueling and rest.",
 }
 
+function textOrFallback(value: string | null | undefined, fallback: string) {
+  return value?.trim() || fallback
+}
+
 export type HomeLocationPreviewCard = {
   /** Location UUID from DB when present */
   id: string
@@ -21,11 +25,23 @@ export type HomeLocationPreviewCard = {
   imageAlt: string
 }
 
-/** Three homepage location teaser cards driven by DB `locations` + `main_media_id`, with mock visuals as fallback. */
-export const getHomeLocationPreviewsPublic = cache(async (): Promise<{ cards: HomeLocationPreviewCard[]; source: "db" | "mock" }> => {
+export type HomeLocationPreviewResult = {
+  cards: HomeLocationPreviewCard[]
+  source: "db" | "fallback"
+  status: "ready" | "empty" | "error" | "unconfigured"
+  message?: string
+}
+
+/** Three homepage location teaser cards driven by DB `locations` + `main_media_id`. */
+export const getHomeLocationPreviewsPublic = cache(async (): Promise<HomeLocationPreviewResult> => {
   const supabase = createPublicSupabaseServerClient()
   if (!supabase) {
-    return { cards: mockFallbackCards(), source: "mock" }
+    return {
+      cards: mockFallbackCards(),
+      source: "fallback",
+      status: "unconfigured",
+      message: "Supabase is not configured, so emergency fallback locations are shown.",
+    }
   }
 
   const { data: locs, error } = await supabase
@@ -35,9 +51,23 @@ export const getHomeLocationPreviewsPublic = cache(async (): Promise<{ cards: Ho
     .order("sort_order", { ascending: true })
     .limit(3)
 
-  if (error || !locs?.length) {
+  if (error) {
     if (error) console.warn("[getHomeLocationPreviewsPublic] Falling back:", error.message)
-    return { cards: mockFallbackCards(), source: "mock" }
+    return {
+      cards: mockFallbackCards(),
+      source: "fallback",
+      status: "error",
+      message: "Locations could not be loaded from Supabase, so emergency fallback locations are shown.",
+    }
+  }
+
+  if (!locs?.length) {
+    return {
+      cards: [],
+      source: "db",
+      status: "empty",
+      message: "No active locations are currently configured.",
+    }
   }
 
   const ids = [...new Set(locs.map((l: { main_media_id: string | null }) => l.main_media_id).filter(Boolean))] as string[]
@@ -78,7 +108,7 @@ export const getHomeLocationPreviewsPublic = cache(async (): Promise<{ cards: Ho
     }
   })
 
-  return { cards, source: "db" }
+  return { cards, source: "db", status: "ready" }
 })
 
 function shorten(s: string, max: number) {
@@ -99,11 +129,20 @@ function mockFallbackCards(): HomeLocationPreviewCard[] {
 
 /** Section heading copy sourced from homepage singleton — falls back to built-in marketing defaults. */
 export function locationsBandCopyFromCMS(row: HomepageContentRow | null) {
+  if (!row) {
+    return {
+      kicker: "Locations",
+      heading: "Our City Stations",
+      subtitle: "Prishtina, Ferizaj, and Gjilan - tap any card to view full location details.",
+    }
+  }
+
   return {
-    kicker: row?.locations_band_kicker?.trim() || "Locations",
-    heading: row?.locations_band_heading?.trim() || "Our City Stations",
-    subtitle:
-      row?.locations_band_subtitle?.trim() ||
-      "Prishtina, Ferizaj, and Gjilan - tap any card to view full location details.",
+    kicker: textOrFallback(row.locations_band_kicker, "Locations"),
+    heading: textOrFallback(row.locations_band_heading, "Our City Stations"),
+    subtitle: textOrFallback(
+      row.locations_band_subtitle,
+      "Prishtina, Ferizaj, and Gjilan - tap any card to view full location details."
+    ),
   }
 }

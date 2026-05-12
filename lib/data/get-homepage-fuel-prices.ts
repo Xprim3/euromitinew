@@ -15,6 +15,13 @@ export type HomepageFuelCard = {
   updatedAtIso: string
 }
 
+export type HomepageFuelPricesResult = {
+  items: HomepageFuelCard[]
+  source: "supabase" | "fallback"
+  status: "ready" | "empty" | "error" | "unconfigured"
+  message?: string
+}
+
 const PREFERRED_KEYS = ["diesel", "euro95", "lpg"] as const
 
 function sortKey(pk: string) {
@@ -61,12 +68,18 @@ function mapDb(rows: HomepageFuelPricesRow[]): HomepageFuelCard[] {
 }
 
 /**
- * Live network fuel SKUs — reads `fuel_prices` via anon key when env is configured and the query succeeds; otherwise aligns with Phase 7 step 1 by using `mockFuelPrices`.
+ * Live network fuel SKUs. Supabase is the normal source; mock rows are only used
+ * as an emergency fallback when configuration/querying fails.
  */
-export const getHomepageFuelPrices = cache(async (): Promise<HomepageFuelCard[]> => {
+export const getHomepageFuelPrices = cache(async (): Promise<HomepageFuelPricesResult> => {
   const supabase = createPublicSupabaseServerClient()
   if (!supabase) {
-    return rowsFromMock()
+    return {
+      items: rowsFromMock(),
+      source: "fallback",
+      status: "unconfigured",
+      message: "Supabase is not configured, so emergency fallback prices are shown.",
+    }
   }
 
   const { data, error } = await supabase
@@ -76,12 +89,26 @@ export const getHomepageFuelPrices = cache(async (): Promise<HomepageFuelCard[]>
 
   if (error) {
     console.warn("[getHomepageFuelPrices] Supabase error, using mock fallback:", error.message)
-    return rowsFromMock()
+    return {
+      items: rowsFromMock(),
+      source: "fallback",
+      status: "error",
+      message: "Fuel prices could not be loaded from Supabase, so emergency fallback prices are shown.",
+    }
   }
 
   if (!data?.length) {
-    return rowsFromMock()
+    return {
+      items: [],
+      source: "supabase",
+      status: "empty",
+      message: "No active fuel prices are currently configured.",
+    }
   }
 
-  return mapDb(data as HomepageFuelPricesRow[])
+  return {
+    items: mapDb(data as HomepageFuelPricesRow[]),
+    source: "supabase",
+    status: "ready",
+  }
 })

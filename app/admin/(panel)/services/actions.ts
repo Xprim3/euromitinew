@@ -19,6 +19,32 @@ function isTruthyCheckbox(v: FormDataEntryValue | null) {
   return v === "on" || v === "true"
 }
 
+async function ensureAdminProfile(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  user: { id: string; email?: string | null }
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  const { data: existing, error: existingErr } = await supabase
+    .from("admins")
+    .select("user_id")
+    .eq("user_id", user.id)
+    .maybeSingle()
+
+  if (existingErr) return { ok: false, message: existingErr.message }
+  if (existing) return { ok: true }
+
+  const { error: insertErr } = await supabase
+    .from("admins")
+    .insert({ user_id: user.id, display_name: user.email ?? null })
+
+  if (!insertErr) return { ok: true }
+
+  return {
+    ok: false,
+    message:
+      "Your signed-in user is not in the admins table. Apply the latest RLS repair migration, then save again, or add this user to public.admins.",
+  }
+}
+
 type OptionalUuid = string | null | undefined
 
 export async function saveServicesContent(
@@ -36,6 +62,8 @@ export async function saveServicesContent(
     }
 
     const editorId = user.id
+    const adminReady = await ensureAdminProfile(supabase, user)
+    if (!adminReady.ok) return { ok: false, message: adminReady.message }
 
     const parsedText = servicesContentFormSchema.safeParse({
       hero_page_title: formData.get("hero_page_title"),
@@ -120,6 +148,7 @@ export async function saveServicesContent(
     if ("error" in miniImg) return { ok: false, message: miniImg.error }
 
     const patch: Record<string, unknown> = {
+      id: 1,
       hero_page_title: v.hero_page_title,
       hero_page_subtitle: v.hero_page_subtitle,
       petrol_section_title: v.petrol_section_title,
@@ -139,7 +168,7 @@ export async function saveServicesContent(
     if (carwashImg.next !== undefined) patch.carwash_image_media_id = carwashImg.next
     if (miniImg.next !== undefined) patch.mini_market_image_media_id = miniImg.next
 
-    const { error: upErr } = await supabase.from("services_content").update(patch).eq("id", 1)
+    const { error: upErr } = await supabase.from("services_content").upsert(patch, { onConflict: "id" })
     if (upErr) return { ok: false, message: upErr.message }
 
     revalidatePath("/services")

@@ -69,23 +69,22 @@ export function normalizeServicesRow(raw: Record<string, unknown>): ServicesCont
 
 /** Default textarea value when loading the admin Services form. */
 export function petrolHighlightsTextFromDb(raw: unknown): string {
-  if (!Array.isArray(raw)) return SERVICES_PANEL_DEFAULTS[0].highlights.join("\n")
+  if (!Array.isArray(raw)) return ""
   const lines = raw
     .map((item) => (typeof item === "string" ? item.trim() : ""))
     .filter(Boolean)
-  return lines.length > 0 ? lines.join("\n") : SERVICES_PANEL_DEFAULTS[0].highlights.join("\n")
+  return lines.join("\n")
 }
 
 function petrolBulletsFromDb(raw: unknown): string[] {
-  const defaultBullets = [...SERVICES_PANEL_DEFAULTS[0].highlights]
-  if (!Array.isArray(raw)) return defaultBullets
+  if (!Array.isArray(raw)) return []
   const bullets = raw
     .map((item) => {
       if (typeof item === "string") return item.trim()
       return null
     })
     .filter((x): x is string => Boolean(x?.length))
-  return bullets.length > 0 ? bullets : defaultBullets
+  return bullets
 }
 
 function mediaSrc(
@@ -152,17 +151,37 @@ export function resolveServicesPage(row: ServicesContentRow | null, media: Servi
   const carwashDef = SERVICES_PANEL_DEFAULTS[2]
   const miniDef = SERVICES_PANEL_DEFAULTS[3]
 
-  const petrolImg = mediaSrc(media, row?.petrol_image_media_id ?? null, petrolDef.imageSrc, petrolDef.imageAlt)
-  const restImg = mediaSrc(media, row?.restaurant_image_media_id ?? null, restDef.imageSrc, restDef.imageAlt)
-  const carImg = mediaSrc(media, row?.carwash_image_media_id ?? null, carwashDef.imageSrc, carwashDef.imageAlt)
-  const miniImg = mediaSrc(media, row?.mini_market_image_media_id ?? null, miniDef.imageSrc, miniDef.imageAlt)
+  if (!row) {
+    return {
+      heroTitle: SERVICES_PAGE_DEFAULT_HERO.title,
+      heroSubtitle: SERVICES_PAGE_DEFAULT_HERO.description,
+      heroImageSrc: SERVICES_PAGE_DEFAULT_HERO.imageSrc,
+      heroImageAlt: SERVICES_PAGE_DEFAULT_HERO.imageAlt,
+      sections: SERVICES_PANEL_DEFAULTS.map((service) => ({
+        id: service.id,
+        title: service.title,
+        description: service.description,
+        highlights: [...service.highlights],
+        ctaLabel: service.ctaLabel,
+        ctaHref: service.ctaHref,
+        imageSrc: service.imageSrc,
+        imageAlt: service.imageAlt,
+        icon: service.icon,
+      })),
+    }
+  }
+
+  const petrolImg = mediaSrc(media, row.petrol_image_media_id, petrolDef.imageSrc, petrolDef.imageAlt)
+  const restImg = mediaSrc(media, row.restaurant_image_media_id, restDef.imageSrc, restDef.imageAlt)
+  const carImg = mediaSrc(media, row.carwash_image_media_id, carwashDef.imageSrc, carwashDef.imageAlt)
+  const miniImg = mediaSrc(media, row.mini_market_image_media_id, miniDef.imageSrc, miniDef.imageAlt)
 
   const sections: ResolvedServicesSection[] = [
     {
       id: petrolDef.id,
-      title: row?.petrol_section_title?.trim() || petrolDef.title,
-      description: row?.petrol_description?.trim() || petrolDef.description,
-      highlights: petrolBulletsFromDb(row?.petrol_highlights_json),
+      title: row.petrol_section_title,
+      description: row.petrol_description,
+      highlights: petrolBulletsFromDb(row.petrol_highlights_json),
       ctaLabel: petrolDef.ctaLabel,
       ctaHref: petrolDef.ctaHref,
       imageSrc: petrolImg.src,
@@ -171,8 +190,8 @@ export function resolveServicesPage(row: ServicesContentRow | null, media: Servi
     },
     {
       id: restDef.id,
-      title: row?.restaurant_section_title?.trim() || restDef.title,
-      description: row?.restaurant_description?.trim() || restDef.description,
+      title: row.restaurant_section_title,
+      description: row.restaurant_description,
       highlights: [...restDef.highlights],
       ctaLabel: restDef.ctaLabel,
       ctaHref: restDef.ctaHref,
@@ -182,8 +201,8 @@ export function resolveServicesPage(row: ServicesContentRow | null, media: Servi
     },
     {
       id: carwashDef.id,
-      title: row?.carwash_section_title?.trim() || carwashDef.title,
-      description: row?.carwash_description?.trim() || carwashDef.description,
+      title: row.carwash_section_title,
+      description: row.carwash_description,
       highlights: [...carwashDef.highlights],
       ctaLabel: carwashDef.ctaLabel,
       ctaHref: carwashDef.ctaHref,
@@ -193,8 +212,8 @@ export function resolveServicesPage(row: ServicesContentRow | null, media: Servi
     },
     {
       id: miniDef.id,
-      title: row?.mini_market_section_title?.trim() || miniDef.title,
-      description: row?.mini_market_description?.trim() || miniDef.description,
+      title: row.mini_market_section_title,
+      description: row.mini_market_description,
       highlights: [...miniDef.highlights],
       ctaLabel: miniDef.ctaLabel,
       ctaHref: miniDef.ctaHref,
@@ -205,10 +224,8 @@ export function resolveServicesPage(row: ServicesContentRow | null, media: Servi
   ]
 
   return {
-    heroTitle:
-      row?.hero_page_title?.trim() || SERVICES_PAGE_DEFAULT_HERO.title,
-    heroSubtitle:
-      row?.hero_page_subtitle?.trim() || SERVICES_PAGE_DEFAULT_HERO.description,
+    heroTitle: row.hero_page_title,
+    heroSubtitle: row.hero_page_subtitle,
     heroImageSrc: SERVICES_PAGE_DEFAULT_HERO.imageSrc,
     heroImageAlt: SERVICES_PAGE_DEFAULT_HERO.imageAlt,
     sections,

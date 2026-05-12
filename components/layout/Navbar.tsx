@@ -1,11 +1,13 @@
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 import { TOPBAR_NAV_LINKS } from "@/lib/navigation"
 import { MaterialSymbol } from "@/components/ui/MaterialSymbol"
 import { cn } from "@/lib/utils"
+import type { SiteFooterPublic } from "@/lib/data/site-contact-public"
 
 import { MobileMenu } from "./MobileMenu"
 
@@ -23,8 +25,13 @@ function navLinkTone(href: string, pathname: string) {
   return muted
 }
 
-export function Navbar() {
+type NavbarProps = {
+  brand?: Pick<SiteFooterPublic, "companyName" | "logoUrl" | "logoAlt">
+}
+
+export function Navbar({ brand }: NavbarProps) {
   const pathname = usePathname()
+  const companyName = brand?.companyName?.trim() || "Euromiti"
 
   return (
     <header className="sticky top-0 z-40 border-b border-white/5 bg-black/95 shadow-lg backdrop-blur-md transition-all">
@@ -35,9 +42,20 @@ export function Navbar() {
           </div>
           <Link
             href="/"
-            className="font-[family-name:var(--font-montserrat)] text-xl font-extrabold tracking-tighter text-white uppercase"
+            className="inline-flex max-w-[12rem] items-center gap-3 font-[family-name:var(--font-montserrat)] text-xl font-extrabold tracking-tighter text-white uppercase"
           >
-            Euromiti
+            {brand?.logoUrl ? (
+              <span className="relative block h-9 w-24 shrink-0">
+                <Image
+                  src={brand.logoUrl}
+                  alt={brand.logoAlt}
+                  fill
+                  sizes="6rem"
+                  className="object-contain object-left"
+                />
+              </span>
+            ) : null}
+            <span className="min-w-0 truncate">{companyName}</span>
           </Link>
         </div>
 

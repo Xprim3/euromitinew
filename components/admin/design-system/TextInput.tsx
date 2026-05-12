@@ -1,11 +1,15 @@
-import { forwardRef, type InputHTMLAttributes } from "react"
+import { forwardRef, useId, type InputHTMLAttributes, type ReactNode } from "react"
 
 import { cnDs } from "./cn-ds"
 
 export type TextInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "size"> & {
   label: string
+  helperText?: ReactNode
+  /** @deprecated Use `helperText`; kept so existing forms can migrate gradually. */
   hint?: string
   error?: string
+  leadingAddon?: ReactNode
+  trailingAddon?: ReactNode
 }
 
 const controlClass =
@@ -15,11 +19,14 @@ const controlClass =
  * Single-line text field with label, optional hint, and error text (non-technical friendly copy).
  */
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(function TextInput(
-  { label, hint, error, className, id, required, ...rest },
+  { label, helperText, hint, error, leadingAddon, trailingAddon, className, id, required, disabled, ...rest },
   ref
 ) {
-  const inputId = id ?? rest.name?.toString() ?? undefined
-  const safeId = inputId ?? `text-input-${label.replace(/\s+/g, "-").toLowerCase()}`
+  const generatedId = useId()
+  const safeId = id ?? rest.name?.toString() ?? `text-input-${generatedId}`
+  const helpId = `${safeId}-help`
+  const errorId = `${safeId}-error`
+  const descriptionId = error ? errorId : helperText || hint ? helpId : undefined
 
   return (
     <div className={cnDs("space-y-1.5", className)}>
@@ -27,10 +34,40 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(function T
         {label}
         {required ? <span className="ml-0.5 text-[var(--admin-accent-active)]">*</span> : null}
       </label>
-      <input ref={ref} id={safeId} required={required} className={cnDs(controlClass, error && "border-red-400 focus:ring-red-600")} {...rest} />
-      {hint ? <p className="text-xs text-[var(--admin-text-muted)]">{hint}</p> : null}
+      <div className="relative">
+        {leadingAddon ? (
+          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-[var(--admin-text-muted)]">
+            {leadingAddon}
+          </span>
+        ) : null}
+        <input
+          ref={ref}
+          id={safeId}
+          required={required}
+          disabled={disabled}
+          aria-invalid={Boolean(error)}
+          aria-describedby={descriptionId}
+          className={cnDs(
+            controlClass,
+            leadingAddon && "pl-9",
+            trailingAddon && "pr-9",
+            error && "border-red-400 focus:border-red-500 focus:ring-red-600"
+          )}
+          {...rest}
+        />
+        {trailingAddon ? (
+          <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-[var(--admin-text-muted)]">
+            {trailingAddon}
+          </span>
+        ) : null}
+      </div>
+      {helperText || hint ? (
+        <p id={helpId} className="text-xs leading-5 text-[var(--admin-text-muted)]">
+          {helperText ?? hint}
+        </p>
+      ) : null}
       {error ? (
-        <p className="text-xs font-medium text-red-700" role="alert">
+        <p id={errorId} className="text-xs font-medium text-red-700" role="alert">
           {error}
         </p>
       ) : null}

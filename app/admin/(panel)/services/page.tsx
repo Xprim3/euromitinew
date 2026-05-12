@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 
 import { ServicesContentForm, type ServicesMediaPreviews } from "@/components/admin/ServicesContentForm"
+import { AdminSectionCard, ErrorMessage, SuccessMessage } from "@/components/admin/design-system"
 import { normalizeServicesRow } from "@/lib/data/services-content-public"
 import { formatNewsDate } from "@/lib/format-news-date"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
@@ -75,23 +76,22 @@ export default async function AdminServicesPage() {
   return (
     <div className="space-y-6">
         {!result.ok ? (
-          <p
-            role="alert"
-            className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-amber-100 text-sm"
-          >
+          <ErrorMessage title="Services content could not load">
             {result.message}
-          </p>
+          </ErrorMessage>
         ) : (
           <>
-            <p className="rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-4 py-3 text-emerald-100/95 text-sm">
+            <SuccessMessage title="Public revalidation">
               Saves revalidate <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">/services</code>{" "}
               automatically. Apply migrations so <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">
                 petrol_highlights_json
               </code> exists before saving bullets.
-            </p>
-            <p className="text-sm text-zinc-500">
-              Last updated <span className="text-zinc-400">{formatNewsDate(result.row.updated_at)}</span>
-            </p>
+            </SuccessMessage>
+            <AdminSectionCard>
+              <p className="text-sm text-[var(--admin-text-muted)]">
+                Last updated <span className="font-medium text-[var(--admin-text)]">{formatNewsDate(result.row.updated_at)}</span>
+              </p>
+            </AdminSectionCard>
             <ServicesContentForm key={result.row.updated_at} initial={result.row} previews={result.previews} />
           </>
         )}

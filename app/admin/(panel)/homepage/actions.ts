@@ -30,6 +30,39 @@ type MediaCols = Partial<
   >
 >
 
+async function ensureAdminProfile(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  user: { id: string; email?: string | null }
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  const { data: existing, error: existingErr } = await supabase
+    .from("admins")
+    .select("user_id")
+    .eq("user_id", user.id)
+    .maybeSingle()
+
+  if (existingErr) {
+    return { ok: false, message: existingErr.message }
+  }
+
+  if (existing) {
+    return { ok: true }
+  }
+
+  const { error: insertErr } = await supabase
+    .from("admins")
+    .insert({ user_id: user.id, display_name: user.email ?? null })
+
+  if (!insertErr) {
+    return { ok: true }
+  }
+
+  return {
+    ok: false,
+    message:
+      "Your signed-in user is not in the admins table. Apply the latest RLS repair migration, then save again, or add this user to public.admins.",
+  }
+}
+
 export async function saveHomepageContent(
   _prev: HomepageSaveState,
   formData: FormData
@@ -45,6 +78,10 @@ export async function saveHomepageContent(
     }
 
     const editorId = user.id
+    const adminReady = await ensureAdminProfile(supabase, user)
+    if (!adminReady.ok) {
+      return { ok: false, message: adminReady.message }
+    }
 
     const clearHero = isTruthyCheckbox(formData.get("clear_hero_image"))
     const secondaryLabel = String(formData.get("hero_cta_secondary_label") ?? "").trim()
@@ -178,7 +215,7 @@ export async function saveHomepageContent(
       if (val !== undefined) patch[key] = val
     }
 
-    const { error: upErr } = await supabase.from("homepage_content").update(patch).eq("id", 1)
+    const { error: upErr } = await supabase.from("homepage_content").upsert({ id: 1, ...patch }, { onConflict: "id" })
 
     if (upErr) {
       return { ok: false, message: upErr.message }

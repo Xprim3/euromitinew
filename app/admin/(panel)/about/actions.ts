@@ -44,6 +44,32 @@ function collectValues(formData: FormData): AboutValueCard[] {
 /** undefined = omit patch; null = clear FK */
 type OptionalUuid = string | null | undefined
 
+async function ensureAdminProfile(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  user: { id: string; email?: string | null }
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  const { data: existing, error: existingErr } = await supabase
+    .from("admins")
+    .select("user_id")
+    .eq("user_id", user.id)
+    .maybeSingle()
+
+  if (existingErr) return { ok: false, message: existingErr.message }
+  if (existing) return { ok: true }
+
+  const { error: insertErr } = await supabase
+    .from("admins")
+    .insert({ user_id: user.id, display_name: user.email ?? null })
+
+  if (!insertErr) return { ok: true }
+
+  return {
+    ok: false,
+    message:
+      "Your signed-in user is not in the admins table. Apply the latest RLS repair migration, then save again, or add this user to public.admins.",
+  }
+}
+
 export async function saveAboutContent(_prev: AboutSaveState, formData: FormData): Promise<AboutSaveState> {
   try {
     const supabase = await createSupabaseServerClient()
@@ -56,6 +82,8 @@ export async function saveAboutContent(_prev: AboutSaveState, formData: FormData
     }
 
     const editorId = user.id
+    const adminReady = await ensureAdminProfile(supabase, user)
+    if (!adminReady.ok) return { ok: false, message: adminReady.message }
 
     const parsed = aboutContentTextSchema.safeParse({
       hero_title: formData.get("hero_title"),
@@ -91,11 +119,6 @@ export async function saveAboutContent(_prev: AboutSaveState, formData: FormData
     const valuesJson = collectValues(formData)
     if (valuesJson.length === 0) {
       return { ok: false, message: "Add at least one core value (title + body)." }
-    }
-    const { data: curRaw, error: loadErr } = await supabase.from("about_content").select("*").eq("id", 1).maybeSingle()
-    if (loadErr) return { ok: false, message: loadErr.message }
-    if (!curRaw) {
-      return { ok: false, message: "No about_content row with id = 1. Run Phase 10 migrations." }
     }
 
     async function resolveMediaSlot(opts: {
@@ -193,7 +216,7 @@ export async function saveAboutContent(_prev: AboutSaveState, formData: FormData
     if (whyR.next !== undefined) patch.gallery_why_us_media_id = whyR.next
     if (partnerR.next !== undefined) patch.gallery_partnerships_media_id = partnerR.next
 
-    const { error: upErr } = await supabase.from("about_content").update(patch).eq("id", 1)
+    const { error: upErr } = await supabase.from("about_content").upsert({ id: 1, ...patch }, { onConflict: "id" })
     if (upErr) return { ok: false, message: upErr.message }
 
     revalidatePath("/about")

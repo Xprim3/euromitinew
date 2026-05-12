@@ -32,6 +32,40 @@ function amenitiesFromForm(formData: FormData): LocationAmenity[] {
   return out
 }
 
+async function ensureAdminProfile(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  user: { id: string; email?: string | null }
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  const { data: existing, error: existingErr } = await supabase
+    .from("admins")
+    .select("user_id")
+    .eq("user_id", user.id)
+    .maybeSingle()
+
+  if (existingErr) return { ok: false, message: existingErr.message }
+  if (existing) return { ok: true }
+
+  const { error: insertErr } = await supabase
+    .from("admins")
+    .insert({ user_id: user.id, display_name: user.email ?? null })
+
+  if (!insertErr) return { ok: true }
+
+  return {
+    ok: false,
+    message:
+      "Your signed-in user is not in the admins table. Apply the latest RLS repair migration, then save again, or add this user to public.admins.",
+  }
+}
+
+function revalidateLocationSurfaces(locationId?: string) {
+  revalidatePath("/")
+  revalidatePath("/locations")
+  revalidatePath("/contact")
+  revalidatePath("/admin/locations")
+  if (locationId) revalidatePath(`/admin/locations/${locationId}`)
+}
+
 type OptionalUuid = string | null | undefined
 
 function dedupeIds(ids: string[]) {
@@ -146,14 +180,16 @@ export async function deleteLocationAction(
     } = await supabase.auth.getUser()
     if (authErr || !user) return { ok: false, message: "You must be signed in as an admin." }
 
+    const adminReady = await ensureAdminProfile(supabase, user)
+    if (!adminReady.ok) return { ok: false, message: adminReady.message }
+
     const id = String(formData.get("id") ?? "").trim()
     if (!id) return { ok: false, message: "Missing location id." }
 
     const { error } = await supabase.from("locations").delete().eq("id", id)
     if (error) return { ok: false, message: pgUniqueMessage(error.message) }
 
-    revalidatePath("/locations")
-    revalidatePath("/admin/locations")
+    revalidateLocationSurfaces()
 
     return { ok: true, message: "Location deleted." }
   } catch (e) {
@@ -172,6 +208,8 @@ export async function createLocationAction(_prev: LocationSaveState, formData: F
   }
 
   const editorId = user.id
+  const adminReady = await ensureAdminProfile(supabase, user)
+  if (!adminReady.ok) return { ok: false, message: adminReady.message }
 
   const parsed = locationCoreFieldsSchema.safeParse({
     slug: formData.get("slug"),
@@ -243,8 +281,7 @@ export async function createLocationAction(_prev: LocationSaveState, formData: F
     return { ok: false, message: gErr.error }
   }
 
-  revalidatePath("/locations")
-  revalidatePath("/admin/locations")
+  revalidateLocationSurfaces(locationId)
   redirect(`/admin/locations/${locationId}`)
 }
 
@@ -260,6 +297,8 @@ export async function updateLocationAction(_prev: LocationSaveState, formData: F
     }
 
     const editorId = user.id
+    const adminReady = await ensureAdminProfile(supabase, user)
+    if (!adminReady.ok) return { ok: false, message: adminReady.message }
 
     const locationId = String(formData.get("id") ?? "").trim()
     if (!locationId) return { ok: false, message: "Missing location id." }
@@ -317,11 +356,9 @@ export async function updateLocationAction(_prev: LocationSaveState, formData: F
     const gErr = await replaceLocationGallery(supabase, locationId, gal.ids)
     if (gErr) return { ok: false, message: gErr.error }
 
-    revalidatePath("/locations")
-    revalidatePath("/admin/locations")
-    revalidatePath(`/admin/locations/${locationId}`)
+    revalidateLocationSurfaces(locationId)
 
-    return { ok: true, message: "Location saved. Public `/locations` was revalidated." }
+    return { ok: true, message: "Location saved. Public homepage and `/locations` were revalidated." }
   } catch (e) {
     return { ok: false, message: e instanceof Error ? e.message : "Unexpected error" }
   }

@@ -1,4 +1,4 @@
-/** Placeholder while `HomeFuelPricesGlass` loads Supabase / mock data. */
+/** Placeholder while `HomeFuelPricesGlass` loads Supabase fuel prices. */
 export function FuelPricesSkeletonSection() {
   return (
     <section

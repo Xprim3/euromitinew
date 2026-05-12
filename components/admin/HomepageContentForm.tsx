@@ -1,13 +1,20 @@
 "use client"
 
-import { useActionState, useEffect, useMemo } from "react"
+import { useActionState, useEffect, useRef, type ReactNode } from "react"
 import { useRouter } from "next/navigation"
 
 import { saveHomepageContent, type HomepageSaveState } from "@/app/admin/(panel)/homepage/actions"
+import {
+  AdminContentGrid,
+  AdminSectionCard,
+  ErrorMessage,
+  FileUploadInput,
+  SaveBar,
+  SuccessMessage,
+  TextareaInput,
+  TextInput,
+} from "@/components/admin/design-system"
 import type { HomepageContentRow } from "@/types/supabase-cms"
-
-import { adminInputClass, adminLabelClass } from "./cn-admin"
-import { HomepageContentSubmitButton } from "./HomepageContentSubmitButton"
 
 export type HomepageMediaPreviews = {
   hero: string | null
@@ -24,15 +31,38 @@ type HomepageContentFormProps = {
   mediaPreviews: HomepageMediaPreviews
 }
 
-function PreviewThumb({ url }: { url: string | null }) {
-  if (!url) {
-    return <p className="text-sm text-zinc-500">No image in the database for this slot.</p>
-  }
+function SectionAccordion({
+  title,
+  description,
+  children,
+  defaultOpen = false,
+}: {
+  title: string
+  description?: string
+  children: ReactNode
+  defaultOpen?: boolean
+}) {
   return (
-    <div className="relative max-h-44 max-w-full overflow-hidden rounded-lg border border-zinc-700 sm:max-w-lg">
-      {/* eslint-disable-next-line @next/next/no-img-element -- admin preview arbitrary URLs */}
-      <img src={url} alt="" className="max-h-44 w-full object-cover" />
-    </div>
+    <details
+      open={defaultOpen}
+      className="group rounded-[var(--admin-radius-card)] border border-[var(--admin-border)] bg-[var(--admin-surface)] shadow-[var(--admin-shadow-card)]"
+    >
+      <summary className="flex cursor-pointer list-none items-start justify-between gap-4 px-5 py-4 marker:hidden sm:px-6">
+        <span className="min-w-0">
+          <span className="block font-[family-name:var(--font-montserrat)] text-base font-semibold tracking-tight text-[var(--admin-text)] sm:text-lg">
+            {title}
+          </span>
+          {description ? <span className="mt-1 block text-sm text-[var(--admin-text-muted)]">{description}</span> : null}
+        </span>
+        <span className="mt-1 rounded-full border border-[var(--admin-border)] px-2 py-0.5 text-xs font-semibold text-[var(--admin-text-muted)] group-open:hidden">
+          Open
+        </span>
+        <span className="mt-1 hidden rounded-full border border-[var(--admin-border)] px-2 py-0.5 text-xs font-semibold text-[var(--admin-text-muted)] group-open:inline-flex">
+          Close
+        </span>
+      </summary>
+      <div className="border-[var(--admin-border)] border-t px-5 py-5 sm:px-6">{children}</div>
+    </details>
   )
 }
 
@@ -40,6 +70,7 @@ const initialActionState: HomepageSaveState = { ok: null }
 
 export function HomepageContentForm({ initial, mediaPreviews }: HomepageContentFormProps) {
   const router = useRouter()
+  const formRef = useRef<HTMLFormElement>(null)
   const [state, formAction] = useActionState(saveHomepageContent, initialActionState)
 
   const fieldErrors = state.ok === false && "fieldErrors" in state ? state.fieldErrors : undefined
@@ -49,421 +80,313 @@ export function HomepageContentForm({ initial, mediaPreviews }: HomepageContentF
     if (state.ok === true) router.refresh()
   }, [router, state.ok])
 
-  const defaultSecondaryHref = useMemo(
-    () => (initial.hero_cta_secondary_label.trim() ? initial.hero_cta_secondary_href : "/locations"),
-    [initial.hero_cta_secondary_href, initial.hero_cta_secondary_label]
-  )
-
-  const fileClassName =
-    "block w-full max-w-lg border border-zinc-700 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-100 file:mr-4 file:rounded-md file:border-0 file:bg-zinc-700 file:px-3 file:py-2 file:text-sm file:text-white"
-
   return (
-    <form action={formAction} className="max-w-4xl space-y-10">
+    <form ref={formRef} action={formAction} className="space-y-6 pb-24">
+      <input type="hidden" name="locations_band_kicker" value={initial.locations_band_kicker} />
+      <input type="hidden" name="locations_band_heading" value={initial.locations_band_heading} />
+      <input type="hidden" name="locations_band_subtitle" value={initial.locations_band_subtitle} />
+      <input type="hidden" name="restaurant_float_1_alt" value="" />
+      <input type="hidden" name="restaurant_float_2_alt" value="" />
+
       {state.ok === true ? (
-        <p
-          role="status"
-          className="rounded-lg border border-emerald-500/35 bg-emerald-500/15 px-4 py-3 text-emerald-100 text-sm"
-        >
+        <SuccessMessage title="Homepage saved">
           {state.message}
-        </p>
+        </SuccessMessage>
       ) : null}
       {state.ok === false && "message" in state ? (
-        <p
-          role="alert"
-          className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-red-100 text-sm"
-        >
+        <ErrorMessage title="Could not save homepage">
           {state.message}
-        </p>
+        </ErrorMessage>
       ) : null}
       {hasFieldErrors ? (
-        <p className="rounded-lg border border-zinc-700 bg-zinc-900/80 px-4 py-3 text-sm text-zinc-400">
+        <ErrorMessage title="Check the highlighted fields">
           Fix the highlighted fields and try again.
-        </p>
+        </ErrorMessage>
       ) : null}
 
-      <section className="space-y-5 rounded-xl border border-zinc-800 bg-zinc-900/40 p-6">
-        <h2 className="font-heading font-semibold text-lg text-white">Hero</h2>
-        <div className="grid gap-5 sm:grid-cols-2">
-          <div>
-            <label className={adminLabelClass} htmlFor="hero_headline_line1">
-              Headline · line 1
-            </label>
-            <input
-              id="hero_headline_line1"
-              name="hero_headline_line1"
-              defaultValue={initial.hero_headline_line1}
-              className={adminInputClass}
-              maxLength={240}
-            />
-            {fieldErrors?.hero_headline_line1 ? (
-              <p className="mt-1 text-red-400 text-xs">{fieldErrors.hero_headline_line1[0]}</p>
-            ) : null}
-          </div>
-          <div>
-            <label className={adminLabelClass} htmlFor="hero_headline_line2">
-              Headline · line 2
-            </label>
-            <input
-              id="hero_headline_line2"
-              name="hero_headline_line2"
-              defaultValue={initial.hero_headline_line2}
-              className={adminInputClass}
-              maxLength={240}
-            />
-          </div>
-        </div>
-        <div>
-          <label className={adminLabelClass} htmlFor="hero_subtitle">
-            Subtitle
-          </label>
-          <textarea
-            id="hero_subtitle"
-            name="hero_subtitle"
-            rows={3}
-            defaultValue={initial.hero_subtitle}
-            className={`min-h-18 resize-y ${adminInputClass}`}
-          />
-          {fieldErrors?.hero_subtitle ? (
-            <p className="mt-1 text-red-400 text-xs">{fieldErrors.hero_subtitle[0]}</p>
-          ) : null}
-        </div>
-
-        <div className="grid gap-5 sm:grid-cols-2">
-          <div>
-            <label className={adminLabelClass} htmlFor="hero_cta_primary_label">
-              Primary button text
-            </label>
-            <input
-              id="hero_cta_primary_label"
-              name="hero_cta_primary_label"
-              defaultValue={initial.hero_cta_primary_label}
-              className={adminInputClass}
-            />
-            {fieldErrors?.hero_cta_primary_label ? (
-              <p className="mt-1 text-red-400 text-xs">{fieldErrors.hero_cta_primary_label[0]}</p>
-            ) : null}
-          </div>
-          <div>
-            <label className={adminLabelClass} htmlFor="hero_cta_primary_href">
-              Primary button link
-            </label>
-            <input
-              id="hero_cta_primary_href"
-              name="hero_cta_primary_href"
-              defaultValue={initial.hero_cta_primary_href}
-              className={`font-mono text-xs ${adminInputClass}`}
-              placeholder="/services"
-            />
-            {fieldErrors?.hero_cta_primary_href ? (
-              <p className="mt-1 text-red-400 text-xs">{fieldErrors.hero_cta_primary_href[0]}</p>
-            ) : null}
-          </div>
-          <div>
-            <label className={adminLabelClass} htmlFor="hero_cta_secondary_label">
-              Secondary button text (optional — leave blank to hide)
-            </label>
-            <input
-              id="hero_cta_secondary_label"
-              name="hero_cta_secondary_label"
-              defaultValue={initial.hero_cta_secondary_label}
-              className={adminInputClass}
-            />
-          </div>
-          <div>
-            <label className={adminLabelClass} htmlFor="hero_cta_secondary_href">
-              Secondary button link
-            </label>
-            <input
-              id="hero_cta_secondary_href"
-              name="hero_cta_secondary_href"
-              defaultValue={defaultSecondaryHref}
-              className={`font-mono text-xs ${adminInputClass}`}
-              placeholder="/locations"
-            />
-            {fieldErrors?.hero_cta_secondary_href ? (
-              <p className="mt-1 text-red-400 text-xs">{fieldErrors.hero_cta_secondary_href[0]}</p>
-            ) : null}
-          </div>
-        </div>
-      </section>
-
-      <section className="space-y-5 rounded-xl border border-zinc-800 bg-zinc-900/40 p-6">
-        <h2 className="font-heading font-semibold text-lg text-white">Locations band (homepage)</h2>
-        <p className="text-xs text-zinc-500">Copy above the three location cards — cards pull from active `locations` rows.</p>
-        <div className="grid gap-5 sm:grid-cols-2">
-          <div>
-            <label className={adminLabelClass} htmlFor="locations_band_kicker">
-              Eyebrow
-            </label>
-            <input
-              id="locations_band_kicker"
-              name="locations_band_kicker"
-              defaultValue={initial.locations_band_kicker}
-              className={adminInputClass}
-            />
-          </div>
-          <div>
-            <label className={adminLabelClass} htmlFor="locations_band_heading">
-              Heading
-            </label>
-            <input
-              id="locations_band_heading"
-              name="locations_band_heading"
-              defaultValue={initial.locations_band_heading}
-              className={adminInputClass}
-            />
-          </div>
-        </div>
-        <div>
-          <label className={adminLabelClass} htmlFor="locations_band_subtitle">
-            Subtitle
-          </label>
-          <textarea
-            id="locations_band_subtitle"
-            name="locations_band_subtitle"
-            rows={2}
-            defaultValue={initial.locations_band_subtitle}
-            className={`resize-y ${adminInputClass}`}
-          />
-        </div>
-      </section>
-
-      <section className="space-y-5 rounded-xl border border-zinc-800 bg-zinc-900/40 p-6">
-        <h2 className="font-heading font-semibold text-lg text-white">Services intro (dark band)</h2>
-        <div>
-          <label className={adminLabelClass} htmlFor="services_intro_title">
-            Heading
-          </label>
-          <input
-            id="services_intro_title"
-            name="services_intro_title"
-            defaultValue={initial.services_intro_title}
-            className={adminInputClass}
-          />
-        </div>
-        <div>
-          <label className={adminLabelClass} htmlFor="services_intro_body">
-            Intro text
-          </label>
-          <textarea
-            id="services_intro_body"
-            name="services_intro_body"
-            rows={4}
-            defaultValue={initial.services_intro_body}
-            className={`resize-y ${adminInputClass}`}
-          />
-        </div>
-        <PreviewThumb url={mediaPreviews.servicesIntro} />
-        <div>
-          <label className={adminLabelClass} htmlFor="services_intro_image">
-            Hero image — services intro column
-          </label>
-          <input id="services_intro_image" name="services_intro_image" type="file" accept="image/*" className={fileClassName} />
-        </div>
-        <div>
-          <label className={adminLabelClass} htmlFor="services_intro_image_alt">
-            Alt text (new upload)
-          </label>
-          <input id="services_intro_image_alt" name="services_intro_image_alt" className={adminInputClass} />
-        </div>
-        <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-300">
-          <input type="checkbox" name="clear_services_intro_image" className="size-4 rounded border-zinc-600" />
-          Remove stored services-intro image reference
-        </label>
-      </section>
-
-      <section className="space-y-5 rounded-xl border border-zinc-800 bg-zinc-900/40 p-6">
-        <h2 className="font-heading font-semibold text-lg text-white">Card row — Restaurant / playground / Mini market copy</h2>
-        <div>
-          <label className={adminLabelClass} htmlFor="about_preview_text">
-            About preview (future sections)
-          </label>
-          <textarea
-            id="about_preview_text"
-            name="about_preview_text"
-            rows={3}
-            defaultValue={initial.about_preview_text}
-            className={`resize-y ${adminInputClass}`}
-          />
-        </div>
-        <div>
-          <label className={adminLabelClass} htmlFor="carwash_intro_text">
-            Carwash card body
-          </label>
-          <textarea
-            id="carwash_intro_text"
-            name="carwash_intro_text"
-            rows={3}
-            defaultValue={initial.carwash_intro_text}
-            className={`resize-y ${adminInputClass}`}
-          />
-        </div>
-        <PreviewThumb url={mediaPreviews.carwash} />
-        <div>
-          <label className={adminLabelClass} htmlFor="carwash_image">
-            Carwash card image
-          </label>
-          <input id="carwash_image" name="carwash_image" type="file" accept="image/*" className={fileClassName} />
-        </div>
-        <div>
-          <label className={adminLabelClass} htmlFor="carwash_image_alt">
-            Alt (new upload)
-          </label>
-          <input id="carwash_image_alt" name="carwash_image_alt" className={adminInputClass} />
-        </div>
-        <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-300">
-          <input type="checkbox" name="clear_carwash_image" className="size-4 rounded border-zinc-600" />
-          Remove carwash image reference
-        </label>
-
-        <div className="border-zinc-800 border-t pt-5">
-          <p className="text-xs text-zinc-500">
-            Playground card still follows static mock visuals; only mini market rows below edit the third card body/image.
-          </p>
-          <label className={`${adminLabelClass} mt-4`} htmlFor="mini_market_intro_text">
-            Mini market card body
-          </label>
-          <textarea
-            id="mini_market_intro_text"
-            name="mini_market_intro_text"
-            rows={3}
-            defaultValue={initial.mini_market_intro_text}
-            className={`resize-y ${adminInputClass}`}
-          />
-          <PreviewThumb url={mediaPreviews.miniMarket} />
-          <div>
-            <label className={`${adminLabelClass} mt-3`} htmlFor="mini_market_image">
-              Mini market card image
-            </label>
-            <input id="mini_market_image" name="mini_market_image" type="file" accept="image/*" className={fileClassName} />
-          </div>
-          <div>
-            <label className={adminLabelClass} htmlFor="mini_market_image_alt">
-              Alt (new upload)
-            </label>
-            <input id="mini_market_image_alt" name="mini_market_image_alt" className={adminInputClass} />
-          </div>
-          <label className="mt-2 flex cursor-pointer items-center gap-2 text-sm text-zinc-300">
-            <input type="checkbox" name="clear_mini_market_image" className="size-4 rounded border-zinc-600" />
-            Remove mini market image reference
-          </label>
-        </div>
-      </section>
-
-      <section className="space-y-5 rounded-xl border border-zinc-800 bg-zinc-900/40 p-6">
-        <h2 className="font-heading font-semibold text-lg text-white">Restaurant luxury band</h2>
-        <div className="grid gap-5 sm:grid-cols-2">
-          <div>
-            <label className={adminLabelClass} htmlFor="restaurant_home_headline_primary">
-              Headline · primary line
-            </label>
-            <input
-              id="restaurant_home_headline_primary"
-              name="restaurant_home_headline_primary"
-              defaultValue={initial.restaurant_home_headline_primary}
-              className={adminInputClass}
-            />
-          </div>
-          <div>
-            <label className={adminLabelClass} htmlFor="restaurant_home_headline_accent">
-              Headline · accent line (colored span)
-            </label>
-            <input
-              id="restaurant_home_headline_accent"
-              name="restaurant_home_headline_accent"
-              defaultValue={initial.restaurant_home_headline_accent}
-              className={adminInputClass}
-            />
-          </div>
-        </div>
-        <div>
-          <label className={adminLabelClass} htmlFor="restaurant_highlight_text">
-            Body
-          </label>
-          <textarea
-            id="restaurant_highlight_text"
-            name="restaurant_highlight_text"
-            rows={4}
-            defaultValue={initial.restaurant_highlight_text}
-            className={`resize-y ${adminInputClass}`}
-          />
-        </div>
+      <AdminSectionCard
+        title="Homepage content"
+        description="Edit the CMS-backed homepage fields. Sections marked as planned are visible for layout planning but are not saved until the schema supports them."
+      >
         <div className="space-y-3">
-          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Main image</p>
-          <PreviewThumb url={mediaPreviews.restaurantMain} />
-          <input id="restaurant_main_image" name="restaurant_main_image" type="file" accept="image/*" className={fileClassName} />
-          <input id="restaurant_main_alt" name="restaurant_main_alt" className={adminInputClass} placeholder="Alt (new upload)" />
-          <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-300">
-            <input type="checkbox" name="clear_restaurant_main_image" className="size-4 rounded border-zinc-600" />
-            Remove main image reference
-          </label>
-        </div>
-        <div className="grid gap-5 sm:grid-cols-2">
-          <div className="space-y-2">
-            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Float 1</p>
-            <PreviewThumb url={mediaPreviews.restaurantFloat1} />
-            <input
-              id="restaurant_float_1_image"
-              name="restaurant_float_1_image"
-              type="file"
-              accept="image/*"
-              className={fileClassName}
-            />
-            <input id="restaurant_float_1_alt" name="restaurant_float_1_alt" className={adminInputClass} placeholder="Alt" />
-            <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-300">
-              <input type="checkbox" name="clear_restaurant_float_1_image" className="size-4 rounded border-zinc-600" />
-              Clear
-            </label>
-          </div>
-          <div className="space-y-2">
-            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Float 2</p>
-            <PreviewThumb url={mediaPreviews.restaurantFloat2} />
-            <input
-              id="restaurant_float_2_image"
-              name="restaurant_float_2_image"
-              type="file"
-              accept="image/*"
-              className={fileClassName}
-            />
-            <input id="restaurant_float_2_alt" name="restaurant_float_2_alt" className={adminInputClass} placeholder="Alt" />
-            <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-300">
-              <input type="checkbox" name="clear_restaurant_float_2_image" className="size-4 rounded border-zinc-600" />
-              Clear
-            </label>
-          </div>
-        </div>
-      </section>
+          <SectionAccordion
+            title="1. Hero Section"
+            description="Main homepage headline, intro copy, primary/secondary CTA labels, and hero image."
+            defaultOpen
+          >
+            <div className="space-y-5">
+              <AdminContentGrid columns={2}>
+                <TextInput
+                  label="Headline line 1"
+                  name="hero_headline_line1"
+                  defaultValue={initial.hero_headline_line1}
+                  maxLength={240}
+                  error={fieldErrors?.hero_headline_line1?.[0]}
+                />
+                <TextInput
+                  label="Headline line 2"
+                  name="hero_headline_line2"
+                  defaultValue={initial.hero_headline_line2}
+                  maxLength={240}
+                  error={fieldErrors?.hero_headline_line2?.[0]}
+                />
+              </AdminContentGrid>
+              <TextareaInput
+                label="Subtitle"
+                name="hero_subtitle"
+                defaultValue={initial.hero_subtitle}
+                rows={4}
+                maxLength={1200}
+                showCharacterCount
+                error={fieldErrors?.hero_subtitle?.[0]}
+              />
+              <FileUploadInput
+                label="Hero image upload"
+                name="hero_image"
+                previewUrl={mediaPreviews.hero}
+                previewAlt="Homepage hero image"
+                helperText="JPEG, PNG, WebP, or GIF up to the configured Supabase storage limit."
+                removeInputName="clear_hero_image"
+              />
+              <TextInput label="Hero image alt text" name="hero_image_alt" placeholder="Describe the photograph" />
+              <AdminContentGrid columns={2}>
+                <TextInput
+                  label="Primary button text"
+                  name="hero_cta_primary_label"
+                  defaultValue={initial.hero_cta_primary_label}
+                  required
+                  error={fieldErrors?.hero_cta_primary_label?.[0]}
+                />
+                <TextInput
+                  label="Secondary button text"
+                  name="hero_cta_secondary_label"
+                  defaultValue={initial.hero_cta_secondary_label}
+                  helperText="Leave empty to hide the second button."
+                  error={fieldErrors?.hero_cta_secondary_label?.[0]}
+                />
+              </AdminContentGrid>
+              <AdminContentGrid columns={2}>
+                <TextInput
+                  label="Primary button link"
+                  name="hero_cta_primary_href"
+                  defaultValue={initial.hero_cta_primary_href || "/services"}
+                  required
+                  helperText="Use a site path like /services or a full URL."
+                  error={fieldErrors?.hero_cta_primary_href?.[0]}
+                />
+                <TextInput
+                  label="Secondary button link"
+                  name="hero_cta_secondary_href"
+                  defaultValue={initial.hero_cta_secondary_href || "/locations"}
+                  helperText="Used when the secondary button text is not empty."
+                  error={fieldErrors?.hero_cta_secondary_href?.[0]}
+                />
+              </AdminContentGrid>
+            </div>
+          </SectionAccordion>
 
-      <section className="space-y-5 rounded-xl border border-zinc-800 bg-zinc-900/40 p-6">
-        <h2 className="font-heading font-semibold text-lg text-white">Hero image</h2>
-        <PreviewThumb url={mediaPreviews.hero} />
-        <div>
-          <label className={adminLabelClass} htmlFor="hero_image">
-            Replace image (JPEG / PNG / WebP / GIF, ≤ 5&nbsp;MB)
-          </label>
-          <input
-            id="hero_image"
-            name="hero_image"
-            type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif"
-            className={fileClassName}
-          />
-        </div>
-        <div>
-          <label className={adminLabelClass} htmlFor="hero_image_alt">
-            Alt text (new uploads)
-          </label>
-          <input id="hero_image_alt" name="hero_image_alt" className={adminInputClass} placeholder="Describe the photograph" />
-        </div>
-        <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-300">
-          <input type="checkbox" name="clear_hero_image" className="size-4 rounded border-zinc-600" />
-          Remove hero image from homepage record (does not delete the storage file yet)
-        </label>
-      </section>
+          <SectionAccordion title="2. Services Preview" description="Title and description for the homepage services preview band.">
+            <div className="space-y-5">
+              <TextInput
+                label="Title"
+                name="services_intro_title"
+                defaultValue={initial.services_intro_title}
+                maxLength={200}
+                error={fieldErrors?.services_intro_title?.[0]}
+              />
+              <TextareaInput
+                label="Description"
+                name="services_intro_body"
+                defaultValue={initial.services_intro_body}
+                rows={5}
+                maxLength={4000}
+                showCharacterCount
+                error={fieldErrors?.services_intro_body?.[0]}
+              />
+              <FileUploadInput
+                label="Services preview image"
+                name="services_intro_image"
+                previewUrl={mediaPreviews.servicesIntro}
+                previewAlt="Homepage services preview"
+                helperText="Existing backend supports this image slot; it is used by the current services intro band."
+                removeInputName="clear_services_intro_image"
+              />
+              <TextInput label="Services image alt text" name="services_intro_image_alt" placeholder="Describe the image" />
+            </div>
+          </SectionAccordion>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <HomepageContentSubmitButton />
-      </div>
+          <SectionAccordion title="3. About Preview" description="About preview copy. Title and button text are planned fields.">
+            <div className="space-y-5">
+              <AdminContentGrid columns={2}>
+                <TextInput
+                  label="Title"
+                  value="Built In Kosovo. Trusted On Every Route."
+                  helperText="Planned CMS field. Current public title is design-owned."
+                  disabled
+                  readOnly
+                />
+                <TextInput
+                  label="Button text"
+                  value="Read Full About Us"
+                  helperText="Planned CMS field. Current public button text is design-owned."
+                  disabled
+                  readOnly
+                />
+              </AdminContentGrid>
+              <TextareaInput
+                label="Description"
+                name="about_preview_text"
+                defaultValue={initial.about_preview_text}
+                rows={5}
+                maxLength={4000}
+                showCharacterCount
+                helperText="Saved to homepage_content and shown in the homepage About preview."
+                error={fieldErrors?.about_preview_text?.[0]}
+              />
+            </div>
+          </SectionAccordion>
+
+          <SectionAccordion title="4. Restaurant Highlight" description="Restaurant headline, description, image, and planned button text.">
+            <div className="space-y-5">
+              <AdminContentGrid columns={2}>
+                <TextInput
+                  label="Title line 1"
+                  name="restaurant_home_headline_primary"
+                  defaultValue={initial.restaurant_home_headline_primary}
+                  error={fieldErrors?.restaurant_home_headline_primary?.[0]}
+                />
+                <TextInput
+                  label="Title line 2"
+                  name="restaurant_home_headline_accent"
+                  defaultValue={initial.restaurant_home_headline_accent}
+                  error={fieldErrors?.restaurant_home_headline_accent?.[0]}
+                />
+              </AdminContentGrid>
+              <TextareaInput
+                label="Description"
+                name="restaurant_highlight_text"
+                defaultValue={initial.restaurant_highlight_text}
+                rows={5}
+                maxLength={4000}
+                showCharacterCount
+                error={fieldErrors?.restaurant_highlight_text?.[0]}
+              />
+              <FileUploadInput
+                label="Restaurant image upload"
+                name="restaurant_main_image"
+                previewUrl={mediaPreviews.restaurantMain}
+                previewAlt="Homepage restaurant highlight"
+                removeInputName="clear_restaurant_main_image"
+              />
+              <TextInput label="Restaurant image alt text" name="restaurant_main_alt" placeholder="Describe the restaurant image" />
+              <TextInput
+                label="Button text"
+                value="Explore restaurant"
+                helperText="Planned CMS field. Current public button text/link are design-owned."
+                disabled
+                readOnly
+              />
+            </div>
+          </SectionAccordion>
+
+          <SectionAccordion title="5. Carwash Intro" description="Carwash card copy and image upload.">
+            <div className="space-y-5">
+              <TextInput
+                label="Title"
+                value="Carwash"
+                helperText="Planned CMS field. Current public title is design-owned."
+                disabled
+                readOnly
+              />
+              <TextareaInput
+                label="Description"
+                name="carwash_intro_text"
+                defaultValue={initial.carwash_intro_text}
+                rows={5}
+                maxLength={4000}
+                showCharacterCount
+                error={fieldErrors?.carwash_intro_text?.[0]}
+              />
+              <FileUploadInput
+                label="Carwash image upload"
+                name="carwash_image"
+                previewUrl={mediaPreviews.carwash}
+                previewAlt="Homepage carwash intro"
+                removeInputName="clear_carwash_image"
+              />
+              <TextInput label="Carwash image alt text" name="carwash_image_alt" placeholder="Describe the carwash image" />
+            </div>
+          </SectionAccordion>
+
+          <SectionAccordion title="6. Mini Market Intro" description="Mini Market card copy and image upload.">
+            <div className="space-y-5">
+              <TextInput
+                label="Title"
+                value="Mini Market"
+                helperText="Planned CMS field. Current public title is design-owned."
+                disabled
+                readOnly
+              />
+              <TextareaInput
+                label="Description"
+                name="mini_market_intro_text"
+                defaultValue={initial.mini_market_intro_text}
+                rows={5}
+                maxLength={4000}
+                showCharacterCount
+                error={fieldErrors?.mini_market_intro_text?.[0]}
+              />
+              <FileUploadInput
+                label="Mini Market image upload"
+                name="mini_market_image"
+                previewUrl={mediaPreviews.miniMarket}
+                previewAlt="Homepage mini market intro"
+                removeInputName="clear_mini_market_image"
+              />
+              <TextInput label="Mini Market image alt text" name="mini_market_image_alt" placeholder="Describe the market image" />
+            </div>
+          </SectionAccordion>
+
+          <SectionAccordion title="7. Careers CTA" description="Prepared section. Not saved until homepage schema/public section support is added.">
+            <AdminContentGrid columns={2}>
+              <TextInput label="Title" value="Join our team" disabled readOnly />
+              <TextInput label="Button text" value="View careers" disabled readOnly />
+              <TextareaInput
+                label="Description"
+                value="Careers CTA copy will be editable after the homepage schema has dedicated careers fields."
+                rows={4}
+                disabled
+                readOnly
+                className="sm:col-span-2"
+              />
+            </AdminContentGrid>
+          </SectionAccordion>
+
+          <SectionAccordion title="8. Contact CTA" description="Prepared section. Contact details are currently managed from Contact Info.">
+            <AdminContentGrid columns={2}>
+              <TextInput label="Title" value="Talk To Euromiti" disabled readOnly />
+              <TextInput label="Button text" value="Contact Us" disabled readOnly />
+              <TextareaInput
+                label="Description"
+                value="Contact CTA copy will be editable after the homepage schema has dedicated contact CTA fields."
+                rows={4}
+                disabled
+                readOnly
+                className="sm:col-span-2"
+              />
+            </AdminContentGrid>
+          </SectionAccordion>
+        </div>
+      </AdminSectionCard>
+
+      <SaveBar
+        hasUnsavedChanges
+        unsavedLabel="Review changes before publishing"
+        cancelLabel="Reset changes"
+        onCancel={() => formRef.current?.reset()}
+        submitLabel="Save changes"
+        submitPendingLabel="Saving homepage…"
+      />
     </form>
   )
 }

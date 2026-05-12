@@ -3,7 +3,12 @@ import Link from "next/link"
 
 import { Container } from "./Container"
 
-import { getSiteFooterPublic, type SiteFooterPublic } from "@/lib/data/site-contact-public"
+import {
+  getContactDetailsPublic,
+  getSiteFooterPublic,
+  type ContactDetailsPublic,
+  type SiteFooterPublic,
+} from "@/lib/data/site-contact-public"
 import { TOPBAR_NAV_LINKS } from "@/lib/navigation"
 
 const legalLinks = [
@@ -17,7 +22,11 @@ const footerLinkClass =
 const socialClass =
   "text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-white/55 transition-colors hover:text-brand-accent-soft"
 
-function FooterView({ data }: { data: SiteFooterPublic }) {
+function telHref(phone: string) {
+  return `tel:${phone.replace(/\s/g, "")}`
+}
+
+function FooterView({ data, contact }: { data: SiteFooterPublic; contact: ContactDetailsPublic }) {
   const year = new Date().getFullYear()
 
   return (
@@ -66,6 +75,26 @@ function FooterView({ data }: { data: SiteFooterPublic }) {
                 Fuel prices
               </Link>
             </div>
+            <div className="mt-8 grid gap-3 border-white/8 border-t pt-6 text-sm text-white/58 sm:grid-cols-2">
+              <a className="font-semibold transition-colors hover:text-brand-accent-soft" href={telHref(contact.phone)}>
+                {contact.phone}
+              </a>
+              <a className="break-all font-semibold transition-colors hover:text-brand-accent-soft" href={`mailto:${contact.email}`}>
+                {contact.email}
+              </a>
+              {contact.mapLink ? (
+                <a
+                  className="leading-relaxed transition-colors hover:text-brand-accent-soft sm:col-span-2"
+                  href={contact.mapLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {contact.hqAddress}
+                </a>
+              ) : (
+                <span className="leading-relaxed sm:col-span-2">{contact.hqAddress}</span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -91,6 +120,6 @@ function FooterView({ data }: { data: SiteFooterPublic }) {
 }
 
 export async function Footer() {
-  const data = await getSiteFooterPublic()
-  return <FooterView data={data} />
+  const [data, contact] = await Promise.all([getSiteFooterPublic(), getContactDetailsPublic()])
+  return <FooterView data={data} contact={contact} />
 }

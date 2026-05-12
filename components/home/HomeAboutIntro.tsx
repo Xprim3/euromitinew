@@ -3,8 +3,15 @@ import Image from "next/image"
 
 import { SectionReveal } from "@/components/motion"
 import { SectionAccentRule } from "@/components/ui/SectionAccentRule"
+import { getPublicHomepageSingleton } from "@/lib/data/homepage-singleton-public"
 
-export function HomeAboutIntro() {
+const defaultWhoWeAre =
+  "Euromiti is a Kosovo-grown fuel and roadside service company operating with dependable standards in Prishtina, Ferizaj, and Gjilan."
+
+export async function HomeAboutIntro() {
+  const { row } = await getPublicHomepageSingleton()
+  const whoWeAre = row?.about_preview_text?.trim() || defaultWhoWeAre
+
   return (
     <section className="bg-brand-surface-tinted px-4 py-11 sm:px-6 md:py-14 lg:px-12" aria-labelledby="about-intro-heading">
       <div className="mx-auto max-w-[1280px]">
@@ -37,8 +44,7 @@ export function HomeAboutIntro() {
               <div className="space-y-4 border-brand-border-muted border-l-2 pl-4 md:pl-5">
                 <p className="text-[0.72rem] font-black uppercase tracking-[0.18em] text-secondary">Who we are</p>
                 <p className="max-w-xl text-[0.95rem] leading-relaxed text-brand-body-soft">
-                  Euromiti is a Kosovo-grown fuel and roadside service company operating with dependable standards
-                  in Prishtina, Ferizaj, and Gjilan.
+                  {whoWeAre}
                 </p>
               </div>
 

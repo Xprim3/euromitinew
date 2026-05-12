@@ -46,6 +46,10 @@ function hydrateRow(raw: Partial<HomepageContentRow> & Pick<HomepageContentRow, 
   }
 }
 
+function textOrFallback(value: string | null | undefined, fallback: string) {
+  return value?.trim() || fallback
+}
+
 /**
  * Loads `homepage_content` + related `media_uploads` URLs for anon RLS-approved reads.
  * One React request caches to a single fetch (called from multiple Suspense shells).
@@ -110,6 +114,19 @@ export type HomeHeroResolved = {
 }
 
 export function heroFromHomepageCMS(row: HomepageContentRow | null, media: HomepageMediaLookup): HomeHeroResolved {
+  if (!row) {
+    return {
+      imageSrc: homeHeroDesign.imageSrc,
+      imageAlt: homeHeroDesign.imageAlt,
+      badge: homeHeroDesign.badge,
+      titleLine1: homeHeroDesign.titleLine1,
+      titleLine2: homeHeroDesign.titleLine2,
+      subtitle: homeHeroDesign.subtitle,
+      primaryCta: { ...homeHeroDesign.primaryCta },
+      secondaryCta: { ...homeHeroDesign.secondaryCta },
+    }
+  }
+
   const heroId = row?.hero_image_media_id
   const dm = heroId ? media[heroId] : undefined
   const img = dm?.public_url?.trim() || homeHeroDesign.imageSrc
@@ -121,21 +138,18 @@ export function heroFromHomepageCMS(row: HomepageContentRow | null, media: Homep
     imageSrc: img,
     imageAlt: imgAlt,
     badge: homeHeroDesign.badge,
-    titleLine1: row?.hero_headline_line1?.trim() || homeHeroDesign.titleLine1,
-    titleLine2: row?.hero_headline_line2?.trim() || homeHeroDesign.titleLine2,
-    subtitle: row?.hero_subtitle?.trim() || homeHeroDesign.subtitle,
+    titleLine1: textOrFallback(row.hero_headline_line1, homeHeroDesign.titleLine1),
+    titleLine2: textOrFallback(row.hero_headline_line2, homeHeroDesign.titleLine2),
+    subtitle: textOrFallback(row.hero_subtitle, homeHeroDesign.subtitle),
     primaryCta: {
-      label: row?.hero_cta_primary_label?.trim() || homeHeroDesign.primaryCta.label,
-      href: row?.hero_cta_primary_href?.trim() || homeHeroDesign.primaryCta.href,
+      label: textOrFallback(row.hero_cta_primary_label, homeHeroDesign.primaryCta.label),
+      href: row.hero_cta_primary_href.trim() || homeHeroDesign.primaryCta.href,
     },
     secondaryCta: {
-      label:
-        row === null ? homeHeroDesign.secondaryCta.label : secondaryLabelRaw,
+      label: secondaryLabelRaw,
       href: secondaryLabelRaw
-        ? (row!.hero_cta_secondary_href?.trim() || homeHeroDesign.secondaryCta.href)
-        : row === null
-          ? homeHeroDesign.secondaryCta.href
-          : "/locations",
+        ? (row.hero_cta_secondary_href.trim() || homeHeroDesign.secondaryCta.href)
+        : "/locations",
     },
   }
 }
@@ -143,11 +157,21 @@ export function heroFromHomepageCMS(row: HomepageContentRow | null, media: Homep
 /** Dark-band services intro (“Elite fueling”) copy + imagery. */
 export function servicesIntroEliteFromCMS(row: HomepageContentRow | null, media: HomepageMediaLookup) {
   const mock = homeBeyondDesign.elite
+  if (!row) {
+    return {
+      title: mock.title,
+      body: mock.body,
+      imageSrc: mock.imageSrc,
+      imageAlt: mock.imageAlt,
+      chips: [...mock.chips] as typeof mock.chips,
+    }
+  }
+
   const mid = row?.services_intro_media_id
   const dm = mid ? media[mid] : undefined
   return {
-    title: row?.services_intro_title?.trim() || mock.title,
-    body: row?.services_intro_body?.trim() || mock.body,
+    title: textOrFallback(row.services_intro_title, mock.title),
+    body: textOrFallback(row.services_intro_body, mock.body),
     imageSrc: dm?.public_url?.trim() || mock.imageSrc,
     imageAlt: dm?.alt_text?.trim() || mock.imageAlt,
     chips: [...mock.chips] as typeof mock.chips,
@@ -158,19 +182,24 @@ export function servicesIntroEliteFromCMS(row: HomepageContentRow | null, media:
 export function secondaryHomeServiceCardsFromCMS(row: HomepageContentRow | null, media: HomepageMediaLookup) {
   const carwashMock = homeBeyondDesign.secondaryServices.find((s) => s.key === "detailing")!
   const marketMock = homeBeyondDesign.secondaryServices.find((s) => s.key === "market")!
+
+  if (!row) {
+    return { carwash: carwashMock, market: marketMock }
+  }
+
   const cMedia = row?.carwash_intro_media_id ? media[row.carwash_intro_media_id] : undefined
   const mMedia = row?.mini_market_intro_media_id ? media[row.mini_market_intro_media_id] : undefined
 
   const carwash = {
     ...carwashMock,
-    body: row?.carwash_intro_text?.trim() || carwashMock.body,
+    body: textOrFallback(row.carwash_intro_text, carwashMock.body),
     imageSrc: cMedia?.public_url?.trim() || carwashMock.imageSrc,
     imageAlt: cMedia?.alt_text?.trim() || carwashMock.imageAlt,
   }
 
   const market = {
     ...marketMock,
-    body: row?.mini_market_intro_text?.trim() || marketMock.body,
+    body: textOrFallback(row.mini_market_intro_text, marketMock.body),
     imageSrc: mMedia?.public_url?.trim() || marketMock.imageSrc,
     imageAlt: mMedia?.alt_text?.trim() || marketMock.imageAlt,
   }
@@ -181,16 +210,29 @@ export function secondaryHomeServiceCardsFromCMS(row: HomepageContentRow | null,
 /** Homepage restaurant luxury block merged with singleton + media. */
 export function restaurantLuxuryFromCMS(row: HomepageContentRow | null, media: HomepageMediaLookup) {
   const r = homeBeyondDesign.restaurant
+  if (!row) {
+    return {
+      headlinePrimary: "Curated Dining.",
+      headlineAccent: "Refined Pause.",
+      body: r.body,
+      ctaHref: r.ctaHref,
+      mainImage: r.mainImage,
+      mainImageAlt: r.mainImageAlt,
+      float1: r.float1,
+      float1Alt: r.float1Alt,
+      float2: r.float2,
+      float2Alt: r.float2Alt,
+    }
+  }
+
   const mm = row?.restaurant_home_main_media_id ? media[row.restaurant_home_main_media_id] : undefined
   const f1 = row?.restaurant_home_float_1_media_id ? media[row.restaurant_home_float_1_media_id] : undefined
   const f2 = row?.restaurant_home_float_2_media_id ? media[row.restaurant_home_float_2_media_id] : undefined
 
   return {
-    headlinePrimary:
-      row?.restaurant_home_headline_primary?.trim() || "Curated Dining.",
-    headlineAccent:
-      row?.restaurant_home_headline_accent?.trim() || "Refined Pause.",
-    body: row?.restaurant_highlight_text?.trim() || r.body,
+    headlinePrimary: textOrFallback(row.restaurant_home_headline_primary, "Curated Dining."),
+    headlineAccent: textOrFallback(row.restaurant_home_headline_accent, "Refined Pause."),
+    body: textOrFallback(row.restaurant_highlight_text, r.body),
     ctaHref: r.ctaHref,
     mainImage: mm?.public_url?.trim() || r.mainImage,
     mainImageAlt: mm?.alt_text?.trim() || r.mainImageAlt,

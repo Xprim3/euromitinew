@@ -4,7 +4,8 @@ import { notFound } from "next/navigation"
 
 import { updateLocationAction } from "@/app/admin/(panel)/locations/actions"
 import { LocationEditorForm } from "@/components/admin/LocationEditorForm"
-import { Button } from "@/components/ui/button"
+import { AdminSectionCard, ErrorMessage } from "@/components/admin/design-system"
+import { dsBtnTertiary } from "@/components/admin/design-system/ds-button-classes"
 import {
   ADMIN_LOCATION_GALLERY_SLOTS,
 } from "@/lib/validations/location-admin"
@@ -62,53 +63,76 @@ async function galleryDraftFromDb(locationId: string): Promise<{ draft: GalleryS
   return { draft }
 }
 
+async function mainPreviewFromDb(mediaId: string | null): Promise<{ publicUrl: string | null; alt: string }> {
+  if (!mediaId) return { publicUrl: null, alt: "" }
+  const supabase = await createSupabaseServerClient()
+  const { data } = await supabase.from("media_uploads").select("public_url, alt_text").eq("id", mediaId).maybeSingle()
+  const row = data as { public_url?: string | null; alt_text?: string | null } | null
+  return {
+    publicUrl: row?.public_url?.trim() || null,
+    alt: row?.alt_text?.trim() || "",
+  }
+}
+
+async function loadLocationEditor(id: string) {
+  try {
+    const supabase = await createSupabaseServerClient()
+    const { data: raw, error } = await supabase.from("locations").select("*").eq("id", id).maybeSingle()
+
+    if (error) return { ok: false as const, message: error.message }
+    if (!raw) return { ok: true as const, row: null }
+
+    const row = normalizeLocationRow(raw as Record<string, unknown>)
+    const [g, mainPreview] = await Promise.all([
+      galleryDraftFromDb(row.id),
+      mainPreviewFromDb(row.main_media_id),
+    ])
+
+    return {
+      ok: true as const,
+      row,
+      gallerySlots: "error" in g ? emptyGalleryDraft() : g.draft,
+      galleryError: "error" in g ? g.error : null,
+      mainPreviewUrl: mainPreview.publicUrl,
+      mainImageAlt: mainPreview.alt,
+    }
+  } catch {
+    return {
+      ok: false as const,
+      message: "Supabase is not configured in this environment.",
+    }
+  }
+}
+
 export default async function AdminEditLocationPage({ params }: PageProps) {
   const { id } = await params
-  let supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>
-  try {
-    supabase = await createSupabaseServerClient()
-  } catch {
-    return (
-      <div className="space-y-6">
-        <p className="text-sm text-red-300" role="alert">
-          Supabase is not configured in this environment.
-        </p>
-      </div>
-    )
+  const result = await loadLocationEditor(id)
+  if (!result.ok) {
+    return <ErrorMessage title="Location could not load">{result.message}</ErrorMessage>
   }
-
-  const { data: raw, error } = await supabase.from("locations").select("*").eq("id", id).maybeSingle()
-
-  if (error) {
-    return (
-      <div className="space-y-6">
-        <p className="text-sm text-red-300" role="alert">
-          {error.message}
-        </p>
-      </div>
-    )
-  }
-
-  if (!raw) notFound()
-
-  const row = normalizeLocationRow(raw as Record<string, unknown>)
-
-  const g = await galleryDraftFromDb(row.id)
-  const gallerySlots = "error" in g ? emptyGalleryDraft() : g.draft
+  if (!result.row) notFound()
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap justify-end gap-2">
-        <Button type="button" size="sm" variant="outline" render={<Link href="/admin/locations" />}>
+      <AdminSectionCard>
+        <Link href="/admin/locations" className={dsBtnTertiary}>
           Back to list
-        </Button>
-      </div>
-      {"error" in g ? (
-        <p className="rounded-lg border border-amber-500/35 bg-amber-500/10 px-4 py-3 text-amber-100 text-sm">
-          Gallery thumbnails could not be loaded ({g.error}). Slots are empty—you can re-upload images.
-        </p>
+        </Link>
+      </AdminSectionCard>
+      {result.galleryError ? (
+        <ErrorMessage title="Gallery thumbnails could not load">
+          {result.galleryError}. Slots are empty; you can re-upload images.
+        </ErrorMessage>
       ) : null}
-      <LocationEditorForm key={row.updated_at} mode="edit" submitAction={updateLocationAction} initial={row} gallerySlots={gallerySlots} />
+      <LocationEditorForm
+        key={result.row.updated_at}
+        mode="edit"
+        submitAction={updateLocationAction}
+        initial={result.row}
+        gallerySlots={result.gallerySlots}
+        mainPreviewUrl={result.mainPreviewUrl}
+        mainImageAlt={result.mainImageAlt}
+      />
     </div>
   )
 }

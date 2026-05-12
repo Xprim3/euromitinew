@@ -20,6 +20,32 @@ function truthyCheckbox(v: FormDataEntryValue | null) {
   return v === "on" || v === "true"
 }
 
+async function ensureAdminProfile(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  user: { id: string; email?: string | null }
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  const { data: existing, error: existingErr } = await supabase
+    .from("admins")
+    .select("user_id")
+    .eq("user_id", user.id)
+    .maybeSingle()
+
+  if (existingErr) return { ok: false, message: existingErr.message }
+  if (existing) return { ok: true }
+
+  const { error: insertErr } = await supabase
+    .from("admins")
+    .insert({ user_id: user.id, display_name: user.email ?? null })
+
+  if (!insertErr) return { ok: true }
+
+  return {
+    ok: false,
+    message:
+      "Your signed-in user is not in the admins table. Apply the latest RLS repair migration, then save again, or add this user to public.admins.",
+  }
+}
+
 function pgUniqueMessage(raw: string) {
   if (
     raw.includes("news_posts_slug_key") ||
@@ -41,6 +67,15 @@ function revalidateNewsPublic(slugs: string[]) {
   revalidatePath("/admin/news")
 }
 
+function resolvePublishedAt(status: string, input: string | undefined, existing?: string | null) {
+  if (status !== "published") return null
+  if (input) {
+    const parsed = new Date(input)
+    if (!Number.isNaN(parsed.getTime())) return parsed.toISOString()
+  }
+  return existing?.trim() || new Date().toISOString()
+}
+
 export async function createNewsPostAction(_prev: NewsPostSaveState, formData: FormData): Promise<NewsPostSaveState> {
   const supabase = await createSupabaseServerClient()
   const {
@@ -50,6 +85,8 @@ export async function createNewsPostAction(_prev: NewsPostSaveState, formData: F
   if (authErr || !user) return { ok: false, message: "You must be signed in as an admin." }
 
   const editorId = user.id
+  const adminReady = await ensureAdminProfile(supabase, user)
+  if (!adminReady.ok) return { ok: false, message: adminReady.message }
 
   const teaserRaw = formData.get("teaser_label")
   const teaserVal = teaserRaw instanceof File ? "" : typeof teaserRaw === "string" ? teaserRaw.trim() : ""
@@ -61,6 +98,7 @@ export async function createNewsPostAction(_prev: NewsPostSaveState, formData: F
     category: formData.get("category"),
     teaser_label: teaserVal.length ? teaserVal : undefined,
     status: formData.get("status"),
+    published_at: formData.get("published_at"),
     hero_image_alt: formData.get("hero_image_alt") ?? "",
     body_paragraphs: formData.get("body_paragraphs"),
   })
@@ -92,7 +130,7 @@ export async function createNewsPostAction(_prev: NewsPostSaveState, formData: F
     heroMediaId = uploaded.id
   }
 
-  const published_at = v.status === "published" ? new Date().toISOString() : null
+  const published_at = resolvePublishedAt(v.status, v.published_at)
 
   const { data: inserted, error: insErr } = await supabase
     .from("news_posts")
@@ -130,6 +168,8 @@ export async function updateNewsPostAction(_prev: NewsPostSaveState, formData: F
     if (authErr || !user) return { ok: false, message: "You must be signed in as an admin." }
 
     const editorId = user.id
+    const adminReady = await ensureAdminProfile(supabase, user)
+    if (!adminReady.ok) return { ok: false, message: adminReady.message }
 
     const id = String(formData.get("id") ?? "").trim()
     if (!id) return { ok: false, message: "Missing post id." }
@@ -144,6 +184,7 @@ export async function updateNewsPostAction(_prev: NewsPostSaveState, formData: F
       category: formData.get("category"),
       teaser_label: teaserVal.length ? teaserVal : undefined,
       status: formData.get("status"),
+      published_at: formData.get("published_at"),
       hero_image_alt: formData.get("hero_image_alt") ?? "",
       body_paragraphs: formData.get("body_paragraphs"),
     })
@@ -165,11 +206,9 @@ export async function updateNewsPostAction(_prev: NewsPostSaveState, formData: F
     const existing = existingRow as NewsPostRow
     const prevSlug = existing.slug
 
-    let published_at: string | null =
+    const existingPublishedAt =
       typeof existing.published_at === "string" && existing.published_at.trim() ? existing.published_at : null
-    if (v.status === "published") {
-      published_at = published_at ?? new Date().toISOString()
-    }
+    const published_at = resolvePublishedAt(v.status, v.published_at, existingPublishedAt)
 
     const patch: Record<string, unknown> = {
       slug: v.slug,
@@ -222,6 +261,9 @@ export async function deleteNewsPostAction(
       error: authErr,
     } = await supabase.auth.getUser()
     if (authErr || !user) return { ok: false, message: "You must be signed in as an admin." }
+
+    const adminReady = await ensureAdminProfile(supabase, user)
+    if (!adminReady.ok) return { ok: false, message: adminReady.message }
 
     const id = String(formData.get("id") ?? "").trim()
     const slug = String(formData.get("slug") ?? "").trim()
