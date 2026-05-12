@@ -148,6 +148,7 @@ export function HomeServicesIntroView(props: {
                       alt={rowItem.card.imageAlt}
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"
+                      loading={rowItem.key === props.carwashKey ? "eager" : "lazy"}
                       className="object-cover"
                     />
                     <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/30 to-transparent opacity-40" />

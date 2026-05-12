@@ -402,14 +402,41 @@ export function HomepageContentForm({ initial, mediaPreviews, locationPreviews }
                 showCharacterCount
                 error={fieldErrors?.restaurant_highlight_text?.[0]}
               />
-              <FileUploadInput
-                label="Restaurant image upload"
-                name="restaurant_main_image"
-                previewUrl={mediaPreviews.restaurantMain}
-                previewAlt="Homepage restaurant highlight"
-                removeInputName="clear_restaurant_main_image"
-              />
-              <TextInput label="Restaurant image alt text" name="restaurant_main_alt" placeholder="Describe the restaurant image" />
+              <AdminContentGrid columns={3}>
+                <div className="space-y-4">
+                  <FileUploadInput
+                    label="Main image"
+                    name="restaurant_main_image"
+                    layout="stacked"
+                    previewUrl={mediaPreviews.restaurantMain}
+                    previewAlt="Homepage restaurant highlight"
+                    removeInputName="clear_restaurant_main_image"
+                  />
+                  <TextInput label="Main image alt text" name="restaurant_main_alt" placeholder="Describe the main restaurant image" />
+                </div>
+                <div className="space-y-4">
+                  <FileUploadInput
+                    label="Detail image"
+                    name="restaurant_float_1_image"
+                    layout="stacked"
+                    previewUrl={mediaPreviews.restaurantFloat1}
+                    previewAlt="Homepage restaurant detail"
+                    removeInputName="clear_restaurant_float_1_image"
+                  />
+                  <TextInput label="Detail image alt text" name="restaurant_float_1_alt" placeholder="Describe the detail image" />
+                </div>
+                <div className="space-y-4">
+                  <FileUploadInput
+                    label="Ambiance image"
+                    name="restaurant_float_2_image"
+                    layout="stacked"
+                    previewUrl={mediaPreviews.restaurantFloat2}
+                    previewAlt="Homepage restaurant ambiance"
+                    removeInputName="clear_restaurant_float_2_image"
+                  />
+                  <TextInput label="Ambiance image alt text" name="restaurant_float_2_alt" placeholder="Describe the ambiance image" />
+                </div>
+              </AdminContentGrid>
               </div>
             </div>
           </SectionAccordion>
@@ -506,6 +533,20 @@ export function HomepageContentForm({ initial, mediaPreviews, locationPreviews }
                 maxLength={1200}
                 showCharacterCount
                 error={fieldErrors?.about_preview_why_text?.[0]}
+              />
+              <FileUploadInput
+                label="About preview image"
+                name="about_preview_image"
+                layout="stacked"
+                previewUrl={mediaPreviews.about}
+                previewAlt="Homepage about preview"
+                removeInputName="clear_about_preview_image"
+                helperText="Replaces the image shown beside the About preview on the public homepage."
+              />
+              <TextInput
+                label="Image alt text"
+                name="about_preview_image_alt"
+                placeholder="Describe the About preview image"
               />
             </div>
           </SectionAccordion>

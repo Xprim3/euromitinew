@@ -3,7 +3,7 @@ import { z } from "zod"
 const text = z.string().trim()
 
 export const ADMIN_RESTAURANT_MENU_SLOTS = 8
-export const ADMIN_RESTAURANT_GALLERY_SLOTS = 5
+export const ADMIN_RESTAURANT_GALLERY_SLOTS = 2
 
 export const restaurantContentFormSchema = z.object({
   hero_title: text.max(240),
