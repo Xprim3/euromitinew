@@ -83,9 +83,7 @@ export default async function AdminServicesPage() {
           <>
             <SuccessMessage title="Public revalidation">
               Saves revalidate <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">/services</code>{" "}
-              automatically. Apply migrations so <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">
-                petrol_highlights_json
-              </code> exists before saving bullets.
+              automatically. Apply the latest services highlight migrations before saving bullets.
             </SuccessMessage>
             <AdminSectionCard>
               <p className="text-sm text-[var(--admin-text-muted)]">

@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache"
 import { uploadHomepageAssetRow } from "@/lib/server/upload-homepage-asset"
 import {
   parsePetrolHighlightsLines,
+  parseServiceHighlightsLines,
   servicesContentFormSchema,
 } from "@/lib/validations/services-content"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
@@ -71,6 +72,9 @@ export async function saveServicesContent(
       petrol_section_title: formData.get("petrol_section_title"),
       petrol_description: formData.get("petrol_description"),
       petrol_highlights: formData.get("petrol_highlights"),
+      restaurant_highlights: formData.get("restaurant_highlights"),
+      carwash_highlights: formData.get("carwash_highlights"),
+      mini_market_highlights: formData.get("mini_market_highlights"),
       restaurant_section_title: formData.get("restaurant_section_title"),
       restaurant_description: formData.get("restaurant_description"),
       carwash_section_title: formData.get("carwash_section_title"),
@@ -91,6 +95,18 @@ export async function saveServicesContent(
     const bulletsR = parsePetrolHighlightsLines(v.petrol_highlights)
     if (!bulletsR.ok) {
       return { ok: false, message: bulletsR.message }
+    }
+    const restaurantBulletsR = parseServiceHighlightsLines(v.restaurant_highlights, "Restaurant bullets")
+    if (!restaurantBulletsR.ok) {
+      return { ok: false, message: restaurantBulletsR.message }
+    }
+    const carwashBulletsR = parseServiceHighlightsLines(v.carwash_highlights, "Carwash bullets")
+    if (!carwashBulletsR.ok) {
+      return { ok: false, message: carwashBulletsR.message }
+    }
+    const miniMarketBulletsR = parseServiceHighlightsLines(v.mini_market_highlights, "Mini Market bullets")
+    if (!miniMarketBulletsR.ok) {
+      return { ok: false, message: miniMarketBulletsR.message }
     }
 
     async function resolveImageSlot(opts: {
@@ -156,10 +172,13 @@ export async function saveServicesContent(
       petrol_highlights_json: bulletsR.value,
       restaurant_section_title: v.restaurant_section_title,
       restaurant_description: v.restaurant_description,
+      restaurant_highlights_json: restaurantBulletsR.value,
       carwash_section_title: v.carwash_section_title,
       carwash_description: v.carwash_description,
+      carwash_highlights_json: carwashBulletsR.value,
       mini_market_section_title: v.mini_market_section_title,
       mini_market_description: v.mini_market_description,
+      mini_market_highlights_json: miniMarketBulletsR.value,
       updated_by: editorId,
     }
 

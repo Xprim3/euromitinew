@@ -21,6 +21,9 @@ export const servicesContentFormSchema = z.object({
   mini_market_description: text.max(5000),
 
   petrol_highlights: z.string().max(32000),
+  restaurant_highlights: z.string().max(32000),
+  carwash_highlights: z.string().max(32000),
+  mini_market_highlights: z.string().max(32000),
 
   petrol_image_alt: alt,
   restaurant_image_alt: alt,
@@ -30,11 +33,11 @@ export const servicesContentFormSchema = z.object({
 
 export type ServicesContentFormInput = z.infer<typeof servicesContentFormSchema>
 
-const MAX_PETROL_HIGHLIGHTS = 24
+const MAX_SERVICE_HIGHLIGHTS = 24
 const MAX_HIGHLIGHT_CHARS = 300
 
 /** One bullet per line; empty lines omitted. Used by admin save action. */
-export function parsePetrolHighlightsLines(raw: string):
+export function parseServiceHighlightsLines(raw: string, label = "Bullets"):
   | { ok: true; value: string[] }
   | { ok: false; message: string } {
   const lines = raw
@@ -42,14 +45,18 @@ export function parsePetrolHighlightsLines(raw: string):
     .map((s) => s.trim())
     .filter(Boolean)
 
-  if (lines.length > MAX_PETROL_HIGHLIGHTS) {
-    return { ok: false, message: `Petrol bullets: at most ${MAX_PETROL_HIGHLIGHTS} lines.` }
+  if (lines.length > MAX_SERVICE_HIGHLIGHTS) {
+    return { ok: false, message: `${label}: at most ${MAX_SERVICE_HIGHLIGHTS} lines.` }
   }
   for (const line of lines) {
     if (line.length > MAX_HIGHLIGHT_CHARS) {
-      return { ok: false, message: `Each bullet must be ${MAX_HIGHLIGHT_CHARS} characters or fewer.` }
+      return { ok: false, message: `${label}: each line must be ${MAX_HIGHLIGHT_CHARS} characters or fewer.` }
     }
   }
 
   return { ok: true, value: lines }
+}
+
+export function parsePetrolHighlightsLines(raw: string) {
+  return parseServiceHighlightsLines(raw, "Petrol bullets")
 }

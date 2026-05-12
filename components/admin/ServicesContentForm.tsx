@@ -15,7 +15,7 @@ import {
   TextInput,
 } from "@/components/admin/design-system"
 import { SERVICES_PANEL_DEFAULTS } from "@/lib/data/services-page-defaults"
-import { petrolHighlightsTextFromDb } from "@/lib/data/services-content-public"
+import { highlightsTextFromDb } from "@/lib/data/services-content-public"
 import type { ServicesContentRow } from "@/types/supabase-cms"
 
 export type ServicesMediaPreviews = {
@@ -81,7 +81,10 @@ export function ServicesContentForm({ initial, previews }: ServicesContentFormPr
     if (state.ok === true) router.refresh()
   }, [router, state.ok])
 
-  const bulletsDefault = petrolHighlightsTextFromDb(initial.petrol_highlights_json)
+  const petrolBulletsDefault = highlightsTextFromDb(initial.petrol_highlights_json)
+  const restaurantBulletsDefault = highlightsTextFromDb(initial.restaurant_highlights_json)
+  const carwashBulletsDefault = highlightsTextFromDb(initial.carwash_highlights_json)
+  const miniMarketBulletsDefault = highlightsTextFromDb(initial.mini_market_highlights_json)
 
   return (
     <form ref={formRef} action={formAction} className="space-y-6 pb-24">
@@ -141,8 +144,8 @@ export function ServicesContentForm({ initial, previews }: ServicesContentFormPr
                 label="Bullet highlights"
                 name="petrol_highlights"
                 rows={7}
-                defaultValue={bulletsDefault}
-                helperText="One bullet per line. Existing backend stores highlights for the petrol section."
+                defaultValue={petrolBulletsDefault}
+                helperText="One bullet per line."
                 error={fieldErrors?.petrol_highlights?.[0]}
               />
               <FileUploadInput
@@ -173,10 +176,11 @@ export function ServicesContentForm({ initial, previews }: ServicesContentFormPr
               />
               <TextareaInput
                 label="Bullet highlights"
-                value={(serviceDefaultsById.restaurant?.highlights ?? []).join("\n")}
-                disabled
-                readOnly
-                helperText="Planned CMS field. Current public highlights are design defaults."
+                name="restaurant_highlights"
+                rows={7}
+                defaultValue={restaurantBulletsDefault}
+                helperText="One bullet per line."
+                error={fieldErrors?.restaurant_highlights?.[0]}
               />
               <FileUploadInput
                 label="Image upload"
@@ -206,10 +210,11 @@ export function ServicesContentForm({ initial, previews }: ServicesContentFormPr
               />
               <TextareaInput
                 label="Bullet highlights"
-                value={(serviceDefaultsById.carwash?.highlights ?? []).join("\n")}
-                disabled
-                readOnly
-                helperText="Planned CMS field. Current public highlights are design defaults."
+                name="carwash_highlights"
+                rows={7}
+                defaultValue={carwashBulletsDefault}
+                helperText="One bullet per line."
+                error={fieldErrors?.carwash_highlights?.[0]}
               />
               <FileUploadInput
                 label="Image upload"
@@ -239,10 +244,11 @@ export function ServicesContentForm({ initial, previews }: ServicesContentFormPr
               />
               <TextareaInput
                 label="Bullet highlights"
-                value={(serviceDefaultsById["mini-market"]?.highlights ?? []).join("\n")}
-                disabled
-                readOnly
-                helperText="Planned CMS field. Current public highlights are design defaults."
+                name="mini_market_highlights"
+                rows={7}
+                defaultValue={miniMarketBulletsDefault}
+                helperText="One bullet per line."
+                error={fieldErrors?.mini_market_highlights?.[0]}
               />
               <FileUploadInput
                 label="Image upload"

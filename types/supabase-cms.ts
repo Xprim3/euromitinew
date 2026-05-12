@@ -116,12 +116,15 @@ export type ServicesContentRow = {
   restaurant_section_title: string
   restaurant_description: string
   restaurant_image_media_id: string | null
+  restaurant_highlights_json: unknown
   carwash_section_title: string
   carwash_description: string
   carwash_image_media_id: string | null
+  carwash_highlights_json: unknown
   mini_market_section_title: string
   mini_market_description: string
   mini_market_image_media_id: string | null
+  mini_market_highlights_json: unknown
   hero_page_title: string
   hero_page_subtitle: string
   why_sections_json: unknown

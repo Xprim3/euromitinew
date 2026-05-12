@@ -29,13 +29,10 @@ export type ResolvedServicesPage = {
 export function normalizeServicesRow(raw: Record<string, unknown>): ServicesContentRow {
   const empty = ""
 
-  const petrolHighlightsRaw =
-    typeof raw === "object" && raw !== null && "petrol_highlights_json" in raw
-      ? raw.petrol_highlights_json
-      : []
-  let petrol_highlights_json: unknown = []
-  if (Array.isArray(petrolHighlightsRaw)) petrol_highlights_json = petrolHighlightsRaw
-  else petrol_highlights_json = []
+  const highlights = (key: string): unknown => {
+    const rawValue = typeof raw === "object" && raw !== null && key in raw ? raw[key] : []
+    return Array.isArray(rawValue) ? rawValue : []
+  }
 
   const fk = (k: string): string | null =>
     typeof raw[k] === "string" && (raw[k] as string).length > 0 ? (raw[k] as string) : null
@@ -45,18 +42,21 @@ export function normalizeServicesRow(raw: Record<string, unknown>): ServicesCont
     petrol_section_title: typeof raw.petrol_section_title === "string" ? raw.petrol_section_title : empty,
     petrol_description: typeof raw.petrol_description === "string" ? raw.petrol_description : empty,
     petrol_image_media_id: fk("petrol_image_media_id"),
-    petrol_highlights_json,
+    petrol_highlights_json: highlights("petrol_highlights_json"),
     restaurant_section_title:
       typeof raw.restaurant_section_title === "string" ? raw.restaurant_section_title : empty,
     restaurant_description: typeof raw.restaurant_description === "string" ? raw.restaurant_description : empty,
     restaurant_image_media_id: fk("restaurant_image_media_id"),
+    restaurant_highlights_json: highlights("restaurant_highlights_json"),
     carwash_section_title: typeof raw.carwash_section_title === "string" ? raw.carwash_section_title : empty,
     carwash_description: typeof raw.carwash_description === "string" ? raw.carwash_description : empty,
     carwash_image_media_id: fk("carwash_image_media_id"),
+    carwash_highlights_json: highlights("carwash_highlights_json"),
     mini_market_section_title:
       typeof raw.mini_market_section_title === "string" ? raw.mini_market_section_title : empty,
     mini_market_description: typeof raw.mini_market_description === "string" ? raw.mini_market_description : empty,
     mini_market_image_media_id: fk("mini_market_image_media_id"),
+    mini_market_highlights_json: highlights("mini_market_highlights_json"),
     hero_page_title:
       typeof raw.hero_page_title === "string" ? raw.hero_page_title : SERVICES_PAGE_DEFAULT_HERO.title,
     hero_page_subtitle:
@@ -68,7 +68,7 @@ export function normalizeServicesRow(raw: Record<string, unknown>): ServicesCont
 }
 
 /** Default textarea value when loading the admin Services form. */
-export function petrolHighlightsTextFromDb(raw: unknown): string {
+export function highlightsTextFromDb(raw: unknown): string {
   if (!Array.isArray(raw)) return ""
   const lines = raw
     .map((item) => (typeof item === "string" ? item.trim() : ""))
@@ -76,7 +76,9 @@ export function petrolHighlightsTextFromDb(raw: unknown): string {
   return lines.join("\n")
 }
 
-function petrolBulletsFromDb(raw: unknown): string[] {
+export const petrolHighlightsTextFromDb = highlightsTextFromDb
+
+function bulletsFromDb(raw: unknown): string[] {
   if (!Array.isArray(raw)) return []
   const bullets = raw
     .map((item) => {
@@ -181,7 +183,7 @@ export function resolveServicesPage(row: ServicesContentRow | null, media: Servi
       id: petrolDef.id,
       title: row.petrol_section_title,
       description: row.petrol_description,
-      highlights: petrolBulletsFromDb(row.petrol_highlights_json),
+      highlights: bulletsFromDb(row.petrol_highlights_json),
       ctaLabel: petrolDef.ctaLabel,
       ctaHref: petrolDef.ctaHref,
       imageSrc: petrolImg.src,
@@ -192,7 +194,7 @@ export function resolveServicesPage(row: ServicesContentRow | null, media: Servi
       id: restDef.id,
       title: row.restaurant_section_title,
       description: row.restaurant_description,
-      highlights: [...restDef.highlights],
+      highlights: bulletsFromDb(row.restaurant_highlights_json),
       ctaLabel: restDef.ctaLabel,
       ctaHref: restDef.ctaHref,
       imageSrc: restImg.src,
@@ -203,7 +205,7 @@ export function resolveServicesPage(row: ServicesContentRow | null, media: Servi
       id: carwashDef.id,
       title: row.carwash_section_title,
       description: row.carwash_description,
-      highlights: [...carwashDef.highlights],
+      highlights: bulletsFromDb(row.carwash_highlights_json),
       ctaLabel: carwashDef.ctaLabel,
       ctaHref: carwashDef.ctaHref,
       imageSrc: carImg.src,
@@ -214,7 +216,7 @@ export function resolveServicesPage(row: ServicesContentRow | null, media: Servi
       id: miniDef.id,
       title: row.mini_market_section_title,
       description: row.mini_market_description,
-      highlights: [...miniDef.highlights],
+      highlights: bulletsFromDb(row.mini_market_highlights_json),
       ctaLabel: miniDef.ctaLabel,
       ctaHref: miniDef.ctaHref,
       imageSrc: miniImg.src,
