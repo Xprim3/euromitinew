@@ -42,7 +42,6 @@ export function HomeStrategicNetworkView(props: {
       <div className="mx-auto max-w-[1280px] px-4 py-11 sm:px-6 md:py-14 lg:px-12 lg:py-16">
         <div className="mb-7 flex flex-col items-start justify-between gap-4 md:mb-9 md:flex-row md:items-end">
           <div className="max-w-2xl space-y-3">
-            <p className="text-[0.65rem] font-black uppercase tracking-[0.32em] text-secondary">{copy.kicker}</p>
             <h2
               id="strategic-network-heading"
               className="font-[family-name:var(--font-montserrat)] text-[1.35rem] font-extrabold tracking-tight text-black md:text-[1.75rem]"

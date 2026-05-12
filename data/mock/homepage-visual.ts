@@ -58,10 +58,10 @@ export const homeBeyondDesign = {
     },
   ] as const,
   restaurant: {
-    kicker: "The Atelier",
-    title: "A Curated Culinary Sanctuary",
-    body: "Where local harvests meet global mastery. Every dish is a narrative of freshness and quality downtime.",
-    ctaLabel: "Reserve a table",
+    kicker: "Atelieja",
+    title: "Një përvojë e kuruar kulinare",
+    body: "Aty ku përbërësit vendorë takohen me përgatitje të kujdesshme. Çdo pjatë sjell freski, cilësi dhe një pushim të këndshëm gjatë rrugës.",
+    ctaLabel: "Rezervo tavolinë",
     ctaHref: "/restaurant",
     mainImage:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuAPKs5AJzRkauqdXtM7yLTO6l56xgVi1VzK0cbCvcsjrqT5AKK2W11vv8YB_1ivxFco2-SwDHc2E8H2C4WvX343X0MYu2iwbt7gbP7Ep8rRutnIdXagmB5NaZjg_LOc94cqL9QwWXGXdvRvwWzSl0QxLh0ayahu5U1sSEub31iPfFcGeLE4sw9o-036RPVsN8kOkJRILbUtkXV5vgZcnY2A12PKydoodk6Rbju4VM7MPSXl9Cnoh-umnRT66SPgYuU0olF4g_IJCeGn",
@@ -114,6 +114,6 @@ export const homeStrategicNetworkDesign: StrategicStationVisual[] = [
 ] as const
 
 export const homeNewsInsightsDesign = {
-  title: "Insights & Innovations",
-  subtitle: "Operational news from Euromiti — fuels, footprint, and the guest experience.",
+  title: "Të rejat nga Euromiti",
+  subtitle: "Përditësime për rrjetin, shërbimet dhe risitë që përmirësojnë çdo ndalesë.",
 } as const

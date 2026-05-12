@@ -1,18 +1,31 @@
 "use client"
 
-import { useActionState, useEffect } from "react"
+import { useActionState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 
 import { saveAboutContent, type AboutSaveState } from "@/app/admin/(panel)/about/actions"
+import {
+  AdminContentGrid,
+  AdminSectionCard,
+  ErrorMessage,
+  FileUploadInput,
+  SaveBar,
+  SelectInput,
+  SuccessMessage,
+  TextareaInput,
+  TextInput,
+} from "@/components/admin/design-system"
 import { storyParagraphsFromDb } from "@/lib/data/about-content-public"
-import type { AboutContentRow, AboutValueCard } from "@/types/supabase-cms"
-
-import { adminInputClass, adminLabelClass } from "./cn-admin"
-import { AboutSaveSubmitButton } from "./AboutSaveSubmitButton"
+import type { AboutContentRow, AboutValueCard, AboutWhyReason } from "@/types/supabase-cms"
 
 export type AboutMediaPreviews = {
   hero: string | null
   story: string | null
+  offerFuel: string | null
+  offerRestaurant: string | null
+  offerPlayground: string | null
+  offerCarwash: string | null
+  offerMiniMarket: string | null
   galleryStrip: string | null
   galleryWhy: string | null
   galleryPartner: string | null
@@ -23,268 +36,434 @@ type AboutContentFormProps = {
   previews: AboutMediaPreviews
   /** Eight slots for editable value cards (extras in DB capped in admin UI). */
   valueSlots: AboutValueCard[]
-}
-
-function PreviewThumb({ url }: { url: string | null }) {
-  if (!url) return <p className="text-sm text-zinc-500">No image assigned.</p>
-  return (
-    <div className="relative max-h-44 max-w-lg overflow-hidden rounded-lg border border-zinc-700">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={url} alt="" className="max-h-44 w-full object-cover" />
-    </div>
-  )
+  /** Six slots matching the public Why Choose Us grid. */
+  whyReasonSlots: AboutWhyReason[]
 }
 
 const initialActionState: AboutSaveState = { ok: null }
 
-export function AboutContentForm({ initial, previews, valueSlots }: AboutContentFormProps) {
+const materialIconOptions = [
+  { value: "verified", label: "Verified" },
+  { value: "groups", label: "Groups" },
+  { value: "bolt", label: "Bolt" },
+  { value: "workspace_premium", label: "Workspace premium" },
+  { value: "construction", label: "Construction" },
+  { value: "support_agent", label: "Support agent" },
+  { value: "favorite", label: "Favorite" },
+  { value: "shield", label: "Shield" },
+  { value: "local_gas_station", label: "Fuel station" },
+  { value: "restaurant", label: "Restaurant" },
+  { value: "local_car_wash", label: "Car wash" },
+  { value: "shopping_bag", label: "Shopping bag" },
+] as const
+
+export function AboutContentForm({ initial, previews, valueSlots, whyReasonSlots }: AboutContentFormProps) {
   const router = useRouter()
+  const formRef = useRef<HTMLFormElement>(null)
   const [state, formAction] = useActionState(saveAboutContent, initialActionState)
 
   const fieldErrors = state.ok === false && "fieldErrors" in state ? state.fieldErrors : undefined
   const hasFieldErrors = Boolean(fieldErrors && Object.values(fieldErrors).some((v) => v?.length))
+  const offerCards = [
+    {
+      key: "fuel",
+      title: "Fuel / petrol card",
+      titleName: "offer_fuel_title",
+      bodyName: "offer_fuel_body",
+      fileName: "offer_fuel_image",
+      clearName: "clear_offer_fuel",
+      titleValue: initial.offer_fuel_title,
+      bodyValue: initial.offer_fuel_body,
+      preview: previews.offerFuel,
+    },
+    {
+      key: "restaurant",
+      title: "Restaurant card",
+      titleName: "offer_restaurant_title",
+      bodyName: "offer_restaurant_body",
+      fileName: "offer_restaurant_image",
+      clearName: "clear_offer_restaurant",
+      titleValue: initial.offer_restaurant_title,
+      bodyValue: initial.offer_restaurant_body,
+      preview: previews.offerRestaurant,
+    },
+    {
+      key: "playground",
+      title: "Playground card",
+      titleName: "offer_playground_title",
+      bodyName: "offer_playground_body",
+      fileName: "offer_playground_image",
+      clearName: "clear_offer_playground",
+      titleValue: initial.offer_playground_title,
+      bodyValue: initial.offer_playground_body,
+      preview: previews.offerPlayground,
+    },
+    {
+      key: "carwash",
+      title: "Carwash card",
+      titleName: "offer_carwash_title",
+      bodyName: "offer_carwash_body",
+      fileName: "offer_carwash_image",
+      clearName: "clear_offer_carwash",
+      titleValue: initial.offer_carwash_title,
+      bodyValue: initial.offer_carwash_body,
+      preview: previews.offerCarwash,
+    },
+    {
+      key: "mini-market",
+      title: "Mini Market card",
+      titleName: "offer_mini_market_title",
+      bodyName: "offer_mini_market_body",
+      fileName: "offer_mini_market_image",
+      clearName: "clear_offer_mini_market",
+      titleValue: initial.offer_mini_market_title,
+      bodyValue: initial.offer_mini_market_body,
+      preview: previews.offerMiniMarket,
+    },
+  ] as const
 
   useEffect(() => {
     if (state.ok === true) router.refresh()
   }, [router, state.ok])
 
   const storyText = storyParagraphsFromDb(initial.company_story).join("\n\n")
-  const fileClassName =
-    "block w-full max-w-lg border border-zinc-700 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-100 file:mr-4 file:rounded-md file:border-0 file:bg-zinc-700 file:px-3 file:py-2 file:text-sm file:text-white"
 
   return (
-    <form action={formAction} className="max-w-4xl space-y-10">
+    <form ref={formRef} action={formAction} className="space-y-6 pb-24">
       {state.ok === true ? (
-        <p
-          role="status"
-          className="rounded-lg border border-emerald-500/35 bg-emerald-500/15 px-4 py-3 text-emerald-100 text-sm"
-        >
+        <SuccessMessage title="About page saved">
           {state.message}
-        </p>
+        </SuccessMessage>
       ) : null}
       {state.ok === false && "message" in state ? (
-        <p
-          role="alert"
-          className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-red-100 text-sm"
-        >
+        <ErrorMessage title="Could not save About page">
           {state.message}
-        </p>
+        </ErrorMessage>
       ) : null}
       {hasFieldErrors ? (
-        <p className="rounded-lg border border-zinc-700 bg-zinc-900/80 px-4 py-3 text-sm text-zinc-400">
+        <ErrorMessage title="Check the highlighted fields">
           Fix the highlighted fields and try again.
-        </p>
+        </ErrorMessage>
       ) : null}
 
-      <section className="space-y-5 rounded-xl border border-zinc-800 bg-zinc-900/40 p-6">
-        <h2 className="font-heading font-semibold text-lg text-white">Hero</h2>
-        <div>
-          <label className={adminLabelClass} htmlFor="hero_title">
-            Title
-          </label>
-          <input id="hero_title" name="hero_title" defaultValue={initial.hero_title} className={adminInputClass} />
-        </div>
-        <div>
-          <label className={adminLabelClass} htmlFor="hero_subtitle">
-            Subtitle
-          </label>
-          <textarea
-            id="hero_subtitle"
+      <AdminSectionCard title="Hero" description="Main public About page headline, intro copy, and hero image.">
+        <div className="space-y-5">
+          <TextInput
+            label="Title"
+            name="hero_title"
+            defaultValue={initial.hero_title}
+            maxLength={240}
+            error={fieldErrors?.hero_title?.[0]}
+          />
+          <TextareaInput
+            label="Subtitle"
             name="hero_subtitle"
-            rows={3}
             defaultValue={initial.hero_subtitle}
-            className={`resize-y ${adminInputClass}`}
+            rows={4}
+            maxLength={1200}
+            showCharacterCount
+            error={fieldErrors?.hero_subtitle?.[0]}
+          />
+          <FileUploadInput
+            label="Hero image"
+            name="hero_media"
+            previewUrl={previews.hero}
+            previewAlt="About page hero image"
+            removeInputName="clear_hero_media"
+            helperText="Shown at the top of the public About page."
+          />
+          <TextInput
+            label="Hero image alt text"
+            name="hero_image_alt"
+            placeholder="Describe the hero image"
+            maxLength={500}
+            error={fieldErrors?.hero_image_alt?.[0]}
           />
         </div>
-        <PreviewThumb url={previews.hero} />
-        <div>
-          <label className={adminLabelClass} htmlFor="hero_media">
-            Replace hero image
-          </label>
-          <input id="hero_media" name="hero_media" type="file" accept="image/*" className={fileClassName} />
-        </div>
-        <div>
-          <label className={adminLabelClass} htmlFor="hero_image_alt">
-            Alt text (new upload)
-          </label>
-          <input id="hero_image_alt" name="hero_image_alt" className={adminInputClass} />
-        </div>
-        <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-300">
-          <input type="checkbox" name="clear_hero_media" className="size-4 rounded border-zinc-600" />
-          Remove hero image reference
-        </label>
-      </section>
+      </AdminSectionCard>
 
-      <section className="space-y-5 rounded-xl border border-zinc-800 bg-zinc-900/40 p-6">
-        <h2 className="font-heading font-semibold text-lg text-white">Company story (“Who We Are”)</h2>
-        <p className="text-xs text-zinc-500">Separate paragraphs with a blank line (double line break).</p>
-        <div>
-          <label className={adminLabelClass} htmlFor="company_story_paragraphs">
-            Paragraphs
-          </label>
-          <textarea
-            id="company_story_paragraphs"
+      <AdminSectionCard
+        title="Company story"
+        description="The “Who We Are” narrative. Separate paragraphs with one blank line."
+      >
+        <div className="space-y-5">
+          <TextareaInput
+            label="Story paragraphs"
             name="company_story_paragraphs"
-            rows={10}
             defaultValue={storyText}
-            className={`resize-y font-sans ${adminInputClass}`}
+            rows={10}
+            maxLength={30000}
+            showCharacterCount
+            helperText="Use a blank line between paragraphs."
+            error={fieldErrors?.company_story_paragraphs?.[0]}
+          />
+          <FileUploadInput
+            label="Story image"
+            name="story_media"
+            previewUrl={previews.story}
+            previewAlt="About page story image"
+            removeInputName="clear_story_media"
+            helperText="Image shown beside or near the company story section."
+          />
+          <TextInput
+            label="Story image alt text"
+            name="story_image_alt"
+            placeholder="Describe the story image"
+            maxLength={500}
+            error={fieldErrors?.story_image_alt?.[0]}
           />
         </div>
-        <PreviewThumb url={previews.story} />
-        <div>
-          <label className={adminLabelClass} htmlFor="story_media">
-            Story column image
-          </label>
-          <input id="story_media" name="story_media" type="file" accept="image/*" className={fileClassName} />
-        </div>
-        <div>
-          <label className={adminLabelClass} htmlFor="story_image_alt">
-            Alt (new upload)
-          </label>
-          <input id="story_image_alt" name="story_image_alt" className={adminInputClass} />
-        </div>
-        <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-300">
-          <input type="checkbox" name="clear_story_media" className="size-4 rounded border-zinc-600" />
-          Remove story image reference
-        </label>
-      </section>
+      </AdminSectionCard>
 
-      <section className="space-y-5 rounded-xl border border-zinc-800 bg-zinc-900/40 p-6">
-        <h2 className="font-heading font-semibold text-lg text-white">Mission &amp; Vision</h2>
-        <div className="grid gap-5 sm:grid-cols-2">
-          <div>
-            <label className={adminLabelClass} htmlFor="mission_title">
-              Mission label
-            </label>
-            <input id="mission_title" name="mission_title" defaultValue={initial.mission_title} className={adminInputClass} />
-          </div>
-          <div>
-            <label className={adminLabelClass} htmlFor="vision_title">
-              Vision label
-            </label>
-            <input id="vision_title" name="vision_title" defaultValue={initial.vision_title} className={adminInputClass} />
+      <AdminSectionCard
+        title="What we offer"
+        description="Edit only the offer card titles, text, and images shown on the public About page."
+      >
+        <input type="hidden" name="offer_label" value={initial.offer_label} />
+        <input type="hidden" name="offer_title" value={initial.offer_title} />
+        <input type="hidden" name="offer_description" value={initial.offer_description} />
+        <div className="space-y-5">
+          <div className="space-y-4">
+            {offerCards.map((card) => (
+              <div
+                key={card.key}
+                className="rounded-[var(--admin-radius-card)] border border-[var(--admin-border)] bg-[var(--admin-surface-muted)] p-4"
+              >
+                <p className="mb-4 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--admin-text-muted)]">
+                  {card.title}
+                </p>
+                <div className="space-y-4">
+                  <TextInput
+                    label="Card title"
+                    name={card.titleName}
+                    defaultValue={card.titleValue}
+                    maxLength={160}
+                    error={fieldErrors?.[card.titleName]?.[0]}
+                  />
+                  <TextareaInput
+                    label="Card description"
+                    name={card.bodyName}
+                    defaultValue={card.bodyValue}
+                    rows={4}
+                    maxLength={2000}
+                    showCharacterCount
+                    error={fieldErrors?.[card.bodyName]?.[0]}
+                  />
+                  <FileUploadInput
+                    label="Image file"
+                    name={card.fileName}
+                    previewUrl={card.preview}
+                    previewAlt={`${card.title} image`}
+                    removeInputName={card.clearName}
+                    layout="auto"
+                    replaceLabel="Upload"
+                    acceptedFileTypesLabel="JPG, PNG, WebP, or GIF"
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-        <div>
-          <label className={adminLabelClass} htmlFor="mission_body">
-            Mission body
-          </label>
-          <textarea
-            id="mission_body"
+      </AdminSectionCard>
+
+      <AdminSectionCard
+        title="Why Choose Us"
+        description="Edit the public About page reasons list and the image beside it."
+      >
+        <div className="space-y-5">
+          <TextInput
+            label="Section title"
+            name="why_choose_heading"
+            defaultValue={initial.why_choose_heading}
+            maxLength={180}
+            error={fieldErrors?.why_choose_heading?.[0]}
+          />
+          <FileUploadInput
+            label="Section image"
+            name="gallery_why_image"
+            previewUrl={previews.galleryWhy}
+            previewAlt="About why choose us image"
+            removeInputName="clear_gallery_why"
+            layout="auto"
+            helperText="Shown beside the Why Choose Us list on the public About page."
+          />
+          <TextInput
+            label="Image alt text"
+            name="gallery_why_alt"
+            placeholder="Describe the why section image"
+            maxLength={500}
+            error={fieldErrors?.gallery_why_alt?.[0]}
+          />
+
+          <div className="space-y-4">
+            {whyReasonSlots.map((reason, i) => (
+              <div
+                key={i}
+                className="rounded-[var(--admin-radius-card)] border border-[var(--admin-border)] bg-[var(--admin-surface-muted)] p-4"
+              >
+                <p className="mb-4 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--admin-text-muted)]">
+                  Reason {i + 1}
+                </p>
+                <AdminContentGrid columns="12">
+                  <SelectInput
+                    label="Icon"
+                    name={`why_reason_${i}_icon`}
+                    defaultValue={reason.icon_material}
+                    options={materialIconOptions}
+                    className="md:col-span-3"
+                  />
+                  <TextInput
+                    label="Title"
+                    name={`why_reason_${i}_title`}
+                    defaultValue={reason.title}
+                    maxLength={180}
+                    className="md:col-span-9"
+                  />
+                  <TextareaInput
+                    label="Description"
+                    name={`why_reason_${i}_body`}
+                    defaultValue={reason.body}
+                    rows={3}
+                    maxLength={1200}
+                    showCharacterCount
+                    className="md:col-span-12"
+                  />
+                </AdminContentGrid>
+              </div>
+            ))}
+          </div>
+        </div>
+      </AdminSectionCard>
+
+      <AdminSectionCard title="Mission & Vision" description="Public About page mission and vision cards.">
+        <div className="space-y-5">
+          <AdminContentGrid columns={2}>
+            <TextInput
+              label="Mission label"
+              name="mission_title"
+              defaultValue={initial.mission_title}
+              maxLength={160}
+              error={fieldErrors?.mission_title?.[0]}
+            />
+            <TextInput
+              label="Vision label"
+              name="vision_title"
+              defaultValue={initial.vision_title}
+              maxLength={160}
+              error={fieldErrors?.vision_title?.[0]}
+            />
+          </AdminContentGrid>
+          <TextareaInput
+            label="Mission body"
             name="mission_body"
-            rows={4}
             defaultValue={initial.mission_body}
-            className={`resize-y ${adminInputClass}`}
+            rows={5}
+            maxLength={8000}
+            showCharacterCount
+            error={fieldErrors?.mission_body?.[0]}
           />
-        </div>
-        <div>
-          <label className={adminLabelClass} htmlFor="vision_body">
-            Vision body
-          </label>
-          <textarea
-            id="vision_body"
+          <TextareaInput
+            label="Vision body"
             name="vision_body"
-            rows={4}
             defaultValue={initial.vision_body}
-            className={`resize-y ${adminInputClass}`}
+            rows={5}
+            maxLength={8000}
+            showCharacterCount
+            error={fieldErrors?.vision_body?.[0]}
           />
         </div>
-      </section>
+      </AdminSectionCard>
 
-      <section className="space-y-5 rounded-xl border border-zinc-800 bg-zinc-900/40 p-6">
-        <h2 className="font-heading font-semibold text-lg text-white">Section images</h2>
-        <p className="text-xs text-zinc-500">
-          Strip = wide image under Mission/Vision cards; Why Us = right column beside reasons; Partnerships =
-          contact teaser image.
-        </p>
+      <AdminSectionCard
+        title="Section images"
+        description="Images used in the mission strip and partnerships/contact block."
+      >
+        <AdminContentGrid columns={2}>
+          <div className="space-y-4">
+            <FileUploadInput
+              label="Mission footer strip"
+              name="gallery_strip_image"
+              previewUrl={previews.galleryStrip}
+              previewAlt="About mission footer strip"
+              removeInputName="clear_gallery_strip"
+              layout="stacked"
+            />
+            <TextInput
+              label="Strip image alt text"
+              name="gallery_strip_alt"
+              placeholder="Describe the strip image"
+              maxLength={500}
+              error={fieldErrors?.gallery_strip_alt?.[0]}
+            />
+          </div>
+          <div className="space-y-4">
+            <FileUploadInput
+              label="Partnerships / contact block"
+              name="gallery_partner_image"
+              previewUrl={previews.galleryPartner}
+              previewAlt="About partnerships image"
+              removeInputName="clear_gallery_partner"
+              layout="stacked"
+            />
+            <TextInput
+              label="Partnerships image alt text"
+              name="gallery_partner_alt"
+              placeholder="Describe the partnerships image"
+              maxLength={500}
+              error={fieldErrors?.gallery_partner_alt?.[0]}
+            />
+          </div>
+        </AdminContentGrid>
+      </AdminSectionCard>
 
-        <div className="space-y-3 rounded-lg border border-zinc-700/80 p-4">
-          <p className="text-xs font-semibold tracking-wide text-zinc-400 uppercase">Mission footer strip</p>
-          <PreviewThumb url={previews.galleryStrip} />
-          <input type="file" name="gallery_strip_image" accept="image/*" className={fileClassName} />
-          <input name="gallery_strip_alt" className={adminInputClass} placeholder="Alt (new upload)" />
-          <label className="flex items-center gap-2 text-sm text-zinc-300">
-            <input type="checkbox" name="clear_gallery_strip" className="size-4 rounded border-zinc-600" />
-            Clear
-          </label>
-        </div>
-
-        <div className="space-y-3 rounded-lg border border-zinc-700/80 p-4">
-          <p className="text-xs font-semibold tracking-wide text-zinc-400 uppercase">Why Choose Us sidebar</p>
-          <PreviewThumb url={previews.galleryWhy} />
-          <input type="file" name="gallery_why_image" accept="image/*" className={fileClassName} />
-          <input name="gallery_why_alt" className={adminInputClass} placeholder="Alt (new upload)" />
-          <label className="flex items-center gap-2 text-sm text-zinc-300">
-            <input type="checkbox" name="clear_gallery_why" className="size-4 rounded border-zinc-600" />
-            Clear
-          </label>
-        </div>
-
-        <div className="space-y-3 rounded-lg border border-zinc-700/80 p-4">
-          <p className="text-xs font-semibold tracking-wide text-zinc-400 uppercase">Partnerships / contact block</p>
-          <PreviewThumb url={previews.galleryPartner} />
-          <input type="file" name="gallery_partner_image" accept="image/*" className={fileClassName} />
-          <input name="gallery_partner_alt" className={adminInputClass} placeholder="Alt (new upload)" />
-          <label className="flex items-center gap-2 text-sm text-zinc-300">
-            <input type="checkbox" name="clear_gallery_partner" className="size-4 rounded border-zinc-600" />
-            Clear
-          </label>
-        </div>
-      </section>
-
-      <section className="space-y-5 rounded-xl border border-zinc-800 bg-zinc-900/40 p-6">
-        <h2 className="font-heading font-semibold text-lg text-white">Core values</h2>
-        <p className="text-xs text-zinc-500">
-          Icons use Material Symbols names (e.g. verified, favorite, trending_up). Leave title/body blank to skip a slot
-          — up to eight cards here (at least one required).
-        </p>
-        <div className="space-y-6">
+      <AdminSectionCard
+        title="Core values"
+        description="Icons use Material Symbols names, for example verified, favorite, trending_up. Leave title/body blank to skip a slot."
+      >
+        <div className="space-y-4">
           {valueSlots.map((slot, i) => (
-            <div key={i} className="rounded-lg border border-zinc-700/70 p-4">
-              <p className="mb-3 text-xs text-zinc-500">Card {i + 1}</p>
-              <div className="grid gap-3 sm:grid-cols-3">
-                <div className="sm:col-span-1">
-                  <label className={adminLabelClass} htmlFor={`value_${i}_icon`}>
-                    Icon
-                  </label>
-                  <input
-                    id={`value_${i}_icon`}
-                    name={`value_${i}_icon`}
-                    defaultValue={slot.icon_material}
-                    className={`font-mono text-xs ${adminInputClass}`}
-                    placeholder="verified"
-                  />
-                </div>
-                <div className="sm:col-span-2">
-                  <label className={adminLabelClass} htmlFor={`value_${i}_title`}>
-                    Title
-                  </label>
-                  <input
-                    id={`value_${i}_title`}
-                    name={`value_${i}_title`}
-                    defaultValue={slot.title}
-                    className={adminInputClass}
-                  />
-                </div>
-              </div>
-              <div className="mt-3">
-                <label className={adminLabelClass} htmlFor={`value_${i}_body`}>
-                  Body
-                </label>
-                <textarea
-                  id={`value_${i}_body`}
-                  name={`value_${i}_body`}
-                  rows={3}
-                  defaultValue={slot.body}
-                  className={`resize-y ${adminInputClass}`}
+            <div
+              key={i}
+              className="rounded-[var(--admin-radius-card)] border border-[var(--admin-border)] bg-[var(--admin-surface-muted)] p-4"
+            >
+              <p className="mb-4 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--admin-text-muted)]">
+                Value card {i + 1}
+              </p>
+              <AdminContentGrid columns="12">
+                <TextInput
+                  label="Icon"
+                  name={`value_${i}_icon`}
+                  defaultValue={slot.icon_material}
+                  placeholder="verified"
+                  maxLength={40}
+                  className="md:col-span-3"
+                  helperText="Material icon name."
                 />
-              </div>
+                <TextInput
+                  label="Title"
+                  name={`value_${i}_title`}
+                  defaultValue={slot.title}
+                  className="md:col-span-9"
+                />
+                <TextareaInput
+                  label="Body"
+                  name={`value_${i}_body`}
+                  defaultValue={slot.body}
+                  rows={3}
+                  className="md:col-span-12"
+                />
+              </AdminContentGrid>
             </div>
           ))}
         </div>
-      </section>
+      </AdminSectionCard>
 
-      <AboutSaveSubmitButton />
+      <SaveBar
+        savedLabel="Ready to save About page"
+        submitLabel="Save about page"
+        submitPendingLabel="Saving about page..."
+        onCancel={() => formRef.current?.reset()}
+      />
     </form>
   )
 }

@@ -10,25 +10,38 @@ import {
   ErrorMessage,
   FileUploadInput,
   SaveBar,
+  SelectInput,
   SuccessMessage,
   TextareaInput,
   TextInput,
 } from "@/components/admin/design-system"
 import type { HomepageContentRow } from "@/types/supabase-cms"
 
+export type HomepageLocationPreviewAdmin = {
+  id: string
+  city: string
+  address: string
+  mainMediaId: string | null
+  imageUrl: string | null
+  imageAlt: string
+}
+
 export type HomepageMediaPreviews = {
   hero: string | null
+  about: string | null
   servicesIntro: string | null
   restaurantMain: string | null
   restaurantFloat1: string | null
   restaurantFloat2: string | null
   carwash: string | null
+  playground: string | null
   miniMarket: string | null
 }
 
 type HomepageContentFormProps = {
   initial: HomepageContentRow
   mediaPreviews: HomepageMediaPreviews
+  locationPreviews: HomepageLocationPreviewAdmin[]
 }
 
 function SectionAccordion({
@@ -68,6 +81,20 @@ function SectionAccordion({
 
 const initialActionState: HomepageSaveState = { ok: null }
 const SERVICES_INTRO_CHIP_SLOTS = 4
+const SERVICES_CHIP_ICON_OPTIONS = [
+  { value: "verified", label: "Verified / quality" },
+  { value: "eco", label: "Eco / low emissions" },
+  { value: "local_gas_station", label: "Fuel station" },
+  { value: "speed", label: "Speed / performance" },
+  { value: "workspace_premium", label: "Premium" },
+  { value: "shield", label: "Safety" },
+  { value: "support_agent", label: "Service" },
+  { value: "restaurant", label: "Restaurant" },
+  { value: "local_car_wash", label: "Carwash" },
+  { value: "storefront", label: "Market" },
+  { value: "family_restroom", label: "Family" },
+  { value: "schedule", label: "Fast stop" },
+] as const
 
 type ServicesIntroChipSlot = {
   icon: string
@@ -76,6 +103,13 @@ type ServicesIntroChipSlot = {
 
 function heroHeadlineDefault(initial: HomepageContentRow) {
   return [initial.hero_headline_line1, initial.hero_headline_line2]
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .join(" ")
+}
+
+function restaurantHeadlineDefault(initial: HomepageContentRow) {
+  return [initial.restaurant_home_headline_primary, initial.restaurant_home_headline_accent]
     .map((part) => part.trim())
     .filter(Boolean)
     .join(" ")
@@ -105,7 +139,14 @@ function servicesIntroChipSlots(raw: unknown): ServicesIntroChipSlot[] {
   return slots
 }
 
-export function HomepageContentForm({ initial, mediaPreviews }: HomepageContentFormProps) {
+function chipIconOptions(selectedIcon: string) {
+  if (!selectedIcon || SERVICES_CHIP_ICON_OPTIONS.some((option) => option.value === selectedIcon)) {
+    return SERVICES_CHIP_ICON_OPTIONS
+  }
+  return [{ value: selectedIcon, label: selectedIcon }, ...SERVICES_CHIP_ICON_OPTIONS]
+}
+
+export function HomepageContentForm({ initial, mediaPreviews, locationPreviews }: HomepageContentFormProps) {
   const router = useRouter()
   const formRef = useRef<HTMLFormElement>(null)
   const [state, formAction] = useActionState(saveHomepageContent, initialActionState)
@@ -144,15 +185,19 @@ export function HomepageContentForm({ initial, mediaPreviews }: HomepageContentF
 
       <AdminSectionCard
         title="Homepage content"
-        description="Edit the CMS-backed homepage fields. Sections marked as planned are visible for layout planning but are not saved until the schema supports them."
+        description="Edit CMS-backed homepage fields. Hero buttons are fixed website copy and are not editable here."
       >
         <div className="space-y-3">
           <SectionAccordion
             title="1. Hero Section"
-            description="Main homepage headline, intro copy, primary/secondary CTA labels, and hero image."
+            description="Hero headline, description, and image."
             defaultOpen
           >
             <div className="space-y-5">
+              <input type="hidden" name="hero_cta_primary_label" value={initial.hero_cta_primary_label || "Our Services"} />
+              <input type="hidden" name="hero_cta_primary_href" value={initial.hero_cta_primary_href || "/services"} />
+              <input type="hidden" name="hero_cta_secondary_label" value={initial.hero_cta_secondary_label} />
+              <input type="hidden" name="hero_cta_secondary_href" value={initial.hero_cta_secondary_href || "/locations"} />
               <input type="hidden" name="hero_headline_line2" value="" />
               <TextInput
                 label="Headline"
@@ -163,7 +208,7 @@ export function HomepageContentForm({ initial, mediaPreviews }: HomepageContentF
                 error={fieldErrors?.hero_headline_line1?.[0]}
               />
               <TextareaInput
-                label="Subtitle"
+                label="Description"
                 name="hero_subtitle"
                 defaultValue={initial.hero_subtitle}
                 rows={4}
@@ -180,43 +225,13 @@ export function HomepageContentForm({ initial, mediaPreviews }: HomepageContentF
                 removeInputName="clear_hero_image"
               />
               <TextInput label="Hero image alt text" name="hero_image_alt" placeholder="Describe the photograph" />
-              <AdminContentGrid columns={2}>
-                <TextInput
-                  label="Primary button text"
-                  name="hero_cta_primary_label"
-                  defaultValue={initial.hero_cta_primary_label}
-                  required
-                  error={fieldErrors?.hero_cta_primary_label?.[0]}
-                />
-                <TextInput
-                  label="Secondary button text"
-                  name="hero_cta_secondary_label"
-                  defaultValue={initial.hero_cta_secondary_label}
-                  helperText="Leave empty to hide the second button."
-                  error={fieldErrors?.hero_cta_secondary_label?.[0]}
-                />
-              </AdminContentGrid>
-              <AdminContentGrid columns={2}>
-                <TextInput
-                  label="Primary button link"
-                  name="hero_cta_primary_href"
-                  defaultValue={initial.hero_cta_primary_href || "/services"}
-                  required
-                  helperText="Use a site path like /services or a full URL."
-                  error={fieldErrors?.hero_cta_primary_href?.[0]}
-                />
-                <TextInput
-                  label="Secondary button link"
-                  name="hero_cta_secondary_href"
-                  defaultValue={initial.hero_cta_secondary_href || "/locations"}
-                  helperText="Used when the secondary button text is not empty."
-                  error={fieldErrors?.hero_cta_secondary_href?.[0]}
-                />
-              </AdminContentGrid>
             </div>
           </SectionAccordion>
 
-          <SectionAccordion title="2. Services Preview" description="Title and description for the homepage services preview band.">
+          <SectionAccordion
+            title="2. Services Preview"
+            description="Homepage services band, service cards, and restaurant highlight."
+          >
             <div className="space-y-5">
               <TextInput
                 label="Title"
@@ -258,13 +273,12 @@ export function HomepageContentForm({ initial, mediaPreviews }: HomepageContentF
                           maxLength={80}
                           placeholder="Cilësi e lartë"
                         />
-                        <TextInput
-                          label="Material icon"
+                        <SelectInput
+                          label="Icon"
                           name={`services_intro_chip_icon_${index}`}
                           defaultValue={chip.icon}
-                          maxLength={40}
-                          placeholder="verified"
-                          helperText="Examples: verified, eco, local_gas_station"
+                          options={chipIconOptions(chip.icon)}
+                          placeholder="Choose icon"
                         />
                       </div>
                     </div>
@@ -280,56 +294,105 @@ export function HomepageContentForm({ initial, mediaPreviews }: HomepageContentF
                 removeInputName="clear_services_intro_image"
               />
               <TextInput label="Services image alt text" name="services_intro_image_alt" placeholder="Describe the image" />
-            </div>
-          </SectionAccordion>
 
-          <SectionAccordion title="3. About Preview" description="About preview copy. Title and button text are planned fields.">
-            <div className="space-y-5">
-              <AdminContentGrid columns={2}>
-                <TextInput
-                  label="Title"
-                  value="Built In Kosovo. Trusted On Every Route."
-                  helperText="Planned CMS field. Current public title is design-owned."
-                  disabled
-                  readOnly
-                />
-                <TextInput
-                  label="Button text"
-                  value="Read Full About Us"
-                  helperText="Planned CMS field. Current public button text is design-owned."
-                  disabled
-                  readOnly
-                />
-              </AdminContentGrid>
-              <TextareaInput
-                label="Description"
-                name="about_preview_text"
-                defaultValue={initial.about_preview_text}
-                rows={5}
-                maxLength={4000}
-                showCharacterCount
-                helperText="Saved to homepage_content and shown in the homepage About preview."
-                error={fieldErrors?.about_preview_text?.[0]}
+              <div className="space-y-4 border-[var(--admin-border)] border-t pt-5">
+                <div>
+                  <p className="text-sm font-semibold text-[var(--admin-text)]">Service cards</p>
+                  <p className="mt-1 text-sm text-[var(--admin-text-muted)]">
+                    Cards shown below the main services band.
+                  </p>
+                </div>
+                <AdminContentGrid columns={3}>
+                  <div className="space-y-4 rounded-[var(--admin-radius-card)] border border-[var(--admin-border)] bg-[var(--admin-surface-muted)] p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--admin-text-muted)]">
+                      Carwash
+                    </p>
+                    <TextareaInput
+                      label="Description"
+                      name="carwash_intro_text"
+                      defaultValue={initial.carwash_intro_text}
+                      rows={5}
+                      maxLength={4000}
+                      showCharacterCount
+                      error={fieldErrors?.carwash_intro_text?.[0]}
+                    />
+                    <FileUploadInput
+                      label="Image"
+                      name="carwash_image"
+                      layout="stacked"
+                      previewUrl={mediaPreviews.carwash}
+                      previewAlt="Homepage carwash intro"
+                      removeInputName="clear_carwash_image"
+                    />
+                    <TextInput label="Image alt text" name="carwash_image_alt" placeholder="Describe the carwash image" />
+                  </div>
+
+                  <div className="space-y-4 rounded-[var(--admin-radius-card)] border border-[var(--admin-border)] bg-[var(--admin-surface-muted)] p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--admin-text-muted)]">
+                      Playground
+                    </p>
+                    <TextareaInput
+                      label="Description"
+                      name="playground_intro_text"
+                      defaultValue={initial.playground_intro_text}
+                      rows={5}
+                      maxLength={4000}
+                      showCharacterCount
+                      error={fieldErrors?.playground_intro_text?.[0]}
+                    />
+                    <FileUploadInput
+                      label="Image"
+                      name="playground_image"
+                      layout="stacked"
+                      previewUrl={mediaPreviews.playground}
+                      previewAlt="Homepage playground intro"
+                      removeInputName="clear_playground_image"
+                    />
+                    <TextInput label="Image alt text" name="playground_image_alt" placeholder="Describe the playground image" />
+                  </div>
+
+                  <div className="space-y-4 rounded-[var(--admin-radius-card)] border border-[var(--admin-border)] bg-[var(--admin-surface-muted)] p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--admin-text-muted)]">
+                      Mini Market
+                    </p>
+                    <TextareaInput
+                      label="Description"
+                      name="mini_market_intro_text"
+                      defaultValue={initial.mini_market_intro_text}
+                      rows={5}
+                      maxLength={4000}
+                      showCharacterCount
+                      error={fieldErrors?.mini_market_intro_text?.[0]}
+                    />
+                    <FileUploadInput
+                      label="Image"
+                      name="mini_market_image"
+                      layout="stacked"
+                      previewUrl={mediaPreviews.miniMarket}
+                      previewAlt="Homepage mini market intro"
+                      removeInputName="clear_mini_market_image"
+                    />
+                    <TextInput label="Image alt text" name="mini_market_image_alt" placeholder="Describe the market image" />
+                  </div>
+                </AdminContentGrid>
+              </div>
+
+              <div className="space-y-4 border-[var(--admin-border)] border-t pt-5">
+                <div>
+                  <p className="text-sm font-semibold text-[var(--admin-text)]">Restaurant highlight</p>
+                  <p className="mt-1 text-sm text-[var(--admin-text-muted)]">
+                    Restaurant block shown directly after the services cards.
+                  </p>
+                </div>
+              <input type="hidden" name="restaurant_home_headline_accent" value="" />
+              <TextInput
+                label="Headline"
+                name="restaurant_home_headline_primary"
+                defaultValue={restaurantHeadlineDefault(initial)}
+                maxLength={320}
+                helperText="Use one headline. The final words are accented visually and wrap automatically."
+                error={fieldErrors?.restaurant_home_headline_primary?.[0]}
               />
-            </div>
-          </SectionAccordion>
-
-          <SectionAccordion title="4. Restaurant Highlight" description="Restaurant headline, description, image, and planned button text.">
-            <div className="space-y-5">
-              <AdminContentGrid columns={2}>
-                <TextInput
-                  label="Title line 1"
-                  name="restaurant_home_headline_primary"
-                  defaultValue={initial.restaurant_home_headline_primary}
-                  error={fieldErrors?.restaurant_home_headline_primary?.[0]}
-                />
-                <TextInput
-                  label="Title line 2"
-                  name="restaurant_home_headline_accent"
-                  defaultValue={initial.restaurant_home_headline_accent}
-                  error={fieldErrors?.restaurant_home_headline_accent?.[0]}
-                />
-              </AdminContentGrid>
               <TextareaInput
                 label="Description"
                 name="restaurant_highlight_text"
@@ -347,75 +410,107 @@ export function HomepageContentForm({ initial, mediaPreviews }: HomepageContentF
                 removeInputName="clear_restaurant_main_image"
               />
               <TextInput label="Restaurant image alt text" name="restaurant_main_alt" placeholder="Describe the restaurant image" />
-              <TextInput
-                label="Button text"
-                value="Explore restaurant"
-                helperText="Planned CMS field. Current public button text/link are design-owned."
-                disabled
-                readOnly
-              />
+              </div>
             </div>
           </SectionAccordion>
 
-          <SectionAccordion title="5. Carwash Intro" description="Carwash card copy and image upload.">
+          <SectionAccordion
+            title="3. Locations Preview"
+            description="Homepage locations band and the three preview cards shown on the public homepage."
+          >
+            <div className="space-y-4">
+              <p className="text-sm leading-relaxed text-[var(--admin-text-muted)]">
+                Edit only the homepage card content here. Full location details such as phone, hours, services, maps, and
+                galleries stay in Locations admin.
+              </p>
+              <div className="grid gap-5 xl:grid-cols-3">
+                {locationPreviews.map((location, index) => (
+                  <div
+                    key={location.id}
+                    className="overflow-hidden rounded-[var(--admin-radius-card)] border border-[var(--admin-border)] bg-[var(--admin-surface-muted)]"
+                  >
+                    <div className="border-[var(--admin-border)] border-b bg-white px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--admin-text-muted)]">
+                        Card {index + 1}
+                      </p>
+                      <p className="mt-1 truncate font-semibold text-[var(--admin-text)]">{location.city}</p>
+                    </div>
+                    <div className="space-y-4 p-4">
+                      <input type="hidden" name={`homepage_location_id_${index}`} value={location.id} />
+                      <input type="hidden" name={`homepage_location_media_id_${index}`} value={location.mainMediaId ?? ""} />
+                      <TextInput
+                        label="Card title"
+                        name={`homepage_location_city_${index}`}
+                        defaultValue={location.city}
+                        maxLength={120}
+                      />
+                      <TextareaInput
+                        label="Card text"
+                        name={`homepage_location_address_${index}`}
+                        defaultValue={location.address}
+                        rows={3}
+                        maxLength={500}
+                        showCharacterCount
+                      />
+                      <FileUploadInput
+                        label="Card image"
+                        name={`homepage_location_image_${index}`}
+                        layout="stacked"
+                        previewUrl={location.imageUrl}
+                        previewAlt={location.imageAlt || location.city}
+                        removeInputName={`clear_homepage_location_image_${index}`}
+                        helperText="Used by the homepage preview card."
+                      />
+                      <TextInput
+                        label="Image alt text"
+                        name={`homepage_location_image_alt_${index}`}
+                        defaultValue={location.imageAlt}
+                        placeholder="Describe the location image"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </SectionAccordion>
+
+          <SectionAccordion title="4. About Preview" description="Homepage About headline and text blocks.">
             <div className="space-y-5">
+              <input type="hidden" name="about_preview_kicker" value={initial.about_preview_kicker} />
+              <input type="hidden" name="about_preview_eyebrow" value={initial.about_preview_eyebrow} />
+              <input type="hidden" name="about_preview_why_title" value={initial.about_preview_why_title} />
+              <input type="hidden" name="about_preview_button_label" value={initial.about_preview_button_label || "Lexo më shumë për ne"} />
+              <input type="hidden" name="about_preview_button_href" value={initial.about_preview_button_href || "/about"} />
               <TextInput
-                label="Title"
-                value="Carwash"
-                helperText="Planned CMS field. Current public title is design-owned."
-                disabled
-                readOnly
+                label="Main headline"
+                name="about_preview_headline"
+                defaultValue={initial.about_preview_headline}
+                maxLength={320}
+                placeholder="Të ndërtuar në Kosovë. Të besuar në çdo rrugë."
+                error={fieldErrors?.about_preview_headline?.[0]}
               />
               <TextareaInput
-                label="Description"
-                name="carwash_intro_text"
-                defaultValue={initial.carwash_intro_text}
+                label="Who we are text"
+                name="about_preview_text"
+                defaultValue={initial.about_preview_text}
                 rows={5}
                 maxLength={4000}
                 showCharacterCount
-                error={fieldErrors?.carwash_intro_text?.[0]}
-              />
-              <FileUploadInput
-                label="Carwash image upload"
-                name="carwash_image"
-                previewUrl={mediaPreviews.carwash}
-                previewAlt="Homepage carwash intro"
-                removeInputName="clear_carwash_image"
-              />
-              <TextInput label="Carwash image alt text" name="carwash_image_alt" placeholder="Describe the carwash image" />
-            </div>
-          </SectionAccordion>
-
-          <SectionAccordion title="6. Mini Market Intro" description="Mini Market card copy and image upload.">
-            <div className="space-y-5">
-              <TextInput
-                label="Title"
-                value="Mini Market"
-                helperText="Planned CMS field. Current public title is design-owned."
-                disabled
-                readOnly
+                error={fieldErrors?.about_preview_text?.[0]}
               />
               <TextareaInput
-                label="Description"
-                name="mini_market_intro_text"
-                defaultValue={initial.mini_market_intro_text}
-                rows={5}
-                maxLength={4000}
+                label="Why choose us text"
+                name="about_preview_why_text"
+                defaultValue={initial.about_preview_why_text}
+                rows={4}
+                maxLength={1200}
                 showCharacterCount
-                error={fieldErrors?.mini_market_intro_text?.[0]}
+                error={fieldErrors?.about_preview_why_text?.[0]}
               />
-              <FileUploadInput
-                label="Mini Market image upload"
-                name="mini_market_image"
-                previewUrl={mediaPreviews.miniMarket}
-                previewAlt="Homepage mini market intro"
-                removeInputName="clear_mini_market_image"
-              />
-              <TextInput label="Mini Market image alt text" name="mini_market_image_alt" placeholder="Describe the market image" />
             </div>
           </SectionAccordion>
 
-          <SectionAccordion title="7. Careers CTA" description="Prepared section. Not saved until homepage schema/public section support is added.">
+          <SectionAccordion title="5. Careers CTA" description="Prepared section. Not saved until homepage schema/public section support is added.">
             <AdminContentGrid columns={2}>
               <TextInput label="Title" value="Join our team" disabled readOnly />
               <TextInput label="Button text" value="View careers" disabled readOnly />
@@ -430,7 +525,7 @@ export function HomepageContentForm({ initial, mediaPreviews }: HomepageContentF
             </AdminContentGrid>
           </SectionAccordion>
 
-          <SectionAccordion title="8. Contact CTA" description="Prepared section. Contact details are currently managed from Contact Info.">
+          <SectionAccordion title="6. Contact CTA" description="Prepared section. Contact details are currently managed from Contact Info.">
             <AdminContentGrid columns={2}>
               <TextInput label="Title" value="Talk To Euromiti" disabled readOnly />
               <TextInput label="Button text" value="Contact Us" disabled readOnly />

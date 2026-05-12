@@ -15,10 +15,9 @@ export async function HomeFuelPricesGlass() {
     >
       <div className="mx-auto w-full max-w-[1280px] space-y-5 px-4 sm:px-6 md:space-y-7 lg:px-12">
         <div>
-          <p className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-secondary">Çmimet live</p>
           <h2
             id="home-fuel-prices-heading"
-            className="mt-2 font-[family-name:var(--font-montserrat)] text-2xl font-extrabold tracking-tight text-black md:text-3xl"
+            className="font-[family-name:var(--font-montserrat)] text-2xl font-extrabold tracking-tight text-black md:text-3xl"
           >
             Çmimet e karburanteve sot
           </h2>

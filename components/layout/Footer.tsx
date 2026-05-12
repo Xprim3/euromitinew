@@ -4,9 +4,7 @@ import Link from "next/link"
 import { Container } from "./Container"
 
 import {
-  getContactDetailsPublic,
   getSiteFooterPublic,
-  type ContactDetailsPublic,
   type SiteFooterPublic,
 } from "@/lib/data/site-contact-public"
 import { TOPBAR_NAV_LINKS } from "@/lib/navigation"
@@ -22,11 +20,7 @@ const footerLinkClass =
 const socialClass =
   "text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-white/55 transition-colors hover:text-brand-accent-soft"
 
-function telHref(phone: string) {
-  return `tel:${phone.replace(/\s/g, "")}`
-}
-
-function FooterView({ data, contact }: { data: SiteFooterPublic; contact: ContactDetailsPublic }) {
+function FooterView({ data }: { data: SiteFooterPublic }) {
   const year = new Date().getFullYear()
 
   return (
@@ -75,32 +69,20 @@ function FooterView({ data, contact }: { data: SiteFooterPublic; contact: Contac
                 Fuel prices
               </Link>
             </div>
-            <div className="mt-8 grid gap-3 border-white/8 border-t pt-6 text-sm text-white/58 sm:grid-cols-2">
-              <a className="font-semibold transition-colors hover:text-brand-accent-soft" href={telHref(contact.phone)}>
-                {contact.phone}
-              </a>
-              <a className="break-all font-semibold transition-colors hover:text-brand-accent-soft" href={`mailto:${contact.email}`}>
-                {contact.email}
-              </a>
-              {contact.mapLink ? (
-                <a
-                  className="leading-relaxed transition-colors hover:text-brand-accent-soft sm:col-span-2"
-                  href={contact.mapLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {contact.hqAddress}
-                </a>
-              ) : (
-                <span className="leading-relaxed sm:col-span-2">{contact.hqAddress}</span>
-              )}
-            </div>
           </div>
         </div>
 
         <div className="mt-14 flex flex-col gap-5 border-white/8 border-t pt-8 md:mt-16 md:flex-row md:items-center md:justify-between md:gap-6">
           <p className="text-[0.7rem] font-medium tracking-[0.04em] text-white/42">
-            © {year} {data.footerCopyrightLine}
+            © {year} {data.footerCopyrightLine}. Website designed by{" "}
+            <a
+              href="https://www.denisjanuzi.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-white/62 transition-colors hover:text-brand-accent-soft"
+            >
+              Denis Januzi
+            </a>
           </p>
           <nav aria-label="Legal" className="flex flex-wrap gap-x-6 gap-y-2">
             {legalLinks.map(({ href, label }) => (
@@ -120,6 +102,6 @@ function FooterView({ data, contact }: { data: SiteFooterPublic; contact: Contac
 }
 
 export async function Footer() {
-  const [data, contact] = await Promise.all([getSiteFooterPublic(), getContactDetailsPublic()])
-  return <FooterView data={data} contact={contact} />
+  const data = await getSiteFooterPublic()
+  return <FooterView data={data} />
 }

@@ -25,9 +25,18 @@ function hydrateRow(raw: Partial<HomepageContentRow> & Pick<HomepageContentRow, 
     hero_cta_primary_href: raw.hero_cta_primary_href ?? "/services",
     hero_cta_secondary_label: raw.hero_cta_secondary_label ?? e,
     hero_cta_secondary_href: raw.hero_cta_secondary_href ?? "/locations",
+    about_preview_kicker: raw.about_preview_kicker ?? e,
+    about_preview_headline: raw.about_preview_headline ?? e,
+    about_preview_eyebrow: raw.about_preview_eyebrow ?? e,
     about_preview_text: raw.about_preview_text ?? e,
+    about_preview_why_title: raw.about_preview_why_title ?? e,
+    about_preview_why_text: raw.about_preview_why_text ?? e,
+    about_preview_button_label: raw.about_preview_button_label ?? e,
+    about_preview_button_href: raw.about_preview_button_href ?? "/about",
+    about_preview_image_media_id: raw.about_preview_image_media_id ?? null,
     restaurant_highlight_text: raw.restaurant_highlight_text ?? e,
     carwash_intro_text: raw.carwash_intro_text ?? e,
+    playground_intro_text: raw.playground_intro_text ?? e,
     mini_market_intro_text: raw.mini_market_intro_text ?? e,
     services_intro_title: raw.services_intro_title ?? e,
     services_intro_body: raw.services_intro_body ?? e,
@@ -39,6 +48,7 @@ function hydrateRow(raw: Partial<HomepageContentRow> & Pick<HomepageContentRow, 
     restaurant_home_float_1_media_id: raw.restaurant_home_float_1_media_id ?? null,
     restaurant_home_float_2_media_id: raw.restaurant_home_float_2_media_id ?? null,
     carwash_intro_media_id: raw.carwash_intro_media_id ?? null,
+    playground_intro_media_id: raw.playground_intro_media_id ?? null,
     mini_market_intro_media_id: raw.mini_market_intro_media_id ?? null,
     locations_band_kicker: raw.locations_band_kicker ?? e,
     locations_band_heading: raw.locations_band_heading ?? e,
@@ -55,6 +65,15 @@ function textOrFallback(value: string | null | undefined, fallback: string) {
 function joinedHeadline(line1: string | null | undefined, line2: string | null | undefined, fallbackLine1: string, fallbackLine2: string) {
   const title = [line1, line2].map((part) => part?.trim()).filter(Boolean).join(" ")
   return title || [fallbackLine1, fallbackLine2].join(" ")
+}
+
+function headlineParts(title: string, accentWordCount = 2) {
+  const words = title.trim().split(/\s+/).filter(Boolean)
+  if (words.length <= accentWordCount) return { main: title.trim(), accent: "" }
+  return {
+    main: words.slice(0, -accentWordCount).join(" "),
+    accent: words.slice(-accentWordCount).join(" "),
+  }
 }
 
 function servicesIntroChipsFromCMS(raw: unknown, fallback: readonly ServicesIntroChip[]) {
@@ -96,11 +115,13 @@ export const getPublicHomepageSingleton = cache(async (): Promise<{ row: Homepag
   const base = homepageContentRowFromUnknown(rawRow as Record<string, unknown>)
   const idList = [
     base.hero_image_media_id,
+    base.about_preview_image_media_id,
     base.services_intro_media_id,
     base.restaurant_home_main_media_id,
     base.restaurant_home_float_1_media_id,
     base.restaurant_home_float_2_media_id,
     base.carwash_intro_media_id,
+    base.playground_intro_media_id,
     base.mini_market_intro_media_id,
   ].filter((x): x is string => typeof x === "string" && x.length > 0)
 
@@ -154,8 +175,6 @@ export function heroFromHomepageCMS(row: HomepageContentRow | null, media: Homep
   const img = dm?.public_url?.trim() || homeHeroDesign.imageSrc
   const imgAlt = dm?.alt_text?.trim() || homeHeroDesign.imageAlt
 
-  const secondaryLabelRaw = row?.hero_cta_secondary_label?.trim() ?? ""
-
   return {
     imageSrc: img,
     imageAlt: imgAlt,
@@ -167,16 +186,8 @@ export function heroFromHomepageCMS(row: HomepageContentRow | null, media: Homep
       homeHeroDesign.titleLine2
     ),
     subtitle: textOrFallback(row.hero_subtitle, homeHeroDesign.subtitle),
-    primaryCta: {
-      label: textOrFallback(row.hero_cta_primary_label, homeHeroDesign.primaryCta.label),
-      href: row.hero_cta_primary_href.trim() || homeHeroDesign.primaryCta.href,
-    },
-    secondaryCta: {
-      label: secondaryLabelRaw,
-      href: secondaryLabelRaw
-        ? (row.hero_cta_secondary_href.trim() || homeHeroDesign.secondaryCta.href)
-        : "/locations",
-    },
+    primaryCta: { ...homeHeroDesign.primaryCta },
+    secondaryCta: { ...homeHeroDesign.secondaryCta },
   }
 }
 
@@ -204,16 +215,18 @@ export function servicesIntroEliteFromCMS(row: HomepageContentRow | null, media:
   }
 }
 
-/** Carwash / Mini market teaser cards beneath the elite band — playground stays mocked. */
+/** Service teaser cards beneath the elite band. */
 export function secondaryHomeServiceCardsFromCMS(row: HomepageContentRow | null, media: HomepageMediaLookup) {
   const carwashMock = homeBeyondDesign.secondaryServices.find((s) => s.key === "detailing")!
+  const playgroundMock = homeBeyondDesign.secondaryServices.find((s) => s.key === "family")!
   const marketMock = homeBeyondDesign.secondaryServices.find((s) => s.key === "market")!
 
   if (!row) {
-    return { carwash: carwashMock, market: marketMock }
+    return { carwash: carwashMock, playground: playgroundMock, market: marketMock }
   }
 
   const cMedia = row?.carwash_intro_media_id ? media[row.carwash_intro_media_id] : undefined
+  const pMedia = row?.playground_intro_media_id ? media[row.playground_intro_media_id] : undefined
   const mMedia = row?.mini_market_intro_media_id ? media[row.mini_market_intro_media_id] : undefined
 
   const carwash = {
@@ -223,6 +236,13 @@ export function secondaryHomeServiceCardsFromCMS(row: HomepageContentRow | null,
     imageAlt: cMedia?.alt_text?.trim() || carwashMock.imageAlt,
   }
 
+  const playground = {
+    ...playgroundMock,
+    body: textOrFallback(row.playground_intro_text, playgroundMock.body),
+    imageSrc: pMedia?.public_url?.trim() || playgroundMock.imageSrc,
+    imageAlt: pMedia?.alt_text?.trim() || playgroundMock.imageAlt,
+  }
+
   const market = {
     ...marketMock,
     body: textOrFallback(row.mini_market_intro_text, marketMock.body),
@@ -230,16 +250,17 @@ export function secondaryHomeServiceCardsFromCMS(row: HomepageContentRow | null,
     imageAlt: mMedia?.alt_text?.trim() || marketMock.imageAlt,
   }
 
-  return { carwash, market }
+  return { carwash, playground, market }
 }
 
 /** Homepage restaurant luxury block merged with singleton + media. */
 export function restaurantLuxuryFromCMS(row: HomepageContentRow | null, media: HomepageMediaLookup) {
   const r = homeBeyondDesign.restaurant
   if (!row) {
+    const title = joinedHeadline(null, null, "Shije të kuruara.", "Pushim i rafinuar.")
     return {
-      headlinePrimary: "Curated Dining.",
-      headlineAccent: "Refined Pause.",
+      headline: title,
+      headlineParts: headlineParts(title),
       body: r.body,
       ctaHref: r.ctaHref,
       mainImage: r.mainImage,
@@ -254,10 +275,16 @@ export function restaurantLuxuryFromCMS(row: HomepageContentRow | null, media: H
   const mm = row?.restaurant_home_main_media_id ? media[row.restaurant_home_main_media_id] : undefined
   const f1 = row?.restaurant_home_float_1_media_id ? media[row.restaurant_home_float_1_media_id] : undefined
   const f2 = row?.restaurant_home_float_2_media_id ? media[row.restaurant_home_float_2_media_id] : undefined
+  const headline = joinedHeadline(
+    row.restaurant_home_headline_primary,
+    row.restaurant_home_headline_accent,
+    "Shije të kuruara.",
+    "Pushim i rafinuar."
+  )
 
   return {
-    headlinePrimary: textOrFallback(row.restaurant_home_headline_primary, "Curated Dining."),
-    headlineAccent: textOrFallback(row.restaurant_home_headline_accent, "Refined Pause."),
+    headline,
+    headlineParts: headlineParts(headline),
     body: textOrFallback(row.restaurant_highlight_text, r.body),
     ctaHref: r.ctaHref,
     mainImage: mm?.public_url?.trim() || r.mainImage,

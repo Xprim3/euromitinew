@@ -131,18 +131,18 @@ function mockFallbackCards(): HomeLocationPreviewCard[] {
 export function locationsBandCopyFromCMS(row: HomepageContentRow | null) {
   if (!row) {
     return {
-      kicker: "Locations",
-      heading: "Our City Stations",
-      subtitle: "Prishtina, Ferizaj, and Gjilan - tap any card to view full location details.",
+      kicker: "Lokacionet",
+      heading: "Stacionet tona në qytet",
+      subtitle: "Prishtinë, Ferizaj dhe Gjilan - hapni cilëndo kartë për detaje të plota të lokacionit.",
     }
   }
 
   return {
-    kicker: textOrFallback(row.locations_band_kicker, "Locations"),
-    heading: textOrFallback(row.locations_band_heading, "Our City Stations"),
+    kicker: textOrFallback(row.locations_band_kicker, "Lokacionet"),
+    heading: textOrFallback(row.locations_band_heading, "Stacionet tona në qytet"),
     subtitle: textOrFallback(
       row.locations_band_subtitle,
-      "Prishtina, Ferizaj, and Gjilan - tap any card to view full location details."
+      "Prishtinë, Ferizaj dhe Gjilan - hapni cilëndo kartë për detaje të plota të lokacionit."
     ),
   }
 }

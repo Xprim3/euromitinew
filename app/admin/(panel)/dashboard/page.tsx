@@ -7,6 +7,7 @@ import {
   Fuel,
   Home,
   ImageIcon,
+  Info,
   MapPin,
   Newspaper,
   Settings,
@@ -216,6 +217,12 @@ export default async function AdminDashboardPage() {
               title="Edit homepage"
               description="Hero, sections, and homepage media."
               icon={<Home className="size-5" aria-hidden />}
+            />
+            <QuickActionCard
+              href="/admin/about"
+              title="Edit About page"
+              description="Hero, story, mission, values, and images."
+              icon={<Info className="size-5" aria-hidden />}
             />
             <QuickActionCard
               href="/admin/fuel-prices"

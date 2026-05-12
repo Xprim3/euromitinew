@@ -21,16 +21,19 @@ type MediaCols = Partial<
   Pick<
     HomepageContentRow,
     | "hero_image_media_id"
+    | "about_preview_image_media_id"
     | "services_intro_media_id"
     | "restaurant_home_main_media_id"
     | "restaurant_home_float_1_media_id"
     | "restaurant_home_float_2_media_id"
     | "carwash_intro_media_id"
+    | "playground_intro_media_id"
     | "mini_market_intro_media_id"
   >
 >
 
 const SERVICES_INTRO_CHIP_SLOTS = 4
+const HOMEPAGE_LOCATION_CARD_SLOTS = 3
 
 function servicesIntroChipsFromForm(formData: FormData) {
   const chips: { icon: string; label: string }[] = []
@@ -44,6 +47,50 @@ function servicesIntroChipsFromForm(formData: FormData) {
     chips.push({ icon, label: label.slice(0, 80) })
   }
   return chips
+}
+
+async function updateHomepageLocationCards(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  editorId: string,
+  formData: FormData
+): Promise<HomepageSaveState | null> {
+  for (let i = 0; i < HOMEPAGE_LOCATION_CARD_SLOTS; i++) {
+    const id = String(formData.get(`homepage_location_id_${i}`) ?? "").trim()
+    if (!id) continue
+
+    const city = String(formData.get(`homepage_location_city_${i}`) ?? "").trim()
+    const address = String(formData.get(`homepage_location_address_${i}`) ?? "").trim()
+    const alt = String(formData.get(`homepage_location_image_alt_${i}`) ?? "").trim()
+    const existingMediaId = String(formData.get(`homepage_location_media_id_${i}`) ?? "").trim()
+    const clearImage = isTruthyCheckbox(formData.get(`clear_homepage_location_image_${i}`))
+    const file = formData.get(`homepage_location_image_${i}`)
+
+    const patch: Record<string, unknown> = {}
+    if (city) patch.city = city
+    if (address) patch.address = address
+
+    if (clearImage) {
+      patch.main_media_id = null
+    } else if (file instanceof File && file.size > 0) {
+      const uploaded = await uploadHomepageAssetRow(supabase, editorId, file, {
+        altText: alt,
+        usageSection: `homepage-location-card-${i + 1}`,
+        category: "locations",
+      })
+      if ("message" in uploaded) return { ok: false, message: uploaded.message }
+      patch.main_media_id = uploaded.id
+    } else if (existingMediaId && alt) {
+      const { error: altErr } = await supabase.from("media_uploads").update({ alt_text: alt }).eq("id", existingMediaId)
+      if (altErr) return { ok: false, message: altErr.message }
+    }
+
+    if (!Object.keys(patch).length) continue
+
+    const { error } = await supabase.from("locations").update(patch).eq("id", id)
+    if (error) return { ok: false, message: error.message }
+  }
+
+  return null
 }
 
 async function ensureAdminProfile(
@@ -111,11 +158,20 @@ export async function saveHomepageContent(
       hero_cta_primary_href: formData.get("hero_cta_primary_href"),
       hero_cta_secondary_label: secondaryLabel,
       hero_cta_secondary_href: secondaryLabel ? secondaryHrefRaw : "/locations",
+      about_preview_kicker: formData.get("about_preview_kicker"),
+      about_preview_headline: formData.get("about_preview_headline"),
+      about_preview_eyebrow: formData.get("about_preview_eyebrow"),
       about_preview_text: formData.get("about_preview_text"),
+      about_preview_why_title: formData.get("about_preview_why_title"),
+      about_preview_why_text: formData.get("about_preview_why_text"),
+      about_preview_button_label: formData.get("about_preview_button_label"),
+      about_preview_button_href: formData.get("about_preview_button_href"),
       restaurant_highlight_text: formData.get("restaurant_highlight_text"),
       carwash_intro_text: formData.get("carwash_intro_text"),
+      playground_intro_text: formData.get("playground_intro_text"),
       mini_market_intro_text: formData.get("mini_market_intro_text"),
       hero_image_alt: formData.get("hero_image_alt") ?? "",
+      about_preview_image_alt: formData.get("about_preview_image_alt") ?? "",
       services_intro_title: formData.get("services_intro_title"),
       services_intro_body: formData.get("services_intro_body"),
       locations_band_kicker: formData.get("locations_band_kicker"),
@@ -128,6 +184,7 @@ export async function saveHomepageContent(
       restaurant_float_1_alt: formData.get("restaurant_float_1_alt") ?? "",
       restaurant_float_2_alt: formData.get("restaurant_float_2_alt") ?? "",
       carwash_image_alt: formData.get("carwash_image_alt") ?? "",
+      playground_image_alt: formData.get("playground_image_alt") ?? "",
       mini_market_image_alt: formData.get("mini_market_image_alt") ?? "",
     })
 
@@ -144,9 +201,17 @@ export async function saveHomepageContent(
       hero_cta_primary_href: v.hero_cta_primary_href,
       hero_cta_secondary_label: v.hero_cta_secondary_label,
       hero_cta_secondary_href: v.hero_cta_secondary_href,
+      about_preview_kicker: v.about_preview_kicker,
+      about_preview_headline: v.about_preview_headline,
+      about_preview_eyebrow: v.about_preview_eyebrow,
       about_preview_text: v.about_preview_text,
+      about_preview_why_title: v.about_preview_why_title,
+      about_preview_why_text: v.about_preview_why_text,
+      about_preview_button_label: v.about_preview_button_label,
+      about_preview_button_href: v.about_preview_button_href,
       restaurant_highlight_text: v.restaurant_highlight_text,
       carwash_intro_text: v.carwash_intro_text,
+      playground_intro_text: v.playground_intro_text,
       mini_market_intro_text: v.mini_market_intro_text,
       services_intro_title: v.services_intro_title,
       services_intro_body: v.services_intro_body,
@@ -197,6 +262,13 @@ export async function saveHomepageContent(
     }
 
     const uploadSteps: Promise<HomepageSaveState | undefined>[] = [
+      consumeUpload(
+        "about_preview_image",
+        "clear_about_preview_image",
+        "about_preview_image_media_id",
+        v.about_preview_image_alt ?? "",
+        "about-preview"
+      ),
       consumeUpload("services_intro_image", "clear_services_intro_image", "services_intro_media_id", v.services_intro_image_alt ?? "", "services-intro"),
       consumeUpload("restaurant_main_image", "clear_restaurant_main_image", "restaurant_home_main_media_id", v.restaurant_main_alt ?? "", "restaurant-home-main"),
       consumeUpload(
@@ -214,6 +286,7 @@ export async function saveHomepageContent(
         "restaurant-home-float-2"
       ),
       consumeUpload("carwash_image", "clear_carwash_image", "carwash_intro_media_id", v.carwash_image_alt ?? "", "carwash-card"),
+      consumeUpload("playground_image", "clear_playground_image", "playground_intro_media_id", v.playground_image_alt ?? "", "playground-card"),
       consumeUpload(
         "mini_market_image",
         "clear_mini_market_image",
@@ -238,8 +311,14 @@ export async function saveHomepageContent(
       return { ok: false, message: upErr.message }
     }
 
+    const locationUpdateError = await updateHomepageLocationCards(supabase, editorId, formData)
+    if (locationUpdateError) return locationUpdateError
+
     revalidatePath("/")
+    revalidatePath("/locations")
+    revalidatePath("/contact")
     revalidatePath("/admin/homepage")
+    revalidatePath("/admin/locations")
 
     return { ok: true, message: "Homepage saved. The public homepage will refresh on the next request." }
   } catch (e) {

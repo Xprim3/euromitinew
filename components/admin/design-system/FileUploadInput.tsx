@@ -19,6 +19,7 @@ export type FileUploadInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "
   replaceLabel?: string
   removeLabel?: string
   acceptedFileTypesLabel?: string
+  layout?: "auto" | "stacked"
   onFileSelect?: (file: File) => void
   onRemove?: () => void
 }
@@ -38,6 +39,7 @@ export const FileUploadInput = forwardRef<HTMLInputElement, FileUploadInputProps
     replaceLabel = "Upload image",
     removeLabel = "Remove image",
     acceptedFileTypesLabel = "JPEG, PNG, WebP, or GIF",
+    layout = "auto",
     onFileSelect,
     onRemove,
     className,
@@ -129,7 +131,8 @@ export const FileUploadInput = forwardRef<HTMLInputElement, FileUploadInputProps
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
         className={cnDs(
-          "grid min-h-40 cursor-pointer gap-4 rounded-[var(--admin-radius-input)] border border-dashed border-slate-300 bg-slate-50 p-4 transition hover:border-slate-400 hover:bg-white sm:grid-cols-[minmax(0,16rem)_1fr]",
+          "grid min-h-40 cursor-pointer gap-4 rounded-[var(--admin-radius-input)] border border-dashed border-slate-300 bg-slate-50 p-4 transition hover:border-slate-400 hover:bg-white",
+          layout === "auto" && "sm:grid-cols-[minmax(0,16rem)_1fr]",
           dragging && "border-[var(--admin-accent-active)] bg-red-50/60",
           disabled && "cursor-not-allowed opacity-70",
           error && "border-red-400 bg-red-50/60"

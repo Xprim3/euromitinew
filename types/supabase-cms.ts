@@ -9,9 +9,18 @@ export type HomepageContentRow = {
   hero_cta_primary_href: string
   hero_cta_secondary_label: string
   hero_cta_secondary_href: string
+  about_preview_kicker: string
+  about_preview_headline: string
+  about_preview_eyebrow: string
   about_preview_text: string
+  about_preview_why_title: string
+  about_preview_why_text: string
+  about_preview_button_label: string
+  about_preview_button_href: string
+  about_preview_image_media_id: string | null
   restaurant_highlight_text: string
   carwash_intro_text: string
+  playground_intro_text: string
   mini_market_intro_text: string
   /** Services intro (“Elite fueling”) — dark homepage band. */
   services_intro_title: string
@@ -25,6 +34,7 @@ export type HomepageContentRow = {
   restaurant_home_float_1_media_id: string | null
   restaurant_home_float_2_media_id: string | null
   carwash_intro_media_id: string | null
+  playground_intro_media_id: string | null
   mini_market_intro_media_id: string | null
   /** Copy above homepage location cards. */
   locations_band_kicker: string
@@ -45,6 +55,26 @@ export type AboutContentRow = {
   vision_title: string
   vision_body: string
   values_json: unknown
+  why_choose_heading: string
+  why_choose_reasons_json: unknown
+  offer_label: string
+  offer_title: string
+  offer_description: string
+  offer_fuel_title: string
+  offer_fuel_body: string
+  offer_fuel_media_id: string | null
+  offer_restaurant_title: string
+  offer_restaurant_body: string
+  offer_restaurant_media_id: string | null
+  offer_playground_title: string
+  offer_playground_body: string
+  offer_playground_media_id: string | null
+  offer_carwash_title: string
+  offer_carwash_body: string
+  offer_carwash_media_id: string | null
+  offer_mini_market_title: string
+  offer_mini_market_body: string
+  offer_mini_market_media_id: string | null
   hero_media_id: string | null
   story_media_id: string | null
   gallery_media_ids: string[] | null
@@ -57,6 +87,13 @@ export type AboutContentRow = {
 
 /** Card shape stored in `about_content.values_json`. */
 export type AboutValueCard = {
+  title: string
+  body: string
+  icon_material: string
+}
+
+/** Editable "Why Choose Us" reason card stored in `about_content.why_choose_reasons_json`. */
+export type AboutWhyReason = {
   title: string
   body: string
   icon_material: string

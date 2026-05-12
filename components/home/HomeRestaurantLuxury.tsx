@@ -46,15 +46,17 @@ export function HomeRestaurantLuxuryView(r: ReturnType<typeof restaurantLuxuryFr
       <div className="relative z-10 mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-10 xl:px-14">
         <div className="grid grid-cols-1 items-start gap-7 lg:grid-cols-12 lg:items-center lg:gap-10 xl:gap-12">
           <div className="space-y-4 max-sm:space-y-3 sm:space-y-5 xl:space-y-6 lg:col-span-5 lg:max-w-none">
-            <p className="text-[0.6rem] font-black uppercase tracking-[0.26em] text-brand-accent-soft sm:text-[0.65rem] sm:tracking-[0.32em] md:tracking-[0.34em]">
-              Restaurant
-            </p>
             <h2
               id="restaurant-luxury-heading"
               className="text-balance font-playfair text-[clamp(1.5rem,5.4vw,2rem)] font-bold leading-[1.06] tracking-tight text-white sm:text-[clamp(1.75rem,3.8vw,2.15rem)] md:text-[clamp(2rem,3.6vw,2.75rem)] lg:text-[clamp(2.1rem,2.6vw,2.85rem)]"
             >
-              {r.headlinePrimary}
-              <span className="mt-1.5 block text-brand-accent-soft max-sm:mt-1 sm:mt-2">{r.headlineAccent}</span>
+              {r.headlineParts.main}
+              {r.headlineParts.accent ? (
+                <>
+                  {" "}
+                  <span className="text-brand-accent-soft">{r.headlineParts.accent}</span>
+                </>
+              ) : null}
             </h2>
             <p className="max-w-xl text-[0.9rem] leading-relaxed text-white/82 sm:text-[0.9375rem] md:text-base">
               {r.body}
@@ -68,7 +70,7 @@ export function HomeRestaurantLuxuryView(r: ReturnType<typeof restaurantLuxuryFr
                 EuromitiMotionClasses.buttonHover
               )}
             >
-              Explore Restaurant
+              Shiko Restaurantin
               <MaterialSymbol name="arrow_forward" className="text-base transition-transform group-hover:translate-x-1" />
             </Link>
           </div>

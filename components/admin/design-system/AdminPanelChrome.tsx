@@ -10,6 +10,7 @@ import {
   Globe,
   Home,
   ImageIcon,
+  Info,
   LayoutDashboard,
   MapPin,
   Newspaper,
@@ -28,6 +29,7 @@ import { AdminSidebar, type AdminSidebarNavItem } from "./AdminSidebar"
 const NAV_ITEMS: readonly AdminSidebarNavItem[] = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/homepage", label: "Homepage", icon: Home },
+  { href: "/admin/about", label: "About Page", icon: Info },
   { href: "/admin/fuel-prices", label: "Fuel Prices", icon: Flame },
   { href: "/admin/locations", label: "Locations", icon: MapPin },
   { href: "/admin/services", label: "Services", icon: Fuel },

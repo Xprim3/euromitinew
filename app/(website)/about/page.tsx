@@ -5,9 +5,9 @@ import { AboutPageBody } from "@/components/about/AboutPageBody"
 import { AboutPageSkeleton } from "@/components/about/AboutPageSkeleton"
 
 export const metadata: Metadata = {
-  title: "About Us",
+  title: "Rreth Nesh",
   description:
-    "Euromiti — Kosovo forecourts built on dependable fuels, hospitality, mini markets, and car care.",
+    "Euromiti - stacione në Kosovë me karburante të besueshme, mikpritje, mini market dhe kujdes për veturën.",
 }
 
 export const dynamic = "force-dynamic"

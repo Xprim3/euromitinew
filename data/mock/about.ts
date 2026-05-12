@@ -1,15 +1,15 @@
 /** About page copy — CMS later. */
 export const aboutPageMock = {
   introParagraphs: [
-    "Euromiti operates a disciplined network of forecourts across Kosovo — pairing dependable fuels with dining, mini market essentials, and car care where travellers need them most.",
-    "From Prishtina to Ferizaj and Gjilan, our teams obsess over bright, safe canopy experiences, thoughtfully stocked aisles, and hospitality that honours both locals and highway guests.",
+    "Euromiti operon një rrjet të organizuar pikash shërbimi në Kosovë, duke bashkuar karburante të besueshme me restaurant, mini market dhe kujdes për veturën aty ku udhëtarët kanë më shumë nevojë.",
+    "Nga Prishtina në Ferizaj dhe Gjilan, ekipet tona kujdesen për ambiente të ndriçuara, të sigurta, rafte të përgatitura me kujdes dhe mikpritje për klientët lokalë dhe udhëtarët në rrugë.",
   ],
   mission: {
-    title: "Mission",
-    body: "Deliver a premium roadside experience that feels consistent, humane, and unmistakably European — anchored by safe fuelling and genuine service culture.",
+    title: "Misioni",
+    body: "Të ofrojmë një përvojë premium në rrugë, të qëndrueshme dhe njerëzore, të mbështetur në furnizim të sigurt me karburant dhe kulturë të sinqertë shërbimi.",
   },
   vision: {
-    title: "Vision",
-    body: "Be Kosovo’s benchmark for integrated mobility hospitality: trusted fuels, calm restaurants, purposeful retail, and spotless lanes that welcome every journey.",
+    title: "Vizioni",
+    body: "Të jemi standardi i Kosovës për mikpritje të integruar në lëvizje: karburante të besueshme, restorante të qeta, market praktik dhe hapësira të pastra për çdo udhëtim.",
   },
 } as const

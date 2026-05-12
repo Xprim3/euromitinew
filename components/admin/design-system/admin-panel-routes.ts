@@ -150,8 +150,8 @@ export function adminRouteHeaderMeta(pathname: string): AdminRouteHeaderMeta {
 
   if (p === "/admin/about") {
     return {
-      title: "About",
-      subtitle: "About page singleton (not in main nav).",
+      title: "About Page",
+      subtitle: "Edit the public About page hero, story, mission, values, and images.",
       breadcrumbs: [crumbAdmin, { label: "About" }],
     }
   }

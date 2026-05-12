@@ -10,15 +10,15 @@ import type { NewsSummary } from "@/types/public"
 import { cn } from "@/lib/utils"
 
 const BADGE_BY_SLUG: Record<string, { label: string; className: string }> = {
-  "expansion-in-prishtina": { label: "Network update", className: "bg-black text-white" },
-  "path-to-zero-emissions": { label: "Sustainability", className: "bg-green-600 text-white" },
-  "premium-diesel-launch": { label: "Innovation", className: "bg-black text-white" },
+  "expansion-in-prishtina": { label: "Risi në rrjet", className: "bg-black text-white" },
+  "path-to-zero-emissions": { label: "Qëndrueshmëri", className: "bg-green-600 text-white" },
+  "premium-diesel-launch": { label: "Inovacion", className: "bg-black text-white" },
 }
 
 function badgeForHomeNews(item: NewsSummary): { label: string; className: string } {
   const fromSlug = BADGE_BY_SLUG[item.slug]
   if (fromSlug) return fromSlug
-  const cat = item.category ?? "Company Updates"
+  const cat = item.category ?? "Përditësime"
   const label = item.teaserLabel ?? cat
   if (cat === "Sustainability") return { label, className: "bg-green-600 text-white" }
   if (cat === "Innovation" || cat === "Community") return { label, className: "bg-black text-white" }
@@ -37,14 +37,14 @@ export async function HomeNewsInsights() {
       >
         <div className="mx-auto max-w-[1280px]">
           <div className="mb-8 text-center md:mb-11">
-            <p className="text-[0.65rem] font-black uppercase tracking-[0.34em] text-brand-accent-soft">Latest news</p>
+            <p className="text-[0.65rem] font-black uppercase tracking-[0.34em] text-brand-accent-soft">Aktualitete</p>
             <h2
               id="insights-heading"
               className="mt-3 font-[family-name:var(--font-montserrat)] text-[1.65rem] font-extrabold tracking-tight text-white sm:text-[1.85rem] md:text-[2.15rem]"
             >
               {n.title}
             </h2>
-            <p className="mx-auto mt-3 max-w-2xl text-base font-medium text-white/75">{n.subtitle}</p>
+            {n.subtitle ? <p className="mx-auto mt-3 max-w-2xl text-base font-medium text-white/75">{n.subtitle}</p> : null}
             <SectionAccentRule className="mx-auto mt-5 md:mt-6" />
           </div>
           <div className="flex justify-center">
@@ -58,13 +58,13 @@ export async function HomeNewsInsights() {
               />
               <div className="relative space-y-3">
                 <p className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-brand-accent-soft">
-                  Stories & insights
+                  Lajme dhe informacione
                 </p>
                 <h3 className="font-[family-name:var(--font-montserrat)] text-xl font-extrabold tracking-tight text-white md:text-2xl">
-                  Visit News &amp; Insights
+                  Shiko lajmet
                 </h3>
                 <p className="text-sm leading-relaxed text-white/75">
-                  Operational updates will appear here as soon as new posts are published.
+                  Përditësimet do të shfaqen këtu sapo të publikohen lajme të reja.
                 </p>
               </div>
             </Link>
@@ -81,14 +81,14 @@ export async function HomeNewsInsights() {
     >
       <div className="mx-auto max-w-[1280px]">
         <div className="mb-8 text-center md:mb-11">
-          <p className="text-[0.65rem] font-black uppercase tracking-[0.34em] text-brand-accent-soft">Latest news</p>
+          <p className="text-[0.65rem] font-black uppercase tracking-[0.34em] text-brand-accent-soft">Aktualitete</p>
           <h2
             id="insights-heading"
             className="mt-3 font-[family-name:var(--font-montserrat)] text-[1.65rem] font-extrabold tracking-tight text-white sm:text-[1.85rem] md:text-[2.15rem]"
           >
             {n.title}
           </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-base font-medium text-white/75">{n.subtitle}</p>
+          {n.subtitle ? <p className="mx-auto mt-3 max-w-2xl text-base font-medium text-white/75">{n.subtitle}</p> : null}
           <SectionAccentRule className="mx-auto mt-5 md:mt-6" />
         </div>
 
@@ -119,7 +119,7 @@ export async function HomeNewsInsights() {
                     {badge.label}
                   </span>
                   <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/60">
-                    {new Date(item.publishedAt).toLocaleDateString("en-GB")}
+                    {new Date(item.publishedAt).toLocaleDateString("sq-AL")}
                   </p>
                   <h3 className="font-[family-name:var(--font-montserrat)] text-lg font-bold leading-tight text-white">
                     {item.title}
@@ -129,7 +129,7 @@ export async function HomeNewsInsights() {
                     href={`/news/${item.slug}`}
                     className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-brand-accent-soft hover:text-white"
                   >
-                    Read article
+                    Lexo artikullin
                     <MaterialSymbol name="arrow_forward" className="text-sm!" />
                   </Link>
                 </div>
@@ -146,12 +146,12 @@ export async function HomeNewsInsights() {
               aria-hidden
             />
             <div className="relative space-y-3">
-              <p className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-brand-accent-soft">More news</p>
+              <p className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-brand-accent-soft">Më shumë lajme</p>
               <h3 className="font-[family-name:var(--font-montserrat)] text-xl font-extrabold tracking-tight text-white md:text-2xl">
-                Read More News
+                Lexo më shumë lajme
               </h3>
               <p className="text-sm leading-relaxed text-white/75">
-                Explore all updates, launches, network developments, and company stories.
+                Shiko të gjitha përditësimet, risitë, zhvillimet e rrjetit dhe historitë e kompanisë.
               </p>
             </div>
           </Link>

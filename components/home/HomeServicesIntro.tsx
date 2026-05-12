@@ -4,7 +4,6 @@ import Link from "next/link"
 import { EuromitiMotionClasses, ImageHoverZoom, Reveal, Stagger } from "@/components/motion"
 import { MaterialSymbol } from "@/components/ui/MaterialSymbol"
 import { SectionAccentRule } from "@/components/ui/SectionAccentRule"
-import { homeBeyondDesign } from "@/data/mock/homepage-visual"
 import {
   getPublicHomepageSingleton,
   secondaryHomeServiceCardsFromCMS,
@@ -80,7 +79,6 @@ export function HomeServicesIntroView(props: {
           <div className="relative mx-auto max-w-[1280px]">
             <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-2 md:gap-9 xl:gap-12">
               <div className="space-y-6">
-                <p className="text-[0.65rem] font-black uppercase tracking-[0.34em] text-brand-accent-soft">Shërbimet</p>
                 <h2
                   id="services-intro-heading"
                   className="font-playfair text-[1.85rem] font-bold leading-[1.06] tracking-tight text-white sm:text-[2.05rem] md:text-4xl lg:text-[2.65rem]"
@@ -142,7 +140,7 @@ export function HomeServicesIntroView(props: {
               {rows.map((rowItem) => (
                 <article
                   key={rowItem.key}
-                  className="group overflow-hidden rounded-2xl border border-brand-border-accent bg-brand-surface-tinted shadow-[0_14px_36px_-26px_rgba(20,27,43,0.35)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_45px_-24px_rgba(20,27,43,0.45)]"
+                  className="overflow-hidden rounded-2xl border border-brand-border-accent bg-brand-surface-tinted shadow-[0_14px_36px_-26px_rgba(20,27,43,0.35)]"
                 >
                   <div className="relative aspect-16/11 overflow-hidden">
                     <Image
@@ -150,9 +148,9 @@ export function HomeServicesIntroView(props: {
                       alt={rowItem.card.imageAlt}
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"
-                      className="object-cover transition-transform duration-700 motion-safe:group-hover:scale-105"
+                      className="object-cover"
                     />
-                    <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/30 to-transparent opacity-40 transition-opacity duration-300 group-hover:opacity-55" />
+                    <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/30 to-transparent opacity-40" />
                   </div>
                   <div className="space-y-1.5 p-3.5 md:p-4">
                     <h3 className="text-base font-bold text-black md:text-lg">{rowItem.title}</h3>
@@ -171,8 +169,7 @@ export function HomeServicesIntroView(props: {
 export async function HomeServicesIntro() {
   const { row, media } = await getPublicHomepageSingleton()
   const elite = servicesIntroEliteFromCMS(row, media)
-  const { carwash, market } = secondaryHomeServiceCardsFromCMS(row, media)
-  const playground = homeBeyondDesign.secondaryServices.find((s) => s.key === "family")!
+  const { carwash, playground, market } = secondaryHomeServiceCardsFromCMS(row, media)
 
   return (
     <HomeServicesIntroView
@@ -181,11 +178,7 @@ export async function HomeServicesIntro() {
       playgroundKey="family"
       marketKey="market"
       carwash={carwash}
-      playground={{
-        imageSrc: playground.imageSrc,
-        imageAlt: playground.imageAlt,
-        body: playground.body,
-      }}
+      playground={playground}
       market={market}
     />
   )

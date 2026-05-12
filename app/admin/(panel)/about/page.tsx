@@ -1,10 +1,13 @@
 import type { Metadata } from "next"
 
 import { AboutContentForm, type AboutMediaPreviews } from "@/components/admin/AboutContentForm"
+import { AdminSectionCard, ErrorMessage, SuccessMessage } from "@/components/admin/design-system"
 import {
   normalizeAboutRow,
   valueCardsFromDb,
   valueSlotsForAdmin,
+  whyReasonsFromDb,
+  whyReasonSlotsForAdmin,
 } from "@/lib/data/about-content-public"
 import { formatNewsDate } from "@/lib/format-news-date"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
@@ -29,6 +32,7 @@ async function loadAbout(): Promise<
       row: AboutContentRow
       previews: AboutMediaPreviews
       valueSlots: ReturnType<typeof valueSlotsForAdmin>
+      whyReasonSlots: ReturnType<typeof whyReasonSlotsForAdmin>
     }
   | { ok: false; message: string }
 > {
@@ -52,6 +56,11 @@ async function loadAbout(): Promise<
   const mediaIds = [
     row.hero_media_id,
     row.story_media_id,
+    row.offer_fuel_media_id,
+    row.offer_restaurant_media_id,
+    row.offer_playground_media_id,
+    row.offer_carwash_media_id,
+    row.offer_mini_market_media_id,
     row.gallery_strip_media_id,
     row.gallery_why_us_media_id,
     row.gallery_partnerships_media_id,
@@ -60,6 +69,11 @@ async function loadAbout(): Promise<
   const previews: AboutMediaPreviews = {
     hero: null,
     story: null,
+    offerFuel: null,
+    offerRestaurant: null,
+    offerPlayground: null,
+    offerCarwash: null,
+    offerMiniMarket: null,
     galleryStrip: null,
     galleryWhy: null,
     galleryPartner: null,
@@ -71,14 +85,20 @@ async function loadAbout(): Promise<
     mediaRows = uploads ?? null
     previews.hero = urlFromRows(mediaRows, row.hero_media_id)
     previews.story = urlFromRows(mediaRows, row.story_media_id)
+    previews.offerFuel = urlFromRows(mediaRows, row.offer_fuel_media_id)
+    previews.offerRestaurant = urlFromRows(mediaRows, row.offer_restaurant_media_id)
+    previews.offerPlayground = urlFromRows(mediaRows, row.offer_playground_media_id)
+    previews.offerCarwash = urlFromRows(mediaRows, row.offer_carwash_media_id)
+    previews.offerMiniMarket = urlFromRows(mediaRows, row.offer_mini_market_media_id)
     previews.galleryStrip = urlFromRows(mediaRows, row.gallery_strip_media_id)
     previews.galleryWhy = urlFromRows(mediaRows, row.gallery_why_us_media_id)
     previews.galleryPartner = urlFromRows(mediaRows, row.gallery_partnerships_media_id)
   }
 
   const valueSlots = valueSlotsForAdmin(valueCardsFromDb(row.values_json))
+  const whyReasonSlots = whyReasonSlotsForAdmin(whyReasonsFromDb(row.why_choose_reasons_json))
 
-  return { ok: true, row, previews, valueSlots }
+  return { ok: true, row, previews, valueSlots, whyReasonSlots }
 }
 
 export default async function AdminAboutPage() {
@@ -87,25 +107,26 @@ export default async function AdminAboutPage() {
   return (
     <div className="space-y-6">
       {!result.ok ? (
-        <p
-          role="alert"
-          className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-amber-100 text-sm"
-        >
+        <ErrorMessage title="About content could not load">
           {result.message}
-        </p>
+        </ErrorMessage>
       ) : (
         <>
-          <p className="rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-4 py-3 text-emerald-100/95 text-sm">
+          <SuccessMessage title="CMS connection">
             Saves revalidate <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">/about</code> automatically.
-          </p>
-          <p className="text-sm text-zinc-500">
-            Last updated <span className="text-zinc-400">{formatNewsDate(result.row.updated_at)}</span>
-          </p>
+          </SuccessMessage>
+          <AdminSectionCard>
+            <p className="text-sm text-[var(--admin-text-muted)]">
+              Last updated in CMS{" "}
+              <span className="font-medium text-[var(--admin-text)]">{formatNewsDate(result.row.updated_at)}</span>
+            </p>
+          </AdminSectionCard>
           <AboutContentForm
             key={result.row.updated_at}
             initial={result.row}
             previews={result.previews}
             valueSlots={result.valueSlots}
+            whyReasonSlots={result.whyReasonSlots}
           />
         </>
       )}

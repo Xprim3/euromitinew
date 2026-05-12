@@ -6,7 +6,7 @@ import { companyStoryJsonFromParagraphs } from "@/lib/data/about-content-public"
 import { uploadHomepageAssetRow } from "@/lib/server/upload-homepage-asset"
 import { aboutContentTextSchema } from "@/lib/validations/about-content"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
-import type { AboutValueCard } from "@/types/supabase-cms"
+import type { AboutValueCard, AboutWhyReason } from "@/types/supabase-cms"
 
 export type AboutSaveState =
   | { ok: null }
@@ -15,6 +15,7 @@ export type AboutSaveState =
   | { ok: false; fieldErrors: Record<string, string[] | undefined> }
 
 const VALUE_SLOTS = 8
+const WHY_REASON_SLOTS = 6
 
 function isTruthyCheckbox(v: FormDataEntryValue | null) {
   return v === "on" || v === "true"
@@ -34,6 +35,19 @@ function collectValues(formData: FormData): AboutValueCard[] {
     const title = String(formData.get(`value_${i}_title`) ?? "").trim()
     const body = String(formData.get(`value_${i}_body`) ?? "").trim()
     let icon = String(formData.get(`value_${i}_icon`) ?? "").trim()
+    if (!title || !body) continue
+    if (!icon || !/^[a-z0-9_]+$/.test(icon)) icon = "verified"
+    out.push({ title, body, icon_material: icon })
+  }
+  return out
+}
+
+function collectWhyReasons(formData: FormData): AboutWhyReason[] {
+  const out: AboutWhyReason[] = []
+  for (let i = 0; i < WHY_REASON_SLOTS; i++) {
+    const title = String(formData.get(`why_reason_${i}_title`) ?? "").trim()
+    const body = String(formData.get(`why_reason_${i}_body`) ?? "").trim()
+    let icon = String(formData.get(`why_reason_${i}_icon`) ?? "").trim()
     if (!title || !body) continue
     if (!icon || !/^[a-z0-9_]+$/.test(icon)) icon = "verified"
     out.push({ title, body, icon_material: icon })
@@ -93,6 +107,20 @@ export async function saveAboutContent(_prev: AboutSaveState, formData: FormData
       vision_title: formData.get("vision_title"),
       vision_body: formData.get("vision_body"),
       company_story_paragraphs: formData.get("company_story_paragraphs"),
+      why_choose_heading: formData.get("why_choose_heading"),
+      offer_label: formData.get("offer_label"),
+      offer_title: formData.get("offer_title"),
+      offer_description: formData.get("offer_description"),
+      offer_fuel_title: formData.get("offer_fuel_title"),
+      offer_fuel_body: formData.get("offer_fuel_body"),
+      offer_restaurant_title: formData.get("offer_restaurant_title"),
+      offer_restaurant_body: formData.get("offer_restaurant_body"),
+      offer_playground_title: formData.get("offer_playground_title"),
+      offer_playground_body: formData.get("offer_playground_body"),
+      offer_carwash_title: formData.get("offer_carwash_title"),
+      offer_carwash_body: formData.get("offer_carwash_body"),
+      offer_mini_market_title: formData.get("offer_mini_market_title"),
+      offer_mini_market_body: formData.get("offer_mini_market_body"),
       hero_image_alt: formData.get("hero_image_alt") ?? "",
       story_image_alt: formData.get("story_image_alt") ?? "",
       gallery_strip_alt: formData.get("gallery_strip_alt") ?? "",
@@ -119,6 +147,11 @@ export async function saveAboutContent(_prev: AboutSaveState, formData: FormData
     const valuesJson = collectValues(formData)
     if (valuesJson.length === 0) {
       return { ok: false, message: "Add at least one core value (title + body)." }
+    }
+
+    const whyReasonsJson = collectWhyReasons(formData)
+    if (whyReasonsJson.length === 0) {
+      return { ok: false, message: "Add at least one Why Choose Us reason (title + description)." }
     }
 
     async function resolveMediaSlot(opts: {
@@ -173,6 +206,46 @@ export async function saveAboutContent(_prev: AboutSaveState, formData: FormData
       }
     }
 
+    const offerFuelR = await resolveMediaSlot({
+      clearName: "clear_offer_fuel",
+      fileField: "offer_fuel_image",
+      alt: v.offer_fuel_title,
+      usageSection: "about-offer-fuel",
+    })
+    if ("error" in offerFuelR) return { ok: false, message: offerFuelR.error }
+
+    const offerRestaurantR = await resolveMediaSlot({
+      clearName: "clear_offer_restaurant",
+      fileField: "offer_restaurant_image",
+      alt: v.offer_restaurant_title,
+      usageSection: "about-offer-restaurant",
+    })
+    if ("error" in offerRestaurantR) return { ok: false, message: offerRestaurantR.error }
+
+    const offerPlaygroundR = await resolveMediaSlot({
+      clearName: "clear_offer_playground",
+      fileField: "offer_playground_image",
+      alt: v.offer_playground_title,
+      usageSection: "about-offer-playground",
+    })
+    if ("error" in offerPlaygroundR) return { ok: false, message: offerPlaygroundR.error }
+
+    const offerCarwashR = await resolveMediaSlot({
+      clearName: "clear_offer_carwash",
+      fileField: "offer_carwash_image",
+      alt: v.offer_carwash_title,
+      usageSection: "about-offer-carwash",
+    })
+    if ("error" in offerCarwashR) return { ok: false, message: offerCarwashR.error }
+
+    const offerMiniMarketR = await resolveMediaSlot({
+      clearName: "clear_offer_mini_market",
+      fileField: "offer_mini_market_image",
+      alt: v.offer_mini_market_title,
+      usageSection: "about-offer-mini-market",
+    })
+    if ("error" in offerMiniMarketR) return { ok: false, message: offerMiniMarketR.error }
+
     const stripR = await resolveMediaSlot({
       clearName: "clear_gallery_strip",
       fileField: "gallery_strip_image",
@@ -205,12 +278,32 @@ export async function saveAboutContent(_prev: AboutSaveState, formData: FormData
       vision_title: v.vision_title,
       vision_body: v.vision_body,
       company_story: companyStoryJsonFromParagraphs(storyParts),
+      why_choose_heading: v.why_choose_heading,
+      why_choose_reasons_json: whyReasonsJson,
+      offer_label: v.offer_label,
+      offer_title: v.offer_title,
+      offer_description: v.offer_description,
+      offer_fuel_title: v.offer_fuel_title,
+      offer_fuel_body: v.offer_fuel_body,
+      offer_restaurant_title: v.offer_restaurant_title,
+      offer_restaurant_body: v.offer_restaurant_body,
+      offer_playground_title: v.offer_playground_title,
+      offer_playground_body: v.offer_playground_body,
+      offer_carwash_title: v.offer_carwash_title,
+      offer_carwash_body: v.offer_carwash_body,
+      offer_mini_market_title: v.offer_mini_market_title,
+      offer_mini_market_body: v.offer_mini_market_body,
       values_json: valuesJson,
       updated_by: editorId,
     }
 
     if (heroMediaId !== undefined) patch.hero_media_id = heroMediaId
     if (storyMediaId !== undefined) patch.story_media_id = storyMediaId
+    if (offerFuelR.next !== undefined) patch.offer_fuel_media_id = offerFuelR.next
+    if (offerRestaurantR.next !== undefined) patch.offer_restaurant_media_id = offerRestaurantR.next
+    if (offerPlaygroundR.next !== undefined) patch.offer_playground_media_id = offerPlaygroundR.next
+    if (offerCarwashR.next !== undefined) patch.offer_carwash_media_id = offerCarwashR.next
+    if (offerMiniMarketR.next !== undefined) patch.offer_mini_market_media_id = offerMiniMarketR.next
 
     if (stripR.next !== undefined) patch.gallery_strip_media_id = stripR.next
     if (whyR.next !== undefined) patch.gallery_why_us_media_id = whyR.next
