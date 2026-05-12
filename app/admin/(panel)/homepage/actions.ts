@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache"
 
 import { homepageContentFormSchema } from "@/lib/validations/homepage-content"
 import { uploadHomepageAssetRow } from "@/lib/server/upload-homepage-asset"
-import type { HomepageContentRow } from "@/types/supabase-cms"
+import type { HomepageContentRow, HomepageHeroSlide } from "@/types/supabase-cms"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 
 export type HomepageSaveState =
@@ -34,6 +34,7 @@ type MediaCols = Partial<
 
 const SERVICES_INTRO_CHIP_SLOTS = 4
 const HOMEPAGE_LOCATION_CARD_SLOTS = 3
+const HERO_SLIDE_SLOTS = 3
 
 function servicesIntroChipsFromForm(formData: FormData) {
   const chips: { icon: string; label: string }[] = []
@@ -47,6 +48,42 @@ function servicesIntroChipsFromForm(formData: FormData) {
     chips.push({ icon, label: label.slice(0, 80) })
   }
   return chips
+}
+
+async function collectHeroSlides(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  editorId: string,
+  formData: FormData
+): Promise<{ ok: true; slides: HomepageHeroSlide[] } | { ok: false; message: string }> {
+  const slides: HomepageHeroSlide[] = []
+
+  for (let i = 0; i < HERO_SLIDE_SLOTS; i++) {
+    const title = String(formData.get(`hero_slide_title_${i}`) ?? "").trim().slice(0, 320)
+    const body = String(formData.get(`hero_slide_body_${i}`) ?? "").trim().slice(0, 1200)
+    const alt = String(formData.get(`hero_slide_alt_${i}`) ?? "").trim()
+    const clearImage = isTruthyCheckbox(formData.get(`clear_hero_slide_image_${i}`))
+    const existingMediaId = String(formData.get(`hero_slide_media_id_${i}`) ?? "").trim()
+    const file = formData.get(`hero_slide_image_${i}`)
+
+    let mediaId: string | null = clearImage ? null : existingMediaId || null
+
+    if (!clearImage && file instanceof File && file.size > 0) {
+      const uploaded = await uploadHomepageAssetRow(supabase, editorId, file, {
+        altText: alt,
+        usageSection: `hero-slide-${i + 1}`,
+      })
+      if ("message" in uploaded) return { ok: false, message: uploaded.message }
+      mediaId = uploaded.id
+    } else if (mediaId && alt) {
+      const { error: altErr } = await supabase.from("media_uploads").update({ alt_text: alt }).eq("id", mediaId)
+      if (altErr) return { ok: false, message: altErr.message }
+    }
+
+    if (!title && !body && !mediaId) continue
+    slides.push({ title, body, mediaId })
+  }
+
+  return { ok: true, slides }
 }
 
 async function updateHomepageLocationCards(
@@ -146,7 +183,6 @@ export async function saveHomepageContent(
       return { ok: false, message: adminReady.message }
     }
 
-    const clearHero = isTruthyCheckbox(formData.get("clear_hero_image"))
     const secondaryLabel = String(formData.get("hero_cta_secondary_label") ?? "").trim()
     const secondaryHrefRaw = String(formData.get("hero_cta_secondary_href") ?? "").trim()
 
@@ -193,10 +229,16 @@ export async function saveHomepageContent(
     }
 
     const v = parsed.data
+    const heroSlidesResult = await collectHeroSlides(supabase, editorId, formData)
+    if (!heroSlidesResult.ok) return { ok: false, message: heroSlidesResult.message }
+    const heroSlides = heroSlidesResult.slides
+    const primaryHeroSlide = heroSlides[0]
+
     const patch: Record<string, unknown> = {
-      hero_headline_line1: v.hero_headline_line1,
+      hero_headline_line1: primaryHeroSlide?.title ?? v.hero_headline_line1,
       hero_headline_line2: v.hero_headline_line2,
-      hero_subtitle: v.hero_subtitle,
+      hero_subtitle: primaryHeroSlide?.body ?? v.hero_subtitle,
+      hero_slides_json: heroSlides,
       hero_cta_primary_label: v.hero_cta_primary_label,
       hero_cta_primary_href: v.hero_cta_primary_href,
       hero_cta_secondary_label: v.hero_cta_secondary_label,
@@ -226,6 +268,8 @@ export async function saveHomepageContent(
 
     const mediaPatches: MediaCols = {}
 
+    mediaPatches.hero_image_media_id = primaryHeroSlide?.mediaId ?? null
+
     async function consumeUpload(
       fileKey: string,
       clearKey: string,
@@ -247,18 +291,6 @@ export async function saveHomepageContent(
       if ("message" in uploaded) return { ok: false, message: uploaded.message }
       mediaPatches[column] = uploaded.id
       return undefined
-    }
-
-    if (clearHero) mediaPatches.hero_image_media_id = null
-
-    const heroFile = formData.get("hero_image")
-    if (!clearHero && heroFile instanceof File && heroFile.size > 0) {
-      const uploaded = await uploadHomepageAssetRow(supabase, editorId, heroFile, {
-        altText: v.hero_image_alt ?? "",
-        usageSection: "hero",
-      })
-      if ("message" in uploaded) return { ok: false, message: uploaded.message }
-      mediaPatches.hero_image_media_id = uploaded.id
     }
 
     const uploadSteps: Promise<HomepageSaveState | undefined>[] = [

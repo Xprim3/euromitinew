@@ -2,9 +2,8 @@ import type { Metadata } from "next"
 import { Suspense } from "react"
 
 import { HomeAboutIntro } from "@/components/home/HomeAboutIntro"
-import { FuelPricesSkeletonSection } from "@/components/home/FuelPricesSkeletonSection"
-import { HomeFuelPricesGlass } from "@/components/home/HomeFuelPricesGlass"
 import { HomeHero, HomeHeroSkeleton } from "@/components/home/HomeHero"
+import { HomeHeroFuelPriceBar, HomeHeroFuelPriceBarSkeleton } from "@/components/home/HomeHeroFuelPriceBar"
 import { HomeNewsInsights, HomeNewsInsightsSkeleton } from "@/components/home/HomeNewsInsights"
 import { HomeRestaurantLuxury, HomeRestaurantLuxurySkeleton } from "@/components/home/HomeRestaurantLuxury"
 import { HomeServicesIntro, HomeServicesIntroSkeleton } from "@/components/home/HomeServicesIntro"
@@ -39,8 +38,8 @@ export default function HomePage() {
       <Suspense fallback={<HomeHeroSkeleton />}>
         <HomeHero />
       </Suspense>
-      <Suspense fallback={<FuelPricesSkeletonSection />}>
-        <HomeFuelPricesGlass />
+      <Suspense fallback={<HomeHeroFuelPriceBarSkeleton />}>
+        <HomeHeroFuelPriceBar />
       </Suspense>
       <Suspense fallback={<HomeServicesIntroSkeleton />}>
         <HomeServicesIntro />

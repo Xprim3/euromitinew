@@ -3,7 +3,7 @@ import type { Metadata } from "next"
 import type { HomepageLocationPreviewAdmin, HomepageMediaPreviews } from "@/components/admin/HomepageContentForm"
 import { HomepageContentForm } from "@/components/admin/HomepageContentForm"
 import { AdminSectionCard, ErrorMessage, SuccessMessage } from "@/components/admin/design-system"
-import { homepageContentRowFromUnknown } from "@/lib/data/homepage-singleton-public"
+import { homepageContentRowFromUnknown, heroSlidesFromCMS } from "@/lib/data/homepage-singleton-public"
 import { normalizeLocationRow } from "@/lib/data/locations-admin-shared"
 import { formatNewsDate } from "@/lib/format-news-date"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
@@ -41,6 +41,7 @@ async function loadHomepage(): Promise<
   }
 
   const typed = homepageContentRowFromUnknown(row as Record<string, unknown>)
+  const heroSlides = heroSlidesFromCMS(typed)
   const { data: locationRows } = await supabase
     .from("locations")
     .select("*")
@@ -52,6 +53,7 @@ async function loadHomepage(): Promise<
 
   const mediaIds = [
     typed.hero_image_media_id,
+    ...heroSlides.map((slide) => slide.mediaId),
     typed.about_preview_image_media_id,
     typed.services_intro_media_id,
     typed.restaurant_home_main_media_id,
@@ -65,6 +67,7 @@ async function loadHomepage(): Promise<
 
   const previews: HomepageMediaPreviews = {
     hero: null,
+    heroSlides: heroSlides.map(() => null),
     about: null,
     servicesIntro: null,
     restaurantMain: null,
@@ -90,6 +93,7 @@ async function loadHomepage(): Promise<
     }
 
     previews.hero = urlOf(typed.hero_image_media_id)
+    previews.heroSlides = heroSlides.map((slide) => urlOf(slide.mediaId))
     previews.about = urlOf(typed.about_preview_image_media_id)
     previews.servicesIntro = urlOf(typed.services_intro_media_id)
     previews.restaurantMain = urlOf(typed.restaurant_home_main_media_id)

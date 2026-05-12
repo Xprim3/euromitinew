@@ -5,6 +5,7 @@ export type HomepageContentRow = {
   hero_headline_line2: string
   hero_subtitle: string
   hero_image_media_id: string | null
+  hero_slides_json: unknown
   hero_cta_primary_label: string
   hero_cta_primary_href: string
   hero_cta_secondary_label: string
@@ -42,6 +43,12 @@ export type HomepageContentRow = {
   locations_band_subtitle: string
   updated_at: string
   updated_by: string | null
+}
+
+export type HomepageHeroSlide = {
+  title: string
+  body: string
+  mediaId: string | null
 }
 
 /** `public.about_content` singleton — Phase 10. */

@@ -43,12 +43,12 @@ export function HomeRestaurantLuxuryView(r: ReturnType<typeof restaurantLuxuryFr
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_8%_14%,rgba(217,53,47,0.26),transparent_40%),radial-gradient(circle_at_92%_82%,rgba(255,180,171,0.16),transparent_42%)]"
         aria-hidden
       />
-      <div className="relative z-10 mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-10 xl:px-14">
-        <div className="grid grid-cols-1 items-start gap-7 lg:grid-cols-12 lg:items-center lg:gap-10 xl:gap-12">
-          <div className="space-y-4 max-sm:space-y-3 sm:space-y-5 xl:space-y-6 lg:col-span-5 lg:max-w-none">
+      <div className="relative z-10 mx-auto max-w-[1440px] px-5 sm:px-6 lg:px-10 xl:px-14">
+        <div className="grid grid-cols-1 items-start gap-8 sm:gap-9 lg:grid-cols-12 lg:items-center lg:gap-10 xl:gap-12">
+          <div className="mx-auto max-w-2xl space-y-5 rounded-3xl bg-white/[0.03] p-5 ring-1 ring-white/8 sm:space-y-5 sm:p-6 lg:col-span-5 lg:mx-0 lg:max-w-none lg:bg-transparent lg:p-0 lg:ring-0 xl:space-y-6">
             <h2
               id="restaurant-luxury-heading"
-              className="text-balance font-playfair text-[clamp(1.5rem,5.4vw,2rem)] font-bold leading-[1.06] tracking-tight text-white sm:text-[clamp(1.75rem,3.8vw,2.15rem)] md:text-[clamp(2rem,3.6vw,2.75rem)] lg:text-[clamp(2.1rem,2.6vw,2.85rem)]"
+              className="max-w-[14ch] text-balance font-playfair text-[clamp(1.7rem,7.2vw,2.35rem)] font-bold leading-[1.08] tracking-tight text-white sm:max-w-[18ch] sm:text-[clamp(1.85rem,4.4vw,2.35rem)] md:text-[clamp(2.05rem,3.7vw,2.75rem)] lg:max-w-none lg:text-[clamp(2.1rem,2.6vw,2.85rem)]"
             >
               {r.headlineParts.main}
               {r.headlineParts.accent ? (
@@ -58,7 +58,7 @@ export function HomeRestaurantLuxuryView(r: ReturnType<typeof restaurantLuxuryFr
                 </>
               ) : null}
             </h2>
-            <p className="max-w-xl text-[0.9rem] leading-relaxed text-white/82 sm:text-[0.9375rem] md:text-base">
+            <p className="max-w-xl text-[0.95rem] leading-[1.75] text-white/82 sm:text-base md:leading-relaxed">
               {r.body}
             </p>
 

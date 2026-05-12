@@ -15,7 +15,7 @@ import {
   TextareaInput,
   TextInput,
 } from "@/components/admin/design-system"
-import type { HomepageContentRow } from "@/types/supabase-cms"
+import type { HomepageContentRow, HomepageHeroSlide } from "@/types/supabase-cms"
 
 export type HomepageLocationPreviewAdmin = {
   id: string
@@ -28,6 +28,7 @@ export type HomepageLocationPreviewAdmin = {
 
 export type HomepageMediaPreviews = {
   hero: string | null
+  heroSlides: (string | null)[]
   about: string | null
   servicesIntro: string | null
   restaurantMain: string | null
@@ -80,6 +81,7 @@ function SectionAccordion({
 }
 
 const initialActionState: HomepageSaveState = { ok: null }
+const HERO_SLIDE_SLOTS = 3
 const SERVICES_INTRO_CHIP_SLOTS = 4
 const SERVICES_CHIP_ICON_OPTIONS = [
   { value: "verified", label: "Verified / quality" },
@@ -106,6 +108,34 @@ function heroHeadlineDefault(initial: HomepageContentRow) {
     .map((part) => part.trim())
     .filter(Boolean)
     .join(" ")
+}
+
+function heroSlideSlots(initial: HomepageContentRow): HomepageHeroSlide[] {
+  const fallback: HomepageHeroSlide[] = [
+    {
+      title: heroHeadlineDefault(initial),
+      body: initial.hero_subtitle,
+      mediaId: initial.hero_image_media_id,
+    },
+  ]
+
+  const slides = Array.isArray(initial.hero_slides_json)
+    ? initial.hero_slides_json
+        .map((slide) => {
+          if (!slide || typeof slide !== "object") return null
+          const s = slide as { title?: unknown; body?: unknown; mediaId?: unknown }
+          const title = typeof s.title === "string" ? s.title.trim() : ""
+          const body = typeof s.body === "string" ? s.body.trim() : ""
+          const mediaId = typeof s.mediaId === "string" && s.mediaId.trim() ? s.mediaId.trim() : null
+          if (!title && !body && !mediaId) return null
+          return { title, body, mediaId }
+        })
+        .filter((slide): slide is HomepageHeroSlide => Boolean(slide))
+    : fallback
+
+  const slots = slides.slice(0, HERO_SLIDE_SLOTS)
+  while (slots.length < HERO_SLIDE_SLOTS) slots.push({ title: "", body: "", mediaId: null })
+  return slots
 }
 
 function restaurantHeadlineDefault(initial: HomepageContentRow) {
@@ -150,6 +180,7 @@ export function HomepageContentForm({ initial, mediaPreviews, locationPreviews }
   const router = useRouter()
   const formRef = useRef<HTMLFormElement>(null)
   const [state, formAction] = useActionState(saveHomepageContent, initialActionState)
+  const heroSlides = heroSlideSlots(initial)
   const serviceChipSlots = servicesIntroChipSlots(initial.services_intro_chips_json)
 
   const fieldErrors = state.ok === false && "fieldErrors" in state ? state.fieldErrors : undefined
@@ -190,7 +221,7 @@ export function HomepageContentForm({ initial, mediaPreviews, locationPreviews }
         <div className="space-y-3">
           <SectionAccordion
             title="1. Hero Section"
-            description="Hero headline, description, and image."
+            description="Advertising slider. Each slide changes the wallpaper, headline, and description."
             defaultOpen
           >
             <div className="space-y-5">
@@ -198,33 +229,55 @@ export function HomepageContentForm({ initial, mediaPreviews, locationPreviews }
               <input type="hidden" name="hero_cta_primary_href" value={initial.hero_cta_primary_href || "/services"} />
               <input type="hidden" name="hero_cta_secondary_label" value={initial.hero_cta_secondary_label} />
               <input type="hidden" name="hero_cta_secondary_href" value={initial.hero_cta_secondary_href || "/locations"} />
+              <input type="hidden" name="hero_headline_line1" value={heroSlides[0]?.title ?? heroHeadlineDefault(initial)} />
               <input type="hidden" name="hero_headline_line2" value="" />
-              <TextInput
-                label="Headline"
-                name="hero_headline_line1"
-                defaultValue={heroHeadlineDefault(initial)}
-                maxLength={320}
-                helperText="Use one headline. It will wrap automatically on desktop and mobile."
-                error={fieldErrors?.hero_headline_line1?.[0]}
-              />
-              <TextareaInput
-                label="Description"
-                name="hero_subtitle"
-                defaultValue={initial.hero_subtitle}
-                rows={4}
-                maxLength={1200}
-                showCharacterCount
-                error={fieldErrors?.hero_subtitle?.[0]}
-              />
-              <FileUploadInput
-                label="Hero image upload"
-                name="hero_image"
-                previewUrl={mediaPreviews.hero}
-                previewAlt="Homepage hero image"
-                helperText="JPEG, PNG, WebP, or GIF up to the configured Supabase storage limit."
-                removeInputName="clear_hero_image"
-              />
-              <TextInput label="Hero image alt text" name="hero_image_alt" placeholder="Describe the photograph" />
+              <input type="hidden" name="hero_subtitle" value={heroSlides[0]?.body ?? initial.hero_subtitle} />
+              <input type="hidden" name="hero_image_alt" value="" />
+              <div className="space-y-4">
+                {heroSlides.map((slide, index) => (
+                  <div key={index} className="rounded-[var(--admin-radius-card)] border border-[var(--admin-border)] bg-slate-50/70 p-4">
+                    <input type="hidden" name={`hero_slide_media_id_${index}`} value={slide.mediaId ?? ""} />
+                    <div className="mb-4 flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold text-[var(--admin-text)]">Slide {index + 1}</p>
+                        <p className="mt-1 text-xs text-[var(--admin-text-muted)]">
+                          Leave title and text empty to hide this slide.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <TextInput
+                        label="Slide headline"
+                        name={`hero_slide_title_${index}`}
+                        defaultValue={slide.title}
+                        maxLength={320}
+                        helperText={index === 0 ? "Slide 1 is also used as the emergency fallback hero copy." : undefined}
+                      />
+                      <TextareaInput
+                        label="Slide description"
+                        name={`hero_slide_body_${index}`}
+                        defaultValue={slide.body}
+                        rows={4}
+                        maxLength={1200}
+                        showCharacterCount
+                      />
+                      <FileUploadInput
+                        label="Wallpaper image"
+                        name={`hero_slide_image_${index}`}
+                        previewUrl={mediaPreviews.heroSlides[index] ?? (index === 0 ? mediaPreviews.hero : null)}
+                        previewAlt={`Hero slide ${index + 1} image`}
+                        helperText="Use a wide, high-quality image. The public hero crops it as a wallpaper."
+                        removeInputName={`clear_hero_slide_image_${index}`}
+                      />
+                      <TextInput
+                        label="Image alt text"
+                        name={`hero_slide_alt_${index}`}
+                        placeholder="Describe the photograph"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </SectionAccordion>
 

@@ -2,7 +2,7 @@ import { cache } from "react"
 
 import { homeBeyondDesign, homeHeroDesign } from "@/data/mock/homepage-visual"
 import { createPublicSupabaseServerClient } from "@/lib/supabase/public-server-client"
-import type { HomepageContentRow } from "@/types/supabase-cms"
+import type { HomepageContentRow, HomepageHeroSlide } from "@/types/supabase-cms"
 
 /** Media rows keyed by UUID for resolving homepage_image fields. */
 export type HomepageMediaLookup = Record<string, { public_url: string; alt_text: string | null }>
@@ -21,6 +21,7 @@ function hydrateRow(raw: Partial<HomepageContentRow> & Pick<HomepageContentRow, 
     hero_headline_line2: raw.hero_headline_line2 ?? e,
     hero_subtitle: raw.hero_subtitle ?? e,
     hero_image_media_id: raw.hero_image_media_id ?? null,
+    hero_slides_json: raw.hero_slides_json ?? null,
     hero_cta_primary_label: raw.hero_cta_primary_label ?? e,
     hero_cta_primary_href: raw.hero_cta_primary_href ?? "/services",
     hero_cta_secondary_label: raw.hero_cta_secondary_label ?? e,
@@ -115,6 +116,7 @@ export const getPublicHomepageSingleton = cache(async (): Promise<{ row: Homepag
   const base = homepageContentRowFromUnknown(rawRow as Record<string, unknown>)
   const idList = [
     base.hero_image_media_id,
+    ...heroSlidesFromCMS(base).map((slide) => slide.mediaId),
     base.about_preview_image_media_id,
     base.services_intro_media_id,
     base.restaurant_home_main_media_id,
@@ -150,11 +152,97 @@ export const getPublicHomepageSingleton = cache(async (): Promise<{ row: Homepag
 export type HomeHeroResolved = {
   imageSrc: string
   imageAlt: string
-  badge: string
   title: string
   subtitle: string
-  primaryCta: { label: string; href: string }
-  secondaryCta: { label: string; href: string }
+}
+
+export type HomeHeroSlideResolved = HomeHeroResolved
+
+const fallbackHeroSlides: HomeHeroSlideResolved[] = [
+  {
+    imageSrc: homeHeroDesign.imageSrc,
+    imageAlt: homeHeroDesign.imageAlt,
+    title: joinedHeadline(null, null, homeHeroDesign.titleLine1, homeHeroDesign.titleLine2),
+    subtitle: homeHeroDesign.subtitle,
+  },
+  {
+    imageSrc: homeBeyondDesign.elite.imageSrc,
+    imageAlt: homeBeyondDesign.elite.imageAlt,
+    title: homeBeyondDesign.elite.title,
+    subtitle: homeBeyondDesign.elite.body,
+  },
+  {
+    imageSrc: homeBeyondDesign.restaurant.mainImage,
+    imageAlt: homeBeyondDesign.restaurant.mainImageAlt,
+    title: homeBeyondDesign.restaurant.title,
+    subtitle: homeBeyondDesign.restaurant.body,
+  },
+]
+
+function isUuidLike(value: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+}
+
+export function heroSlidesFromCMS(row: HomepageContentRow | null): HomepageHeroSlide[] {
+  const fallback: HomepageHeroSlide[] = row
+    ? [
+        {
+          title: joinedHeadline(
+            row.hero_headline_line1,
+            row.hero_headline_line2,
+            homeHeroDesign.titleLine1,
+            homeHeroDesign.titleLine2
+          ),
+          body: textOrFallback(row.hero_subtitle, homeHeroDesign.subtitle),
+          mediaId: row.hero_image_media_id,
+        },
+      ]
+    : []
+
+  if (!row || !Array.isArray(row.hero_slides_json)) return fallback
+
+  const slides = row.hero_slides_json
+    .map((slide) => {
+      if (!slide || typeof slide !== "object") return null
+      const s = slide as { title?: unknown; body?: unknown; mediaId?: unknown }
+      const title = typeof s.title === "string" ? s.title.trim() : ""
+      const body = typeof s.body === "string" ? s.body.trim() : ""
+      const rawMediaId = typeof s.mediaId === "string" ? s.mediaId.trim() : ""
+      const mediaId = rawMediaId && isUuidLike(rawMediaId) ? rawMediaId : null
+      if (!title && !body && !mediaId) return null
+      return {
+        title: title || homeHeroDesign.titleLine1,
+        body: body || homeHeroDesign.subtitle,
+        mediaId,
+      }
+    })
+    .filter((slide): slide is HomepageHeroSlide => Boolean(slide))
+
+  return slides.length ? slides : fallback
+}
+
+export function heroSliderFromHomepageCMS(row: HomepageContentRow | null, media: HomepageMediaLookup): HomeHeroSlideResolved[] {
+  const fallbackSlide = fallbackHeroSlides[0]
+
+  if (!row) return fallbackHeroSlides
+
+  const slides = heroSlidesFromCMS(row).map((slide) => {
+    const dm = slide.mediaId ? media[slide.mediaId] : undefined
+    return {
+      imageSrc: dm?.public_url?.trim() || homeHeroDesign.imageSrc,
+      imageAlt: dm?.alt_text?.trim() || homeHeroDesign.imageAlt,
+      title: textOrFallback(slide.title, fallbackSlide.title),
+      subtitle: textOrFallback(slide.body, fallbackSlide.subtitle),
+    }
+  })
+
+  if (slides.length >= 2) return slides
+  if (slides.length === 1) {
+    const uniqueFallbacks = fallbackHeroSlides.filter((slide) => slide.title !== slides[0]?.title)
+    return [slides[0], ...uniqueFallbacks].slice(0, 3)
+  }
+
+  return fallbackHeroSlides
 }
 
 export function heroFromHomepageCMS(row: HomepageContentRow | null, media: HomepageMediaLookup): HomeHeroResolved {
@@ -162,11 +250,8 @@ export function heroFromHomepageCMS(row: HomepageContentRow | null, media: Homep
     return {
       imageSrc: homeHeroDesign.imageSrc,
       imageAlt: homeHeroDesign.imageAlt,
-      badge: homeHeroDesign.badge,
       title: joinedHeadline(null, null, homeHeroDesign.titleLine1, homeHeroDesign.titleLine2),
       subtitle: homeHeroDesign.subtitle,
-      primaryCta: { ...homeHeroDesign.primaryCta },
-      secondaryCta: { ...homeHeroDesign.secondaryCta },
     }
   }
 
@@ -178,7 +263,6 @@ export function heroFromHomepageCMS(row: HomepageContentRow | null, media: Homep
   return {
     imageSrc: img,
     imageAlt: imgAlt,
-    badge: homeHeroDesign.badge,
     title: joinedHeadline(
       row.hero_headline_line1,
       row.hero_headline_line2,
@@ -186,8 +270,6 @@ export function heroFromHomepageCMS(row: HomepageContentRow | null, media: Homep
       homeHeroDesign.titleLine2
     ),
     subtitle: textOrFallback(row.hero_subtitle, homeHeroDesign.subtitle),
-    primaryCta: { ...homeHeroDesign.primaryCta },
-    secondaryCta: { ...homeHeroDesign.secondaryCta },
   }
 }
 
