@@ -28,6 +28,8 @@ export const metadata: Metadata = {
   },
 }
 
+export const dynamic = "force-dynamic"
+
 /** Brief ISR cache; Saving in `/admin/homepage` calls `revalidatePath("/")` for faster picks-up. */
 export const revalidate = 120
 

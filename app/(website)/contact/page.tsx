@@ -18,6 +18,8 @@ export const metadata: Metadata = {
     "Euromiti headquarters in Prishtina — phone, email, hours, forecourt locations across Kosovo, and careers.",
 }
 
+export const dynamic = "force-dynamic"
+
 export const revalidate = 120
 
 function telHref(phone: string) {

@@ -4,6 +4,8 @@ import { createPublicSupabaseServerClient } from "@/lib/supabase/public-server-c
 
 const site = process.env.NEXT_PUBLIC_SITE_URL ?? "https://euromiti.com"
 
+export const dynamic = "force-dynamic"
+
 const staticRoutes = [
   "",
   "/about",

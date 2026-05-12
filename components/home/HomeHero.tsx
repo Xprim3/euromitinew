@@ -39,6 +39,7 @@ function HomeHeroView({ h }: { h: HomeHeroResolved }) {
         alt={h.imageAlt}
         fill
         priority
+        loading="eager"
         sizes="100vw"
         className="object-cover euromiti-home-hero-media"
       />

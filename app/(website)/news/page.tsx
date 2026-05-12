@@ -11,6 +11,8 @@ export const metadata: Metadata = {
     "Euromiti news — forecourt upgrades, fuels, hospitality, and community programmes across Kosovo.",
 }
 
+export const dynamic = "force-dynamic"
+
 export const revalidate = 120
 
 export default async function NewsPage() {

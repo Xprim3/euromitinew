@@ -10,6 +10,8 @@ export const metadata: Metadata = {
     "Euromiti — Kosovo forecourts built on dependable fuels, hospitality, mini markets, and car care.",
 }
 
+export const dynamic = "force-dynamic"
+
 /** Matches other marketing routes — admin save triggers `revalidatePath("/about")`. */
 export const revalidate = 120
 

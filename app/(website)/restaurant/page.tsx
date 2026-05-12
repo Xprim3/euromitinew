@@ -4,6 +4,8 @@ import { Suspense } from "react"
 import { RestaurantPageBody } from "./RestaurantPageBody"
 import { RestaurantPageSkeleton } from "./RestaurantPageSkeleton"
 
+export const dynamic = "force-dynamic"
+
 export const revalidate = 120
 
 export const metadata: Metadata = {

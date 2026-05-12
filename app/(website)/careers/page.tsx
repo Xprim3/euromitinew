@@ -10,6 +10,8 @@ import { homeHeroDesign } from "@/data/mock/homepage-visual"
 import { getActiveJobsPublic } from "@/lib/data/careers-public"
 import { formatNewsDate } from "@/lib/format-news-date"
 
+export const dynamic = "force-dynamic"
+
 export const revalidate = 120
 
 export const metadata: Metadata = {

@@ -4,6 +4,8 @@ import { Suspense } from "react"
 import { LocationsPageContent } from "./LocationsPageContent"
 import { LocationsPageSkeleton } from "./LocationsPageSkeleton"
 
+export const dynamic = "force-dynamic"
+
 export const revalidate = 120
 
 export const metadata: Metadata = {

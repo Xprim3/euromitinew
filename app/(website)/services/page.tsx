@@ -4,6 +4,8 @@ import { Suspense } from "react"
 import { ServicesPageBody } from "./ServicesPageBody"
 import { ServicesPageSkeleton } from "./ServicesPageSkeleton"
 
+export const dynamic = "force-dynamic"
+
 export const revalidate = 120
 
 export const metadata: Metadata = {
