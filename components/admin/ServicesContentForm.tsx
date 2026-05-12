@@ -15,7 +15,11 @@ import {
   TextInput,
 } from "@/components/admin/design-system"
 import { SERVICES_PANEL_DEFAULTS } from "@/lib/data/services-page-defaults"
-import { highlightsTextFromDb } from "@/lib/data/services-content-public"
+import {
+  DEFAULT_SERVICES_WHY_CARDS,
+  highlightsTextFromDb,
+  servicesWhyCardsFromDb,
+} from "@/lib/data/services-content-public"
 import type { ServicesContentRow } from "@/types/supabase-cms"
 
 export type ServicesMediaPreviews = {
@@ -85,6 +89,11 @@ export function ServicesContentForm({ initial, previews }: ServicesContentFormPr
   const restaurantBulletsDefault = highlightsTextFromDb(initial.restaurant_highlights_json)
   const carwashBulletsDefault = highlightsTextFromDb(initial.carwash_highlights_json)
   const miniMarketBulletsDefault = highlightsTextFromDb(initial.mini_market_highlights_json)
+  const whyCardsFromCms = servicesWhyCardsFromDb(initial.why_sections_json)
+  const whyCardSlots = [...(whyCardsFromCms.length ? whyCardsFromCms : DEFAULT_SERVICES_WHY_CARDS)].slice(0, 4)
+  while (whyCardSlots.length < 4) {
+    whyCardSlots.push(DEFAULT_SERVICES_WHY_CARDS[whyCardSlots.length] ?? { icon: "verified", title: "", body: "" })
+  }
 
   return (
     <form ref={formRef} action={formAction} className="space-y-6 pb-24">
@@ -120,6 +129,88 @@ export function ServicesContentForm({ initial, previews }: ServicesContentFormPr
                 maxLength={1600}
                 showCharacterCount
               />
+            </div>
+          </EditorAccordion>
+
+          <EditorAccordion
+            title="Why Choose Euromiti"
+            description="Editable Albanian text and cards for the dark premium section on the public Services page."
+            defaultOpen
+          >
+            <div className="space-y-5">
+              <AdminContentGrid columns={2}>
+                <TextInput
+                  label="Small label"
+                  name="why_choose_kicker"
+                  defaultValue={initial.why_choose_kicker}
+                  maxLength={120}
+                  error={fieldErrors?.why_choose_kicker?.[0]}
+                />
+                <TextInput
+                  label="Section title"
+                  name="why_choose_title"
+                  defaultValue={initial.why_choose_title}
+                  maxLength={240}
+                  error={fieldErrors?.why_choose_title?.[0]}
+                />
+              </AdminContentGrid>
+              <TextareaInput
+                label="Section description"
+                name="why_choose_body"
+                rows={4}
+                defaultValue={initial.why_choose_body}
+                maxLength={1600}
+                showCharacterCount
+                error={fieldErrors?.why_choose_body?.[0]}
+              />
+              <TextInput
+                label="Featured statement title"
+                name="why_choose_featured_title"
+                defaultValue={initial.why_choose_featured_title}
+                maxLength={240}
+                error={fieldErrors?.why_choose_featured_title?.[0]}
+              />
+              <TextareaInput
+                label="Featured statement body"
+                name="why_choose_featured_body"
+                rows={4}
+                defaultValue={initial.why_choose_featured_body}
+                maxLength={1600}
+                showCharacterCount
+                error={fieldErrors?.why_choose_featured_body?.[0]}
+              />
+
+              <div className="space-y-4">
+                {whyCardSlots.map((card, i) => (
+                  <div
+                    key={`why-card-${i}`}
+                    className="rounded-(--admin-radius-card) border border-(--admin-border) bg-(--admin-surface-muted) p-4"
+                  >
+                    <input type="hidden" name={`why_card_${i}_icon`} value={card.icon} />
+                    <p className="mb-4 text-xs font-semibold uppercase tracking-[0.14em] text-(--admin-text-muted)">
+                      Card {i + 1}
+                    </p>
+                    <AdminContentGrid columns="12">
+                      <TextInput
+                        label="Title"
+                        name={`why_card_${i}_title`}
+                        defaultValue={card.title}
+                        maxLength={180}
+                        className="md:col-span-4"
+                      />
+                      <TextareaInput
+                        label="Description"
+                        name={`why_card_${i}_body`}
+                        defaultValue={card.body}
+                        rows={3}
+                        maxLength={800}
+                        showCharacterCount
+                        className="md:col-span-8"
+                      />
+                    </AdminContentGrid>
+                  </div>
+                ))}
+              </div>
             </div>
           </EditorAccordion>
 

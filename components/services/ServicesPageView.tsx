@@ -17,34 +17,6 @@ import { SectionAccentRule } from "@/components/ui/SectionAccentRule"
 import type { ResolvedServicesPage } from "@/lib/data/services-content-public"
 import { cn } from "@/lib/utils"
 
-const WHY_CHOOSE = [
-  {
-    icon: "shield_with_heart",
-    title: "Reliable service",
-    body: "Dependable fuel and support 24/7.",
-  },
-  {
-    icon: "diamond",
-    title: "Premium experience",
-    body: "Luxury at every stop on your journey.",
-  },
-  {
-    icon: "map",
-    title: "Multiple locations",
-    body: "Strategic hubs across Kosovo.",
-  },
-  {
-    icon: "flatware",
-    title: "Quality food",
-    body: "Fresh meals for the discerning traveler.",
-  },
-  {
-    icon: "cleaning_services",
-    title: "Clean facilities",
-    body: "Pristine carwash and market areas.",
-  },
-] as const
-
 export type ServicesPageViewProps = {
   data: ResolvedServicesPage
 }
@@ -123,16 +95,16 @@ export function ServicesPageView({ data }: ServicesPageViewProps) {
             <Reveal variant="fade-up" once className="lg:col-span-4">
               <div className="max-w-xl">
                 <p className="mb-4 text-[0.64rem] font-black uppercase tracking-[0.32em] text-brand-accent-soft">
-                  Euromiti Standard
+                  {data.whyChoose.kicker}
                 </p>
                 <h2
                   id="services-why-heading"
                   className="font-(family-name:--font-montserrat) text-[clamp(2rem,8vw,2.75rem)] font-extrabold leading-[1.04] tracking-[-0.045em] text-white sm:text-[clamp(2.35rem,4.8vw,3.5rem)]"
                 >
-                  Why Choose Euromiti
+                  {data.whyChoose.title}
                 </h2>
                 <p className="mt-5 text-[0.98rem] leading-8 text-white/70">
-                  Every stop is designed around reliability, comfort, and clean service, from the forecourt to the table.
+                  {data.whyChoose.body}
                 </p>
                 <SectionAccentRule className="mt-6" />
               </div>
@@ -147,20 +119,20 @@ export function ServicesPageView({ data }: ServicesPageViewProps) {
                   />
                   <div className="relative">
                     <span className="inline-flex size-12 items-center justify-center rounded-full border border-white/14 bg-white/8 text-brand-accent-soft">
-                      <MaterialSymbol name={WHY_CHOOSE[0].icon} className="text-[1.45rem]" />
+                      <MaterialSymbol name={data.whyChoose.featuredIcon} className="text-[1.45rem]" />
                     </span>
                     <h3 className="mt-6 font-(family-name:--font-montserrat) text-2xl font-extrabold leading-tight tracking-[-0.04em] text-white md:text-3xl">
-                      Built around dependable service.
+                      {data.whyChoose.featuredTitle}
                     </h3>
                     <p className="mt-4 max-w-md text-[0.98rem] leading-8 text-white/68">
-                      From fuel quality to hospitality, Euromiti keeps the essentials organized, clean, and consistent for every stop.
+                      {data.whyChoose.featuredBody}
                     </p>
                   </div>
                 </article>
 
                 <div className="rounded-[1.1rem] border border-white/12 bg-white/6 p-2 shadow-[0_22px_55px_rgba(0,0,0,0.16)] backdrop-blur-md">
                   <div className="divide-y divide-white/10">
-                    {WHY_CHOOSE.slice(1).map((item) => (
+                    {data.whyChoose.cards.map((item) => (
                       <article key={item.title} className="grid grid-cols-[auto_1fr] gap-4 px-4 py-4 sm:px-5">
                         <span className="mt-1 inline-flex size-9 items-center justify-center rounded-full bg-white/8 text-brand-accent-soft">
                           <MaterialSymbol name={item.icon} className="text-[1.15rem]" />
@@ -187,15 +159,15 @@ export function ServicesPageView({ data }: ServicesPageViewProps) {
             <div className="rounded-[var(--rounded-lg)] border border-border/70 bg-card p-6 shadow-(--shadow-euromiti-soft) md:p-8">
               <SectionHeading
                 headingId="services-nearest-location"
-                title="Find the Nearest Euromiti Location"
-                description="Explore our stations across Prishtina, Ferizaj, and Gjilan to find the service mix you need, exactly where you need it."
+                title="Gjeni lokacionin më të afërt të Euromitit"
+                description="Shikoni stacionet tona në Prishtinë, Ferizaj dhe Gjilan për të gjetur shërbimet që ju duhen, pikërisht aty ku ju përshtatet."
                 actions={
                   <Button
                     variant="default"
                     render={<Link href="/locations" />}
                     className={cn(EuromitiMotionClasses.buttonHover)}
                   >
-                    View All Locations
+                    Shiko të gjitha lokacionet
                   </Button>
                 }
               />

@@ -9,6 +9,7 @@ import {
   servicesContentFormSchema,
 } from "@/lib/validations/services-content"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
+import type { ResolvedServicesWhyCard } from "@/lib/data/services-content-public"
 
 export type ServicesSaveState =
   | { ok: null }
@@ -47,6 +48,20 @@ async function ensureAdminProfile(
 }
 
 type OptionalUuid = string | null | undefined
+const WHY_CARD_SLOTS = 4
+
+function collectWhyCards(formData: FormData): ResolvedServicesWhyCard[] {
+  const out: ResolvedServicesWhyCard[] = []
+  for (let i = 0; i < WHY_CARD_SLOTS; i++) {
+    const title = String(formData.get(`why_card_${i}_title`) ?? "").trim()
+    const body = String(formData.get(`why_card_${i}_body`) ?? "").trim()
+    let icon = String(formData.get(`why_card_${i}_icon`) ?? "").trim()
+    if (!title || !body) continue
+    if (!icon || !/^[a-z0-9_]+$/.test(icon)) icon = "verified"
+    out.push({ icon, title, body })
+  }
+  return out
+}
 
 export async function saveServicesContent(
   _prev: ServicesSaveState,
@@ -69,6 +84,11 @@ export async function saveServicesContent(
     const parsedText = servicesContentFormSchema.safeParse({
       hero_page_title: formData.get("hero_page_title"),
       hero_page_subtitle: formData.get("hero_page_subtitle"),
+      why_choose_kicker: formData.get("why_choose_kicker"),
+      why_choose_title: formData.get("why_choose_title"),
+      why_choose_body: formData.get("why_choose_body"),
+      why_choose_featured_title: formData.get("why_choose_featured_title"),
+      why_choose_featured_body: formData.get("why_choose_featured_body"),
       petrol_section_title: formData.get("petrol_section_title"),
       petrol_description: formData.get("petrol_description"),
       petrol_highlights: formData.get("petrol_highlights"),
@@ -107,6 +127,10 @@ export async function saveServicesContent(
     const miniMarketBulletsR = parseServiceHighlightsLines(v.mini_market_highlights, "Mini Market bullets")
     if (!miniMarketBulletsR.ok) {
       return { ok: false, message: miniMarketBulletsR.message }
+    }
+    const whyCards = collectWhyCards(formData)
+    if (whyCards.length === 0) {
+      return { ok: false, message: "Add at least one Why Choose Euromiti card (title + description)." }
     }
 
     async function resolveImageSlot(opts: {
@@ -167,6 +191,12 @@ export async function saveServicesContent(
       id: 1,
       hero_page_title: v.hero_page_title,
       hero_page_subtitle: v.hero_page_subtitle,
+      why_choose_kicker: v.why_choose_kicker,
+      why_choose_title: v.why_choose_title,
+      why_choose_body: v.why_choose_body,
+      why_choose_featured_title: v.why_choose_featured_title,
+      why_choose_featured_body: v.why_choose_featured_body,
+      why_sections_json: whyCards,
       petrol_section_title: v.petrol_section_title,
       petrol_description: v.petrol_description,
       petrol_highlights_json: bulletsR.value,

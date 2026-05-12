@@ -133,6 +133,11 @@ export type ServicesContentRow = {
   mini_market_highlights_json: unknown
   hero_page_title: string
   hero_page_subtitle: string
+  why_choose_kicker: string
+  why_choose_title: string
+  why_choose_body: string
+  why_choose_featured_title: string
+  why_choose_featured_body: string
   why_sections_json: unknown
   updated_at: string
   updated_by: string | null

@@ -18,12 +18,64 @@ export type ResolvedServicesSection = {
   icon: string
 }
 
+export type ResolvedServicesWhyCard = {
+  icon: string
+  title: string
+  body: string
+}
+
+export type ResolvedServicesWhySection = {
+  kicker: string
+  title: string
+  body: string
+  featuredIcon: string
+  featuredTitle: string
+  featuredBody: string
+  cards: ResolvedServicesWhyCard[]
+}
+
 export type ResolvedServicesPage = {
   heroTitle: string
   heroSubtitle: string
   heroImageSrc: string
   heroImageAlt: string
   sections: ResolvedServicesSection[]
+  whyChoose: ResolvedServicesWhySection
+}
+
+export const DEFAULT_SERVICES_WHY_CARDS: ResolvedServicesWhyCard[] = [
+  {
+    icon: "diamond",
+    title: "Përvojë premium",
+    body: "Komoditet, kujdes dhe atmosferë e rregullt në çdo ndalesë.",
+  },
+  {
+    icon: "map",
+    title: "Lokacione strategjike",
+    body: "Pika shërbimi të vendosura për qasje të lehtë në rrugët kryesore.",
+  },
+  {
+    icon: "flatware",
+    title: "Ushqim cilësor",
+    body: "Ushqim i freskët dhe ambient i rehatshëm për udhëtarë dhe familje.",
+  },
+  {
+    icon: "cleaning_services",
+    title: "Hapësira të pastra",
+    body: "Autolarje, market dhe ambiente të mirëmbajtura me kujdes të vazhdueshëm.",
+  },
+]
+
+export const DEFAULT_SERVICES_WHY_SECTION: ResolvedServicesWhySection = {
+  kicker: "Standardi Euromiti",
+  title: "Pse të zgjidhni Euromitin",
+  body:
+    "Çdo ndalesë është menduar rreth besueshmërisë, komoditetit dhe shërbimit të pastër, nga hapësira e karburantit deri te tavolina.",
+  featuredIcon: "shield_with_heart",
+  featuredTitle: "E ndërtuar rreth shërbimit të besueshëm.",
+  featuredBody:
+    "Nga cilësia e karburantit deri te mikpritja, Euromiti i mban shërbimet kryesore të organizuara, të pastra dhe të qëndrueshme për çdo ndalesë.",
+  cards: DEFAULT_SERVICES_WHY_CARDS,
 }
 
 export function normalizeServicesRow(raw: Record<string, unknown>): ServicesContentRow {
@@ -61,6 +113,20 @@ export function normalizeServicesRow(raw: Record<string, unknown>): ServicesCont
       typeof raw.hero_page_title === "string" ? raw.hero_page_title : SERVICES_PAGE_DEFAULT_HERO.title,
     hero_page_subtitle:
       typeof raw.hero_page_subtitle === "string" ? raw.hero_page_subtitle : empty,
+    why_choose_kicker:
+      typeof raw.why_choose_kicker === "string" ? raw.why_choose_kicker : DEFAULT_SERVICES_WHY_SECTION.kicker,
+    why_choose_title:
+      typeof raw.why_choose_title === "string" ? raw.why_choose_title : DEFAULT_SERVICES_WHY_SECTION.title,
+    why_choose_body:
+      typeof raw.why_choose_body === "string" ? raw.why_choose_body : DEFAULT_SERVICES_WHY_SECTION.body,
+    why_choose_featured_title:
+      typeof raw.why_choose_featured_title === "string"
+        ? raw.why_choose_featured_title
+        : DEFAULT_SERVICES_WHY_SECTION.featuredTitle,
+    why_choose_featured_body:
+      typeof raw.why_choose_featured_body === "string"
+        ? raw.why_choose_featured_body
+        : DEFAULT_SERVICES_WHY_SECTION.featuredBody,
     why_sections_json: raw.why_sections_json ?? [],
     updated_at: typeof raw.updated_at === "string" ? raw.updated_at : new Date().toISOString(),
     updated_by: fk("updated_by"),
@@ -87,6 +153,31 @@ function bulletsFromDb(raw: unknown): string[] {
     })
     .filter((x): x is string => Boolean(x?.length))
   return bullets
+}
+
+function textOrFallback(value: string | null | undefined, fallback: string) {
+  return value?.trim() || fallback
+}
+
+export function servicesWhyCardsFromDb(raw: unknown): ResolvedServicesWhyCard[] {
+  if (!Array.isArray(raw)) return []
+  const out: ResolvedServicesWhyCard[] = []
+  for (const item of raw) {
+    if (!item || typeof item !== "object") continue
+    const r = item as Record<string, unknown>
+    const title = typeof r.title === "string" ? r.title.trim() : ""
+    const body = typeof r.body === "string" ? r.body.trim() : ""
+    let icon =
+      typeof r.icon === "string"
+        ? r.icon.trim()
+        : typeof r.icon_material === "string"
+          ? r.icon_material.trim()
+          : "verified"
+    if (!/^[a-z0-9_]+$/.test(icon)) icon = "verified"
+    if (!title || !body) continue
+    out.push({ icon, title, body })
+  }
+  return out
 }
 
 function mediaSrc(
@@ -170,6 +261,7 @@ export function resolveServicesPage(row: ServicesContentRow | null, media: Servi
         imageAlt: service.imageAlt,
         icon: service.icon,
       })),
+      whyChoose: DEFAULT_SERVICES_WHY_SECTION,
     }
   }
 
@@ -231,5 +323,16 @@ export function resolveServicesPage(row: ServicesContentRow | null, media: Servi
     heroImageSrc: SERVICES_PAGE_DEFAULT_HERO.imageSrc,
     heroImageAlt: SERVICES_PAGE_DEFAULT_HERO.imageAlt,
     sections,
+    whyChoose: {
+      kicker: textOrFallback(row.why_choose_kicker, DEFAULT_SERVICES_WHY_SECTION.kicker),
+      title: textOrFallback(row.why_choose_title, DEFAULT_SERVICES_WHY_SECTION.title),
+      body: textOrFallback(row.why_choose_body, DEFAULT_SERVICES_WHY_SECTION.body),
+      featuredIcon: DEFAULT_SERVICES_WHY_SECTION.featuredIcon,
+      featuredTitle: textOrFallback(row.why_choose_featured_title, DEFAULT_SERVICES_WHY_SECTION.featuredTitle),
+      featuredBody: textOrFallback(row.why_choose_featured_body, DEFAULT_SERVICES_WHY_SECTION.featuredBody),
+      cards: servicesWhyCardsFromDb(row.why_sections_json).length
+        ? servicesWhyCardsFromDb(row.why_sections_json)
+        : DEFAULT_SERVICES_WHY_CARDS,
+    },
   }
 }
