@@ -121,8 +121,14 @@ export async function saveAboutContent(_prev: AboutSaveState, formData: FormData
       offer_carwash_body: formData.get("offer_carwash_body"),
       offer_mini_market_title: formData.get("offer_mini_market_title"),
       offer_mini_market_body: formData.get("offer_mini_market_body"),
+      owner_section_kicker: formData.get("owner_section_kicker"),
+      owner_section_title: formData.get("owner_section_title"),
+      owner_name: formData.get("owner_name"),
+      owner_role: formData.get("owner_role"),
+      owner_body: formData.get("owner_body"),
       hero_image_alt: formData.get("hero_image_alt") ?? "",
       story_image_alt: formData.get("story_image_alt") ?? "",
+      owner_image_alt: formData.get("owner_image_alt") ?? "",
       gallery_strip_alt: formData.get("gallery_strip_alt") ?? "",
       gallery_why_alt: formData.get("gallery_why_alt") ?? "",
       gallery_partner_alt: formData.get("gallery_partner_alt") ?? "",
@@ -246,6 +252,14 @@ export async function saveAboutContent(_prev: AboutSaveState, formData: FormData
     })
     if ("error" in offerMiniMarketR) return { ok: false, message: offerMiniMarketR.error }
 
+    const ownerR = await resolveMediaSlot({
+      clearName: "clear_owner_image",
+      fileField: "owner_image",
+      alt: v.owner_image_alt ?? "",
+      usageSection: "about-owner",
+    })
+    if ("error" in ownerR) return { ok: false, message: ownerR.error }
+
     const stripR = await resolveMediaSlot({
       clearName: "clear_gallery_strip",
       fileField: "gallery_strip_image",
@@ -293,6 +307,11 @@ export async function saveAboutContent(_prev: AboutSaveState, formData: FormData
       offer_carwash_body: v.offer_carwash_body,
       offer_mini_market_title: v.offer_mini_market_title,
       offer_mini_market_body: v.offer_mini_market_body,
+      owner_section_kicker: v.owner_section_kicker,
+      owner_section_title: v.owner_section_title,
+      owner_name: v.owner_name,
+      owner_role: v.owner_role,
+      owner_body: v.owner_body,
       values_json: valuesJson,
       updated_by: editorId,
     }
@@ -304,6 +323,7 @@ export async function saveAboutContent(_prev: AboutSaveState, formData: FormData
     if (offerPlaygroundR.next !== undefined) patch.offer_playground_media_id = offerPlaygroundR.next
     if (offerCarwashR.next !== undefined) patch.offer_carwash_media_id = offerCarwashR.next
     if (offerMiniMarketR.next !== undefined) patch.offer_mini_market_media_id = offerMiniMarketR.next
+    if (ownerR.next !== undefined) patch.owner_media_id = ownerR.next
 
     if (stripR.next !== undefined) patch.gallery_strip_media_id = stripR.next
     if (whyR.next !== undefined) patch.gallery_why_us_media_id = whyR.next

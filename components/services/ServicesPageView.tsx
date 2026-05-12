@@ -13,6 +13,7 @@ import {
 } from "@/components/motion"
 import { Button } from "@/components/ui/button"
 import { MaterialSymbol } from "@/components/ui/MaterialSymbol"
+import { SectionAccentRule } from "@/components/ui/SectionAccentRule"
 import type { ResolvedServicesPage } from "@/lib/data/services-content-public"
 import { cn } from "@/lib/utils"
 
@@ -38,7 +39,7 @@ const WHY_CHOOSE = [
     body: "Fresh meals for the discerning traveler.",
   },
   {
-    icon: "colors_spark",
+    icon: "cleaning_services",
     title: "Clean facilities",
     body: "Pristine carwash and market areas.",
   },
@@ -112,34 +113,71 @@ export function ServicesPageView({ data }: ServicesPageViewProps) {
         )
       })}
 
-      <section className="bg-primary text-primary-foreground">
-        <Container className="euromiti-section">
-          <Reveal variant="fade-up" once>
-            <div className="mb-9 space-y-3 text-center md:mb-12">
-              <SectionHeading
-                headingId="services-why-heading"
-                title="Why Choose Euromiti"
-                align="center"
-                invert
-                className="[&>div]:max-w-none"
-              />
-              <div className="mx-auto h-1 w-20 rounded-full bg-accent" aria-hidden />
-            </div>
-          </Reveal>
-          <Stagger once className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-            {WHY_CHOOSE.map((item) => (
-              <article
-                key={item.title}
-                className="flex flex-col items-center rounded-[var(--rounded-lg)] border border-primary-foreground/12 bg-primary-foreground/6 p-5 text-center md:p-6"
-              >
-                <div className="mb-3 flex items-center gap-2">
-                  <MaterialSymbol name={item.icon} className="text-[1.5rem] text-accent" />
-                  <h3 className="text-sm font-bold uppercase tracking-wide text-primary-foreground">{item.title}</h3>
+      <section className="relative overflow-hidden bg-brand-shell-deep text-white">
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgba(255,180,171,0.12),transparent_34%),linear-gradient(135deg,var(--brand-shell-deep)_0%,var(--brand-shell)_52%,var(--brand-primary-hover)_100%)]"
+          aria-hidden
+        />
+        <Container className="relative euromiti-section">
+          <div className="grid grid-cols-1 gap-9 lg:grid-cols-12 lg:gap-12">
+            <Reveal variant="fade-up" once className="lg:col-span-4">
+              <div className="max-w-xl">
+                <p className="mb-4 text-[0.64rem] font-black uppercase tracking-[0.32em] text-brand-accent-soft">
+                  Euromiti Standard
+                </p>
+                <h2
+                  id="services-why-heading"
+                  className="font-(family-name:--font-montserrat) text-[clamp(2rem,8vw,2.75rem)] font-extrabold leading-[1.04] tracking-[-0.045em] text-white sm:text-[clamp(2.35rem,4.8vw,3.5rem)]"
+                >
+                  Why Choose Euromiti
+                </h2>
+                <p className="mt-5 text-[0.98rem] leading-8 text-white/70">
+                  Every stop is designed around reliability, comfort, and clean service, from the forecourt to the table.
+                </p>
+                <SectionAccentRule className="mt-6" />
+              </div>
+            </Reveal>
+
+            <div className="lg:col-span-8">
+              <Stagger once className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
+                <article className="relative overflow-hidden rounded-[1.1rem] border border-white/12 bg-white/8 p-6 shadow-[0_22px_55px_rgba(0,0,0,0.2)] backdrop-blur-md md:p-7">
+                  <div
+                    className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_82%_16%,rgba(255,180,171,0.18),transparent_34%)]"
+                    aria-hidden
+                  />
+                  <div className="relative">
+                    <span className="inline-flex size-12 items-center justify-center rounded-full border border-white/14 bg-white/8 text-brand-accent-soft">
+                      <MaterialSymbol name={WHY_CHOOSE[0].icon} className="text-[1.45rem]" />
+                    </span>
+                    <h3 className="mt-6 font-(family-name:--font-montserrat) text-2xl font-extrabold leading-tight tracking-[-0.04em] text-white md:text-3xl">
+                      Built around dependable service.
+                    </h3>
+                    <p className="mt-4 max-w-md text-[0.98rem] leading-8 text-white/68">
+                      From fuel quality to hospitality, Euromiti keeps the essentials organized, clean, and consistent for every stop.
+                    </p>
+                  </div>
+                </article>
+
+                <div className="rounded-[1.1rem] border border-white/12 bg-white/6 p-2 shadow-[0_22px_55px_rgba(0,0,0,0.16)] backdrop-blur-md">
+                  <div className="divide-y divide-white/10">
+                    {WHY_CHOOSE.slice(1).map((item) => (
+                      <article key={item.title} className="grid grid-cols-[auto_1fr] gap-4 px-4 py-4 sm:px-5">
+                        <span className="mt-1 inline-flex size-9 items-center justify-center rounded-full bg-white/8 text-brand-accent-soft">
+                          <MaterialSymbol name={item.icon} className="text-[1.15rem]" />
+                        </span>
+                        <div>
+                          <h3 className="font-(family-name:--font-montserrat) text-[0.78rem] font-extrabold uppercase tracking-[0.14em] text-white">
+                            {item.title}
+                          </h3>
+                          <p className="mt-2 text-sm leading-7 text-white/62">{item.body}</p>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
                 </div>
-                <p className="mt-2 text-xs leading-relaxed text-primary-foreground/70">{item.body}</p>
-              </article>
-            ))}
-          </Stagger>
+              </Stagger>
+            </div>
+          </div>
         </Container>
       </section>
 

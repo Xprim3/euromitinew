@@ -92,6 +92,13 @@ export type ResolvedAboutPage = {
   visionBody: string
   missionStripSrc: string
   missionStripAlt: string
+  ownerKicker: string
+  ownerTitle: string
+  ownerName: string
+  ownerRole: string
+  ownerBody: string
+  ownerImageSrc: string
+  ownerImageAlt: string
   whyUsAsideSrc: string
   whyUsAsideAlt: string
   partnershipAsideSrc: string
@@ -158,6 +165,12 @@ export function normalizeAboutRow(raw: Record<string, unknown>): AboutContentRow
     offer_mini_market_title: typeof raw.offer_mini_market_title === "string" ? raw.offer_mini_market_title : e,
     offer_mini_market_body: typeof raw.offer_mini_market_body === "string" ? raw.offer_mini_market_body : e,
     offer_mini_market_media_id: fk("offer_mini_market_media_id"),
+    owner_section_kicker: typeof raw.owner_section_kicker === "string" ? raw.owner_section_kicker : e,
+    owner_section_title: typeof raw.owner_section_title === "string" ? raw.owner_section_title : e,
+    owner_name: typeof raw.owner_name === "string" ? raw.owner_name : e,
+    owner_role: typeof raw.owner_role === "string" ? raw.owner_role : e,
+    owner_body: typeof raw.owner_body === "string" ? raw.owner_body : e,
+    owner_media_id: fk("owner_media_id"),
     hero_media_id: typeof raw.hero_media_id === "string" ? raw.hero_media_id : null,
     story_media_id: typeof raw.story_media_id === "string" ? raw.story_media_id : null,
     gallery_media_ids: galleryList,
@@ -192,6 +205,7 @@ export const getAboutContentPublic = cache(async (): Promise<{
     row.gallery_strip_media_id,
     row.gallery_why_us_media_id,
     row.gallery_partnerships_media_id,
+    row.owner_media_id,
     row.offer_fuel_media_id,
     row.offer_restaurant_media_id,
     row.offer_playground_media_id,
@@ -332,6 +346,14 @@ export function resolveAboutPage(row: AboutContentRow | null, media: AboutMediaL
       visionBody: aboutPageMock.vision.body,
       missionStripSrc: homeStrategicNetworkDesign[1].imageSrc,
       missionStripAlt: homeStrategicNetworkDesign[1].imageAlt,
+      ownerKicker: "Pronari",
+      ownerTitle: "Njerëzit pas standardit Euromiti",
+      ownerName: "Pronari i Euromitit",
+      ownerRole: "Themelues dhe drejtues i kompanisë",
+      ownerBody:
+        "Euromiti është ndërtuar me vizion vendor: të krijojë ndalesa të besueshme ku karburanti, ushqimi, marketi dhe shërbimi funksionojnë me kujdes të njëjtë.",
+      ownerImageSrc: homeStrategicNetworkDesign[0].imageSrc,
+      ownerImageAlt: "Pronari i Euromitit",
       whyUsAsideSrc: homeHeroDesign.imageSrc,
       whyUsAsideAlt: "Përvoja në stacionet Euromiti",
       partnershipAsideSrc: homeBeyondDesign.restaurant.float2,
@@ -404,6 +426,26 @@ export function resolveAboutPage(row: AboutContentRow | null, media: AboutMediaL
       )
       return { missionStripSrc: s.src, missionStripAlt: s.alt }
     })(),
+    ...(() => {
+      const s = lookup(
+        media,
+        row.owner_media_id,
+        homeStrategicNetworkDesign[0].imageSrc,
+        "Pronari i Euromitit"
+      )
+      return {
+        ownerImageSrc: s.src,
+        ownerImageAlt: s.alt,
+      }
+    })(),
+    ownerKicker: textOrFallback(row.owner_section_kicker, "Pronari"),
+    ownerTitle: textOrFallback(row.owner_section_title, "Njerëzit pas standardit Euromiti"),
+    ownerName: textOrFallback(row.owner_name, "Pronari i Euromitit"),
+    ownerRole: textOrFallback(row.owner_role, "Themelues dhe drejtues i kompanisë"),
+    ownerBody: textOrFallback(
+      row.owner_body,
+      "Euromiti është ndërtuar me vizion vendor: të krijojë ndalesa të besueshme ku karburanti, ushqimi, marketi dhe shërbimi funksionojnë me kujdes të njëjtë."
+    ),
     ...(() => {
       const s = lookup(media, g1, homeHeroDesign.imageSrc, "Përvoja në stacionet Euromiti")
       return { whyUsAsideSrc: s.src, whyUsAsideAlt: s.alt }

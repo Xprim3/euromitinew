@@ -64,6 +64,7 @@ async function loadAbout(): Promise<
     row.gallery_strip_media_id,
     row.gallery_why_us_media_id,
     row.gallery_partnerships_media_id,
+    row.owner_media_id,
   ].filter((x): x is string => typeof x === "string" && x.length > 0)
 
   const previews: AboutMediaPreviews = {
@@ -77,6 +78,7 @@ async function loadAbout(): Promise<
     galleryStrip: null,
     galleryWhy: null,
     galleryPartner: null,
+    owner: null,
   }
 
   let mediaRows: { id: string; public_url: string | null }[] | null = null
@@ -93,6 +95,7 @@ async function loadAbout(): Promise<
     previews.galleryStrip = urlFromRows(mediaRows, row.gallery_strip_media_id)
     previews.galleryWhy = urlFromRows(mediaRows, row.gallery_why_us_media_id)
     previews.galleryPartner = urlFromRows(mediaRows, row.gallery_partnerships_media_id)
+    previews.owner = urlFromRows(mediaRows, row.owner_media_id)
   }
 
   const valueSlots = valueSlotsForAdmin(valueCardsFromDb(row.values_json))

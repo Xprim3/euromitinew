@@ -64,17 +64,42 @@ export function AboutPageView({ data }: { data: ResolvedAboutPage }) {
                     </p>
                   ))}
                 </div>
+              </div>
+            </div>
+          </SectionReveal>
+        </Container>
+      </section>
 
-                <div className="max-w-3xl border-t border-border/70 pt-5 md:pt-6">
-                  <div className="rounded-[1.5rem] bg-brand-shell px-4 py-4 text-white shadow-[0_18px_50px_-42px_rgba(15,27,45,0.7)] sm:px-5">
-                    <p className="text-[0.72rem] font-bold uppercase tracking-[0.16em] text-brand-accent-soft">
-                      Standard i qëndrueshëm
-                    </p>
-                    <p className="mt-2 text-sm leading-relaxed text-white/82 sm:text-[0.95rem]">
-                      Çdo ndalesë është ndërtuar për të qenë e pastër, e shpejtë dhe komode - nga karburanti deri te
-                      restoranti, marketi dhe kujdesi për veturën.
-                    </p>
-                  </div>
+      <section className="border-t border-border/60 bg-muted/40">
+        <Container className="py-10 sm:py-12 md:py-16 lg:py-20">
+          <SectionReveal variant="fade-up" once>
+            <div className="grid items-center gap-8 lg:grid-cols-12 lg:gap-12 xl:gap-16">
+              <div className="space-y-5 lg:col-span-7">
+                <h2 className="font-heading text-[clamp(1.75rem,6vw,2.6rem)] font-extrabold leading-[1.08] tracking-[-0.04em] text-foreground md:text-[clamp(2.15rem,4vw,3.25rem)]">
+                  {data.ownerTitle}
+                </h2>
+                <SectionAccentRule />
+                <div className="max-w-3xl space-y-4 text-[0.98rem] leading-8 text-muted-foreground md:text-[1.05rem]">
+                  <p>{data.ownerBody}</p>
+                </div>
+                <div className="border-border/70 border-t pt-5">
+                  <p className="font-heading text-xl font-extrabold tracking-tight text-foreground">{data.ownerName}</p>
+                  <p className="mt-1 text-sm font-semibold uppercase tracking-[0.16em] text-secondary">{data.ownerRole}</p>
+                </div>
+              </div>
+
+              <div className="relative lg:col-span-5">
+                <div className="relative min-h-[22rem] overflow-hidden rounded-[1.25rem] bg-muted shadow-[0_24px_70px_rgba(15,23,42,0.12)] sm:min-h-[28rem] lg:min-h-[34rem]">
+                  <ImageHoverZoom className="absolute inset-0 h-full w-full">
+                    <Image
+                      src={data.ownerImageSrc}
+                      alt={data.ownerImageAlt}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 40vw"
+                      className="object-cover object-center"
+                    />
+                  </ImageHoverZoom>
+                  <div className="absolute inset-0 bg-linear-to-t from-brand-shell-deep/32 via-transparent to-transparent" aria-hidden />
                 </div>
               </div>
             </div>

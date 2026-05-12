@@ -82,6 +82,12 @@ export type AboutContentRow = {
   offer_mini_market_title: string
   offer_mini_market_body: string
   offer_mini_market_media_id: string | null
+  owner_section_kicker: string
+  owner_section_title: string
+  owner_name: string
+  owner_role: string
+  owner_body: string
+  owner_media_id: string | null
   hero_media_id: string | null
   story_media_id: string | null
   gallery_media_ids: string[] | null

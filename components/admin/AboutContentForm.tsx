@@ -29,6 +29,7 @@ export type AboutMediaPreviews = {
   galleryStrip: string | null
   galleryWhy: string | null
   galleryPartner: string | null
+  owner: string | null
 }
 
 type AboutContentFormProps = {
@@ -211,6 +212,60 @@ export function AboutContentForm({ initial, previews, valueSlots, whyReasonSlots
             placeholder="Describe the story image"
             maxLength={500}
             error={fieldErrors?.story_image_alt?.[0]}
+          />
+        </div>
+      </AdminSectionCard>
+
+      <AdminSectionCard
+        title="Owner section"
+        description="Owner/founder story shown under the first About section."
+      >
+        <div className="space-y-5">
+          <input type="hidden" name="owner_section_kicker" value={initial.owner_section_kicker} />
+          <TextInput
+            label="Owner name"
+            name="owner_name"
+            defaultValue={initial.owner_name}
+            maxLength={160}
+            error={fieldErrors?.owner_name?.[0]}
+          />
+          <TextInput
+            label="Section title"
+            name="owner_section_title"
+            defaultValue={initial.owner_section_title}
+            maxLength={240}
+            error={fieldErrors?.owner_section_title?.[0]}
+          />
+          <TextInput
+            label="Owner role"
+            name="owner_role"
+            defaultValue={initial.owner_role}
+            maxLength={200}
+            error={fieldErrors?.owner_role?.[0]}
+          />
+          <TextareaInput
+            label="Owner / company message"
+            name="owner_body"
+            defaultValue={initial.owner_body}
+            rows={6}
+            maxLength={4000}
+            showCharacterCount
+            error={fieldErrors?.owner_body?.[0]}
+          />
+          <FileUploadInput
+            label="Owner image"
+            name="owner_image"
+            previewUrl={previews.owner}
+            previewAlt="Owner image"
+            removeInputName="clear_owner_image"
+            helperText="Portrait or owner/company leadership image shown on the public About page."
+          />
+          <TextInput
+            label="Owner image alt text"
+            name="owner_image_alt"
+            placeholder="Describe the owner image"
+            maxLength={500}
+            error={fieldErrors?.owner_image_alt?.[0]}
           />
         </div>
       </AdminSectionCard>
