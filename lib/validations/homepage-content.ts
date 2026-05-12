@@ -20,7 +20,7 @@ const alt = z.string().trim().max(500).optional()
 
 export const homepageContentFormSchema = z
   .object({
-    hero_headline_line1: z.string().trim().max(240),
+    hero_headline_line1: z.string().trim().max(320),
     hero_headline_line2: z.string().trim().max(240),
     hero_subtitle: z.string().trim().max(1200),
     hero_cta_primary_label: z.string().trim().min(1, "Primary button label is required").max(120),

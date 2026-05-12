@@ -6,6 +6,7 @@ import type { HomepageContentRow } from "@/types/supabase-cms"
 
 /** Media rows keyed by UUID for resolving homepage_image fields. */
 export type HomepageMediaLookup = Record<string, { public_url: string; alt_text: string | null }>
+export type ServicesIntroChip = { icon: string; label: string }
 
 /** Coerce partially-known `homepage_content` JSON (e.g. before optional migration columns exist) into a full row shape. */
 export function homepageContentRowFromUnknown(raw: Record<string, unknown>): HomepageContentRow {
@@ -30,6 +31,7 @@ function hydrateRow(raw: Partial<HomepageContentRow> & Pick<HomepageContentRow, 
     mini_market_intro_text: raw.mini_market_intro_text ?? e,
     services_intro_title: raw.services_intro_title ?? e,
     services_intro_body: raw.services_intro_body ?? e,
+    services_intro_chips_json: raw.services_intro_chips_json ?? null,
     services_intro_media_id: raw.services_intro_media_id ?? null,
     restaurant_home_headline_primary: raw.restaurant_home_headline_primary ?? e,
     restaurant_home_headline_accent: raw.restaurant_home_headline_accent ?? e,
@@ -48,6 +50,28 @@ function hydrateRow(raw: Partial<HomepageContentRow> & Pick<HomepageContentRow, 
 
 function textOrFallback(value: string | null | undefined, fallback: string) {
   return value?.trim() || fallback
+}
+
+function joinedHeadline(line1: string | null | undefined, line2: string | null | undefined, fallbackLine1: string, fallbackLine2: string) {
+  const title = [line1, line2].map((part) => part?.trim()).filter(Boolean).join(" ")
+  return title || [fallbackLine1, fallbackLine2].join(" ")
+}
+
+function servicesIntroChipsFromCMS(raw: unknown, fallback: readonly ServicesIntroChip[]) {
+  if (raw == null) return [...fallback]
+  if (!Array.isArray(raw)) return []
+
+  return raw
+    .map((chip) => {
+      if (!chip || typeof chip !== "object") return null
+      const c = chip as { icon?: unknown; label?: unknown }
+      const label = typeof c.label === "string" ? c.label.trim() : ""
+      let icon = typeof c.icon === "string" ? c.icon.trim() : "verified"
+      if (!/^[a-z0-9_]+$/.test(icon)) icon = "verified"
+      if (!label) return null
+      return { icon, label }
+    })
+    .filter((chip): chip is ServicesIntroChip => Boolean(chip))
 }
 
 /**
@@ -106,8 +130,7 @@ export type HomeHeroResolved = {
   imageSrc: string
   imageAlt: string
   badge: string
-  titleLine1: string
-  titleLine2: string
+  title: string
   subtitle: string
   primaryCta: { label: string; href: string }
   secondaryCta: { label: string; href: string }
@@ -119,8 +142,7 @@ export function heroFromHomepageCMS(row: HomepageContentRow | null, media: Homep
       imageSrc: homeHeroDesign.imageSrc,
       imageAlt: homeHeroDesign.imageAlt,
       badge: homeHeroDesign.badge,
-      titleLine1: homeHeroDesign.titleLine1,
-      titleLine2: homeHeroDesign.titleLine2,
+      title: joinedHeadline(null, null, homeHeroDesign.titleLine1, homeHeroDesign.titleLine2),
       subtitle: homeHeroDesign.subtitle,
       primaryCta: { ...homeHeroDesign.primaryCta },
       secondaryCta: { ...homeHeroDesign.secondaryCta },
@@ -138,8 +160,12 @@ export function heroFromHomepageCMS(row: HomepageContentRow | null, media: Homep
     imageSrc: img,
     imageAlt: imgAlt,
     badge: homeHeroDesign.badge,
-    titleLine1: textOrFallback(row.hero_headline_line1, homeHeroDesign.titleLine1),
-    titleLine2: textOrFallback(row.hero_headline_line2, homeHeroDesign.titleLine2),
+    title: joinedHeadline(
+      row.hero_headline_line1,
+      row.hero_headline_line2,
+      homeHeroDesign.titleLine1,
+      homeHeroDesign.titleLine2
+    ),
     subtitle: textOrFallback(row.hero_subtitle, homeHeroDesign.subtitle),
     primaryCta: {
       label: textOrFallback(row.hero_cta_primary_label, homeHeroDesign.primaryCta.label),
@@ -163,7 +189,7 @@ export function servicesIntroEliteFromCMS(row: HomepageContentRow | null, media:
       body: mock.body,
       imageSrc: mock.imageSrc,
       imageAlt: mock.imageAlt,
-      chips: [...mock.chips] as typeof mock.chips,
+      chips: [...mock.chips],
     }
   }
 
@@ -174,7 +200,7 @@ export function servicesIntroEliteFromCMS(row: HomepageContentRow | null, media:
     body: textOrFallback(row.services_intro_body, mock.body),
     imageSrc: dm?.public_url?.trim() || mock.imageSrc,
     imageAlt: dm?.alt_text?.trim() || mock.imageAlt,
-    chips: [...mock.chips] as typeof mock.chips,
+    chips: servicesIntroChipsFromCMS(row.services_intro_chips_json, mock.chips),
   }
 }
 

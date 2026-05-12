@@ -16,6 +16,7 @@ export type HomepageContentRow = {
   /** Services intro (“Elite fueling”) — dark homepage band. */
   services_intro_title: string
   services_intro_body: string
+  services_intro_chips_json: unknown
   services_intro_media_id: string | null
   /** Restaurant homepage block headings (split headline). Body is `restaurant_highlight_text`. */
   restaurant_home_headline_primary: string

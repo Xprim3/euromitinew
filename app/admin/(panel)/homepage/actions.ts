@@ -30,6 +30,22 @@ type MediaCols = Partial<
   >
 >
 
+const SERVICES_INTRO_CHIP_SLOTS = 4
+
+function servicesIntroChipsFromForm(formData: FormData) {
+  const chips: { icon: string; label: string }[] = []
+  for (let i = 0; i < SERVICES_INTRO_CHIP_SLOTS; i++) {
+    const label = String(formData.get(`services_intro_chip_label_${i}`) ?? "").trim()
+    if (!label) continue
+
+    let icon = String(formData.get(`services_intro_chip_icon_${i}`) ?? "").trim() || "verified"
+    if (!/^[a-z0-9_]+$/.test(icon)) icon = "verified"
+
+    chips.push({ icon, label: label.slice(0, 80) })
+  }
+  return chips
+}
+
 async function ensureAdminProfile(
   supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
   user: { id: string; email?: string | null }
@@ -134,6 +150,7 @@ export async function saveHomepageContent(
       mini_market_intro_text: v.mini_market_intro_text,
       services_intro_title: v.services_intro_title,
       services_intro_body: v.services_intro_body,
+      services_intro_chips_json: servicesIntroChipsFromForm(formData),
       locations_band_kicker: v.locations_band_kicker,
       locations_band_heading: v.locations_band_heading,
       locations_band_subtitle: v.locations_band_subtitle,

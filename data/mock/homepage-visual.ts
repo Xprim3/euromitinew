@@ -22,36 +22,36 @@ export const homeBeyondDesign = {
   elite: {
     imageSrc:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuDFsEp-KUrU8cQdOnecAyAXQ3U2uog4dKT9CEQ0KLP5lw7Uy2LOCgmrdIbSFJxm-gaKCbSddItdHeeCnvGoBT76hp-l1mMPI_QNVBoOj2pCYlTaqQMJxt7ZVKYgdNecvKH5BeD48RNw6xR0TOUcsOOMWbUvRg40pqdlDDDzxDvH3QNdvxuFs5ngWphmM4E1cZItguJG7IvSRxxjgXjbBLf656eOUfau2iJqht7PDXcJcZm8ohoznL9t3s6Z18Zge2HJMn4mPxD3pjU5",
-    imageAlt: "Elite fueling station",
-    badge: "Flagship Service",
-    title: "Elite Fueling",
-    body: "Our proprietary Euro 6+ standards are meticulously engineered for peak thermal efficiency and long-term carbon reduction.",
+    imageAlt: "Pompë moderne e Euromitit",
+    badge: "Shërbim kryesor",
+    title: "Karburant Cilësor",
+    body: "Standardet tona Euro 6+ janë të zhvilluara për efikasitet të lartë, performancë të qëndrueshme dhe emetime më të ulëta.",
     chips: [
-      { icon: "verified" as const, label: "Performance grade" },
-      { icon: "eco" as const, label: "Ultra low emission" },
+      { icon: "verified" as const, label: "Cilësi e lartë" },
+      { icon: "eco" as const, label: "Emetime të ulëta" },
     ],
   },
   secondaryServices: [
     {
       key: "family",
-      title: "Family Sanctuary",
-      body: "Safe, creative, and engaging play areas where children can burn off energy.",
+      title: "Këndi familjar",
+      body: "Hapësira të sigurta dhe argëtuese ku fëmijët mund të luajnë gjatë ndalesës.",
       imageSrc:
         "https://lh3.googleusercontent.com/aida-public/AB6AXuADBeDZHZAtBNzWpI3FuV1jEa6H11obUs1HMHbSv5Zq31pEaAk3k0_J9lmSHyevmofr9x6u9IkBC13JB_uFuoxhcWz9i_7jKVDQ-o600nNmnnJ1N7mZkdWplFQqHCFh3gmdcuM73ogs0CuTr01Nr0_fw1omR2tfkyOppnSNWACg532puP7mwJ24hOUNewWtcXQmc5i_X-F3WWixk6cZmBY0rYnZP1YBIRWM5YVSmxDkBvv9PATxITYI0ps6A6oxyx4CapUKnd3yebha",
       imageAlt: "Family playground",
     },
     {
       key: "market",
-      title: "Boutique Market",
-      body: "Exquisite essentials for the road, from artisanal snacks to premium travel accessories.",
+      title: "Mini Market",
+      body: "Produkte të nevojshme për rrugë, pije, ushqime dhe artikuj praktikë për çdo udhëtim.",
       imageSrc:
         "https://lh3.googleusercontent.com/aida-public/AB6AXuD8S5hGP1c18sfDFaDaUppXHP46HuuFboTBzwrqQDLf7q4PSXQTe0SHQG7TgmOTwEgK_fe43LVqQDJd-ScVPoQmq2-IZ09lTYyfOVH2CgTTVUp3hmTEclyYGaizppdWNgj2QGg4XhRZLcJIbha9lPBCt9W6Q9m2SOJDCdQ5Xz7pXeGDNZyxInOd8uNm8CgWuG8qHD7fHBjrmpn7zbQ8inK6ovO6PTn14B98DPNG1iUWZjZycpN9aikm-EFxByyLyk_ct8EGIQZlbgJB",
       imageAlt: "Boutique mini market",
     },
     {
       key: "detailing",
-      title: "Artisan Detailing",
-      body: "PH-neutral solutions and filtered water systems for a lasting showroom finish.",
+      title: "Autolarje profesionale",
+      body: "Pastrime të kujdesshme me pajisje moderne për një veturë të pastër dhe të freskët.",
       imageSrc:
         "https://lh3.googleusercontent.com/aida-public/AB6AXuD5B-EZQOzTwHzaJouKcr9yQO3K-Hk-IRy8BE8Ki-CfYOAcowCglwAkLnWGo3gxp9I8SWwkseEt4ec_dcrrlQ5PlXU-dvzihluc25gLZzXDg6W1KpB9F_RuP2um6dBGeJBhF9c5A4vMm4gKFc6vmAz_5kX91gXJaNfzJg8EjLOe1KlooGf3HE-SpR5JZdqV4cN5tKfl2c9jHtLwuxihK_j-eI8ihDwHi3YHiuA5pZvV1mhqQdFZIToFAYN-OCN5uzFSLi9u8GLmcbpg",
       imageAlt: "Artisan detailing",

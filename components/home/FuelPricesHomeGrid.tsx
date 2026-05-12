@@ -42,7 +42,7 @@ export function FuelPricesHomeGrid({ items }: FuelPricesHomeGridProps) {
                 }
               >
                 <span className={`size-2 rounded-full ${isActive ? "bg-green-500" : "bg-amber-500"}`} />
-                {isActive ? "LIVE" : "RECENT UPDATE"}
+                {isActive ? "LIVE" : "PËRDITËSIM I FUNDIT"}
               </div>
             </div>
             <div className="mb-3 flex items-baseline gap-2">

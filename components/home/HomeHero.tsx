@@ -53,9 +53,7 @@ function HomeHeroView({ h }: { h: HomeHeroResolved }) {
           <Reveal variant="fade-up" once threshold={0} rootMargin="0px 0px 0px 0px">
             <div className="euromiti-home-hero-intro-copy">
               <h1 className="font-[family-name:var(--font-montserrat)] text-[clamp(2rem,4.6vw,3.35rem)] font-extrabold leading-[1.08] tracking-[-0.03em] text-white">
-                {h.titleLine1}
-                <br />
-                {h.titleLine2}
+                {h.title}
               </h1>
 
               <p className="mt-5 max-w-xl text-[0.9375rem] leading-relaxed text-white/80 md:mt-6 md:text-base">{h.subtitle}</p>

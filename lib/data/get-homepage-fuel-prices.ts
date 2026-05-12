@@ -30,9 +30,9 @@ function sortKey(pk: string) {
 }
 
 const DEFAULT_LABELS: Record<string, string> = {
-  diesel: "Diesel Euro 6",
-  euro95: "Petrol 95",
-  lpg: "LPG Gas",
+  diesel: "Naftë Euro 6",
+  euro95: "Benzinë 95",
+  lpg: "Gaz LPG",
 }
 
 function headlineForProductKey(pk: string, fuelType: string) {

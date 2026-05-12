@@ -64,8 +64,8 @@ export function HomeServicesIntroView(props: {
   const { elite, carwash, playground, market } = props
 
   const rows: { key: CardKey; title: string; card: typeof carwash }[] = [
-    { key: props.carwashKey, title: "Car Wash", card: carwash },
-    { key: props.playgroundKey, title: "Playground", card: playground },
+    { key: props.carwashKey, title: "Autolarje", card: carwash },
+    { key: props.playgroundKey, title: "Këndi i lojërave", card: playground },
     { key: props.marketKey, title: "Mini Market", card: market },
   ]
 
@@ -80,7 +80,7 @@ export function HomeServicesIntroView(props: {
           <div className="relative mx-auto max-w-[1280px]">
             <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-2 md:gap-9 xl:gap-12">
               <div className="space-y-6">
-                <p className="text-[0.65rem] font-black uppercase tracking-[0.34em] text-brand-accent-soft">Services</p>
+                <p className="text-[0.65rem] font-black uppercase tracking-[0.34em] text-brand-accent-soft">Shërbimet</p>
                 <h2
                   id="services-intro-heading"
                   className="font-playfair text-[1.85rem] font-bold leading-[1.06] tracking-tight text-white sm:text-[2.05rem] md:text-4xl lg:text-[2.65rem]"
@@ -111,7 +111,7 @@ export function HomeServicesIntroView(props: {
                     EuromitiMotionClasses.buttonHover
                   )}
                 >
-                  Full service detail
+                  Detajet e shërbimeve
                   <MaterialSymbol name="arrow_forward" className="text-base transition-transform group-hover:translate-x-1" />
                 </Link>
               </div>

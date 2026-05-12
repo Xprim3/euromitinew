@@ -67,11 +67,49 @@ function SectionAccordion({
 }
 
 const initialActionState: HomepageSaveState = { ok: null }
+const SERVICES_INTRO_CHIP_SLOTS = 4
+
+type ServicesIntroChipSlot = {
+  icon: string
+  label: string
+}
+
+function heroHeadlineDefault(initial: HomepageContentRow) {
+  return [initial.hero_headline_line1, initial.hero_headline_line2]
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .join(" ")
+}
+
+function servicesIntroChipSlots(raw: unknown): ServicesIntroChipSlot[] {
+  const fallback: ServicesIntroChipSlot[] = [
+    { icon: "verified", label: "Cilësi e lartë" },
+    { icon: "eco", label: "Emetime të ulëta" },
+  ]
+
+  const chips = Array.isArray(raw)
+    ? raw
+        .map((chip) => {
+          if (!chip || typeof chip !== "object") return null
+          const c = chip as { icon?: unknown; label?: unknown }
+          const label = typeof c.label === "string" ? c.label.trim() : ""
+          const icon = typeof c.icon === "string" ? c.icon.trim() : "verified"
+          if (!label) return null
+          return { icon, label }
+        })
+        .filter((chip): chip is ServicesIntroChipSlot => Boolean(chip))
+    : fallback
+
+  const slots = chips.slice(0, SERVICES_INTRO_CHIP_SLOTS)
+  while (slots.length < SERVICES_INTRO_CHIP_SLOTS) slots.push({ icon: "", label: "" })
+  return slots
+}
 
 export function HomepageContentForm({ initial, mediaPreviews }: HomepageContentFormProps) {
   const router = useRouter()
   const formRef = useRef<HTMLFormElement>(null)
   const [state, formAction] = useActionState(saveHomepageContent, initialActionState)
+  const serviceChipSlots = servicesIntroChipSlots(initial.services_intro_chips_json)
 
   const fieldErrors = state.ok === false && "fieldErrors" in state ? state.fieldErrors : undefined
   const hasFieldErrors = Boolean(fieldErrors && Object.values(fieldErrors).some((v) => v?.length))
@@ -115,22 +153,15 @@ export function HomepageContentForm({ initial, mediaPreviews }: HomepageContentF
             defaultOpen
           >
             <div className="space-y-5">
-              <AdminContentGrid columns={2}>
-                <TextInput
-                  label="Headline line 1"
-                  name="hero_headline_line1"
-                  defaultValue={initial.hero_headline_line1}
-                  maxLength={240}
-                  error={fieldErrors?.hero_headline_line1?.[0]}
-                />
-                <TextInput
-                  label="Headline line 2"
-                  name="hero_headline_line2"
-                  defaultValue={initial.hero_headline_line2}
-                  maxLength={240}
-                  error={fieldErrors?.hero_headline_line2?.[0]}
-                />
-              </AdminContentGrid>
+              <input type="hidden" name="hero_headline_line2" value="" />
+              <TextInput
+                label="Headline"
+                name="hero_headline_line1"
+                defaultValue={heroHeadlineDefault(initial)}
+                maxLength={320}
+                helperText="Use one headline. It will wrap automatically on desktop and mobile."
+                error={fieldErrors?.hero_headline_line1?.[0]}
+              />
               <TextareaInput
                 label="Subtitle"
                 name="hero_subtitle"
@@ -203,6 +234,43 @@ export function HomepageContentForm({ initial, mediaPreviews }: HomepageContentF
                 showCharacterCount
                 error={fieldErrors?.services_intro_body?.[0]}
               />
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm font-semibold text-[var(--admin-text)]">Highlight chips</p>
+                  <p className="mt-1 text-sm text-[var(--admin-text-muted)]">
+                    Edit labels/icons shown under the services intro. Clear a label to remove that chip.
+                  </p>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {serviceChipSlots.map((chip, index) => (
+                    <div
+                      key={`services-intro-chip-${index}`}
+                      className="rounded-[var(--admin-radius-card)] border border-[var(--admin-border)] bg-[var(--admin-surface-muted)] p-4"
+                    >
+                      <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--admin-text-muted)]">
+                        Chip {index + 1}
+                      </p>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <TextInput
+                          label="Label"
+                          name={`services_intro_chip_label_${index}`}
+                          defaultValue={chip.label}
+                          maxLength={80}
+                          placeholder="Cilësi e lartë"
+                        />
+                        <TextInput
+                          label="Material icon"
+                          name={`services_intro_chip_icon_${index}`}
+                          defaultValue={chip.icon}
+                          maxLength={40}
+                          placeholder="verified"
+                          helperText="Examples: verified, eco, local_gas_station"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
               <FileUploadInput
                 label="Services preview image"
                 name="services_intro_image"
