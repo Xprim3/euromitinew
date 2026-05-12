@@ -238,6 +238,24 @@
     animation: euromiti-hero-copy-slide 820ms var(--euromiti-ease-smooth) both;
   }
 
+  .euromiti-hero-readable-shadow {
+    background:
+      linear-gradient(
+        to top,
+        rgb(0 0 0 / 0.58) 0%,
+        rgb(0 0 0 / 0.46) 28%,
+        rgb(0 0 0 / 0.28) 58%,
+        rgb(0 0 0 / 0.08) 82%,
+        rgb(0 0 0 / 0) 100%
+      );
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+
+  .euromiti-hero-copy-readable {
+    text-shadow: 0 3px 18px rgb(0 0 0 / 0.5), 0 1px 2px rgb(0 0 0 / 0.64);
+  }
+
   @keyframes euromiti-hero-copy-slide {
     from {
       opacity: 0;
