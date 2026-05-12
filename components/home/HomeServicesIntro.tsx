@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 
-import { EuromitiMotionClasses, ImageHoverZoom, Reveal, Stagger } from "@/components/motion"
+import { ImageHoverZoom, Stagger } from "@/components/motion"
 import { MaterialSymbol } from "@/components/ui/MaterialSymbol"
 import { SectionAccentRule } from "@/components/ui/SectionAccentRule"
 import {
@@ -9,7 +9,6 @@ import {
   secondaryHomeServiceCardsFromCMS,
   servicesIntroEliteFromCMS,
 } from "@/lib/data/homepage-singleton-public"
-import { cn } from "@/lib/utils"
 
 /** Pulse placeholder matching two-column services band + triple cards rhythm. */
 export function HomeServicesIntroSkeleton() {
@@ -35,10 +34,10 @@ export function HomeServicesIntroSkeleton() {
           <div className="mx-auto grid max-w-[1280px] animate-pulse gap-4 md:grid-cols-3 md:gap-5">
             {[0, 1, 2].map((k) => (
               <div key={k} className="rounded-2xl border border-brand-border-accent bg-brand-surface-tinted">
-                <div className="aspect-16/11 bg-black/10" />
+                <div className="aspect-16/11 bg-brand-shell-deep/10" />
                 <div className="space-y-2 p-4">
-                  <div className="h-5 w-28 rounded bg-black/15" />
-                  <div className="h-12 w-full rounded bg-black/10" />
+                  <div className="h-5 w-28 rounded bg-brand-shell-deep/15" />
+                  <div className="h-12 w-full rounded bg-brand-shell-deep/10" />
                 </div>
               </div>
             ))}
@@ -69,30 +68,43 @@ export function HomeServicesIntroView(props: {
   ]
 
   return (
-    <div id="services" className="overflow-hidden">
-      <section className="overflow-hidden" aria-labelledby="services-intro-heading">
-        <div className="relative overflow-hidden bg-[#f9f9ff] px-4 py-16 sm:px-6 sm:py-18 md:py-24 lg:px-12">
-          <div
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_14%,rgba(198,198,205,0.42),transparent_34%),linear-gradient(180deg,#ffffff_0%,#f9f9ff_62%,#eef2ff_100%)]"
-            aria-hidden
-          />
-          <div className="relative mx-auto max-w-[1280px]">
-            <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-[0.88fr_1.12fr] md:gap-10 xl:gap-14">
-              <div className="space-y-6">
+    <>
+      <section className="relative overflow-hidden bg-brand-surface-tinted px-4 py-12 sm:px-6 sm:py-16 md:py-20 lg:px-12" aria-labelledby="services-intro-heading">
+        <div className="mx-auto max-w-[1280px]">
+          <div className="grid grid-cols-1 overflow-hidden rounded-[1.2rem] bg-brand-shell-deep shadow-[0_26px_75px_rgba(15,23,42,0.16)] lg:grid-cols-12">
+            <div className="relative min-h-72 overflow-hidden lg:col-span-5 lg:min-h-112">
+              <ImageHoverZoom className="absolute inset-0 h-full w-full">
+                <Image
+                  src={elite.imageSrc}
+                  alt={elite.imageAlt}
+                  fill
+                  sizes="(max-width: 1023px) 100vw, 42vw"
+                  className="object-cover"
+                />
+              </ImageHoverZoom>
+              <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-brand-shell-deep/58 via-brand-shell-deep/10 to-transparent lg:bg-linear-to-r lg:from-transparent lg:via-brand-shell-deep/12 lg:to-brand-shell-deep/74" />
+            </div>
+
+            <div className="relative flex flex-col justify-center px-5 py-8 sm:px-7 sm:py-10 lg:col-span-7 lg:px-10 xl:px-12">
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_18%,rgba(255,180,171,0.12),transparent_34%)]" aria-hidden />
+              <div className="relative max-w-2xl">
+                <p className="mb-4 text-[0.62rem] font-black uppercase tracking-[0.3em] text-brand-accent-soft">
+                  Cilësi & standard
+                </p>
                 <h2
                   id="services-intro-heading"
-                  className="font-(family-name:--font-montserrat) text-[clamp(2rem,8vw,2.8rem)] font-extrabold leading-[1.04] tracking-[-0.045em] text-[#141b2b] sm:text-[clamp(2.35rem,4.6vw,3.7rem)]"
+                  className="font-(family-name:--font-montserrat) text-[clamp(1.9rem,8vw,2.55rem)] font-extrabold leading-[1.05] tracking-[-0.045em] text-white sm:text-[clamp(2.35rem,4.4vw,3.7rem)]"
                 >
                   {elite.title}
                 </h2>
-                <p className="max-w-xl text-[0.98rem] leading-7 text-[#45464d] md:text-[1.05rem] md:leading-8">{elite.body}</p>
+                <p className="mt-5 max-w-xl text-[0.98rem] leading-8 text-white/74 md:text-[1.04rem]">{elite.body}</p>
 
                 {elite.chips.length > 0 ? (
-                  <ul className="flex flex-wrap gap-2 pt-1" aria-label="Service highlights">
+                  <ul className="mt-6 flex flex-wrap gap-2" aria-label="Service highlights">
                     {elite.chips.map((chip) => (
                       <li
                         key={chip.label}
-                        className="inline-flex items-center gap-2 rounded-full border border-black/8 bg-white px-3.5 py-1.5 text-[0.65rem] font-bold uppercase tracking-[0.14em] text-[#141b2b] shadow-sm"
+                        className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/8 px-3.5 py-1.5 text-[0.64rem] font-black uppercase tracking-[0.14em] text-white/78"
                       >
                         <MaterialSymbol name={chip.icon} className="text-base! text-brand-accent-soft" />
                         {chip.label}
@@ -101,50 +113,31 @@ export function HomeServicesIntroView(props: {
                   </ul>
                 ) : null}
 
-                <SectionAccentRule />
+                <SectionAccentRule className="mt-6" />
                 <Link
                   href="/services"
-                  className={cn(
-                    "group inline-flex items-center gap-2.5 rounded-full bg-black px-7 py-3.5 text-sm font-bold tracking-[0.06em] text-white shadow-[0_18px_45px_rgba(15,23,42,0.18)] transition duration-300 hover:bg-[#141b2b]",
-                    EuromitiMotionClasses.buttonHover
-                  )}
+                  className="group mt-7 inline-flex w-full max-w-none items-center justify-between gap-4 rounded-[0.85rem] border border-white/16 bg-white/8 px-4 py-3 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_18px_45px_rgba(15,23,42,0.22)] backdrop-blur-md transition-colors duration-300 hover:border-brand-accent-soft/45 hover:bg-white/10 sm:w-auto sm:min-w-64 sm:px-5"
                 >
-                  Detajet e shërbimeve
-                  <MaterialSymbol name="arrow_forward" className="text-base transition-transform group-hover:translate-x-1" />
+                  <span>Detajet e shërbimeve</span>
+                  <span className="grid size-8 shrink-0 place-items-center rounded-full bg-brand-accent-soft text-brand-shell-deep transition-transform duration-300 group-hover:translate-x-1">
+                    <MaterialSymbol name="arrow_forward" className="text-base" />
+                  </span>
                 </Link>
               </div>
-
-              <Reveal variant="fade-up" once className="w-full">
-                <div className="relative">
-                  <div className="absolute -inset-4 rounded-[1.5rem] bg-[#141b2b]/8 blur-2xl" aria-hidden />
-                  <div className="relative aspect-16/11 max-h-112 w-full overflow-hidden rounded-[1.25rem] border border-white bg-white p-2 shadow-[0_24px_70px_rgba(15,23,42,0.14)] md:aspect-auto md:min-h-80 md:max-h-none lg:min-h-100">
-                    <ImageHoverZoom className="absolute inset-2 h-[calc(100%-1rem)] w-[calc(100%-1rem)] overflow-hidden rounded-[0.85rem]">
-                      <Image
-                        src={elite.imageSrc}
-                        alt={elite.imageAlt}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                        className="object-cover"
-                      />
-                    </ImageHoverZoom>
-                    <div className="pointer-events-none absolute inset-2 rounded-[0.85rem] bg-linear-to-t from-black/36 via-transparent to-transparent" />
-                  </div>
-                </div>
-              </Reveal>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-[#f9f9ff]" aria-label="Services and amenities">
+      <section id="services" className="relative overflow-hidden bg-brand-surface-tinted" aria-label="Services and amenities">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-linear-to-b from-[#eef2ff] to-transparent" aria-hidden />
         <div className="relative px-4 pb-16 pt-5 sm:px-6 md:pb-20 lg:px-12">
           <div className="mx-auto max-w-[1180px]">
             <Stagger once className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
-              {rows.map((rowItem, index) => (
+              {rows.map((rowItem) => (
                 <article
                   key={rowItem.key}
-                  className="overflow-hidden rounded-[1rem] border border-black/8 bg-white shadow-[0_18px_48px_rgba(15,23,42,0.08)]"
+                  className="overflow-hidden rounded-[1rem] border border-brand-shell-deep/8 bg-white shadow-[0_18px_48px_rgba(15,23,42,0.08)]"
                 >
                   <div className="relative aspect-16/11 overflow-hidden">
                     <Image
@@ -155,18 +148,15 @@ export function HomeServicesIntroView(props: {
                       loading={rowItem.key === props.carwashKey ? "eager" : "lazy"}
                       className="object-cover"
                     />
-                    <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/56 via-black/10 to-transparent" />
+                    <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-brand-shell-deep/58 via-brand-shell/12 to-transparent" />
                     <div className="absolute inset-x-0 bottom-0 p-4">
-                      <span className="mb-3 inline-flex size-9 items-center justify-center rounded-full border border-white/18 bg-white/12 text-sm font-black text-white backdrop-blur-md">
-                        0{index + 1}
-                      </span>
                       <h3 className="font-(family-name:--font-montserrat) text-lg font-extrabold tracking-[-0.03em] text-white md:text-xl">
                         {rowItem.title}
                       </h3>
                     </div>
                   </div>
                   <div className="p-4 sm:p-5">
-                    <p className="mt-5 text-[0.98rem] leading-8 text-[#45464d]">{rowItem.card.body}</p>
+                    <p className="mt-5 text-[0.98rem] leading-8 text-brand-body-soft">{rowItem.card.body}</p>
                   </div>
                 </article>
               ))}
@@ -174,7 +164,7 @@ export function HomeServicesIntroView(props: {
           </div>
         </div>
       </section>
-    </div>
+    </>
   )
 }
 

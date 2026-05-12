@@ -2,6 +2,7 @@ import Link from "next/link"
 import Image from "next/image"
 
 import { SectionReveal } from "@/components/motion"
+import { MaterialSymbol } from "@/components/ui/MaterialSymbol"
 import { SectionAccentRule } from "@/components/ui/SectionAccentRule"
 import { getPublicHomepageSingleton } from "@/lib/data/homepage-singleton-public"
 
@@ -12,9 +13,10 @@ const defaultHeadline = "Të ndërtuar në Kosovë. Të besuar në çdo rrugë."
 const defaultEyebrow = "Kush jemi"
 const defaultWhoWeAre =
   "Euromiti është kompani vendore në Kosovë për karburante dhe shërbime rrugore, me standarde të besueshme në Prishtinë, Ferizaj dhe Gjilan."
-const defaultWhyTitle = "Pse të na zgjidhni"
 const defaultWhyText =
   "Cilësi e qëndrueshme e karburantit, shërbime praktike në një vend dhe ekip i fokusuar në shpejtësi, siguri dhe kujdes premium."
+const defaultCompanyDetail =
+  "Qëllimi ynë është të ndërtojmë një standard të qëndrueshëm shërbimi: furnizim korrekt, ambiente të pastra, ushqim të freskët dhe kujdes të shpejtë për klientët që ndalen gjatë rrugës."
 const defaultButtonLabel = "Lexo më shumë për ne"
 const defaultButtonHref = "/about"
 
@@ -39,57 +41,61 @@ export async function HomeAboutIntro() {
   const whyText = row?.about_preview_why_text?.trim() || defaultWhyText
 
   return (
-    <section className="bg-brand-surface-tinted px-4 py-11 sm:px-6 md:py-14 lg:px-12" aria-labelledby="about-intro-heading">
-      <div className="mx-auto max-w-[1280px]">
+    <section
+      className="relative overflow-hidden bg-brand-surface-tinted px-4 py-12 sm:px-6 sm:py-16 md:py-18 lg:px-12 lg:py-20"
+      aria-labelledby="about-intro-heading"
+    >
+      <div className="relative mx-auto max-w-[1280px]">
         <SectionReveal variant="fade-up" once>
-          <div className="grid grid-cols-1 items-start gap-7 md:grid-cols-2 md:gap-10">
-            <div className="relative min-h-[15rem] overflow-hidden rounded-3xl md:min-h-[22rem]">
+          <div className="grid grid-cols-1 items-center gap-8 md:gap-10 lg:grid-cols-12 lg:gap-12 xl:gap-16">
+            <div className="order-1 flex flex-col justify-center lg:col-span-7">
+              <div className="max-w-[43rem]">
+                <p className="mb-3 text-[0.6rem] font-black uppercase tracking-[0.28em] text-brand-red-vivid sm:mb-4 sm:text-[0.64rem] sm:tracking-[0.32em]">
+                  {defaultEyebrow}
+                </p>
+                <h2
+                  id="about-intro-heading"
+                  className="font-(family-name:--font-montserrat) text-[clamp(1.75rem,7vw,2.35rem)] font-extrabold leading-[1.08] tracking-[-0.04em] text-brand-primary sm:text-[clamp(2.05rem,4.2vw,3rem)] lg:text-[clamp(2.35rem,3.4vw,3.25rem)]"
+                >
+                  {headlineCopy.main}
+                  {headlineCopy.accent ? (
+                    <>
+                      {" "}
+                      <span className="text-brand-red-vivid">{headlineCopy.accent}</span>
+                    </>
+                  ) : null}
+                </h2>
+                <SectionAccentRule className="mt-5 sm:mt-6" />
+
+                <div className="mt-5 max-w-[39rem] space-y-3 sm:mt-6 sm:space-y-4">
+                  <p className="text-[0.98rem] leading-8 text-brand-body-soft md:text-[1.04rem]">{whoWeAre}</p>
+                  <p className="text-[0.96rem] leading-8 text-brand-body-soft md:text-[1rem]">{whyText}</p>
+                  <p className="text-[0.96rem] leading-8 text-brand-body-soft md:text-[1rem]">{defaultCompanyDetail}</p>
+                </div>
+
+                <Link
+                  href={defaultButtonHref}
+                  className="group mt-7 inline-flex w-full items-center justify-between gap-4 rounded-[0.85rem] border border-brand-shell-deep/12 bg-white px-4 py-3 text-sm font-extrabold uppercase tracking-[0.1em] text-brand-shell-deep shadow-[0_18px_45px_rgba(15,23,42,0.1)] transition-colors duration-300 hover:border-brand-shell-deep/24 sm:w-auto sm:min-w-64 sm:tracking-[0.12em] lg:mt-8"
+                >
+                  <span>{defaultButtonLabel}</span>
+                  <span className="grid size-8 shrink-0 place-items-center rounded-full bg-brand-shell-deep text-white transition-transform duration-300 group-hover:translate-x-1">
+                    <MaterialSymbol name="arrow_forward" className="text-base" />
+                  </span>
+                </Link>
+              </div>
+            </div>
+
+            <div className="relative order-2 min-h-72 overflow-hidden rounded-[1rem] bg-brand-shell-deep/8 shadow-[0_24px_70px_rgba(15,23,42,0.12)] sm:min-h-88 md:min-h-104 lg:col-span-5 lg:min-h-136">
               <Image
                 src={image?.public_url?.trim() || defaultImageSrc}
                 alt={image?.alt_text?.trim() || defaultImageAlt}
                 fill
-                sizes="(max-width: 768px) 100vw, 50vw"
+                sizes="(max-width: 767px) 100vw, (max-width: 1023px) 88vw, 42vw"
                 className="object-cover"
               />
-              <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/35 via-transparent to-transparent" />
-            </div>
-
-            <div className="space-y-6">
-              <h2
-                id="about-intro-heading"
-                className="font-[family-name:var(--font-montserrat)] text-[1.35rem] font-extrabold tracking-tight text-black md:text-[2rem] md:leading-[1.12]"
-              >
-                {headlineCopy.main}
-                {headlineCopy.accent ? <span className="mt-1 block text-secondary">{headlineCopy.accent}</span> : null}
-              </h2>
-              <SectionAccentRule className="mt-4 md:mt-5" />
-
-              <div className="space-y-4 border-brand-border-muted border-l-2 pl-4 md:pl-5">
-                <p className="text-[0.72rem] font-black uppercase tracking-[0.18em] text-secondary">
-                  {defaultEyebrow}
-                </p>
-                <p className="max-w-xl text-[0.95rem] leading-relaxed text-brand-body-soft">
-                  {whoWeAre}
-                </p>
-              </div>
-
-              <div className="space-y-4 border-brand-border-muted border-l-2 pl-4 md:pl-5">
-                <p className="text-[0.72rem] font-black uppercase tracking-[0.18em] text-secondary">
-                  {defaultWhyTitle}
-                </p>
-                <p className="max-w-xl text-[0.95rem] leading-relaxed text-brand-body-soft">
-                  {whyText}
-                </p>
-              </div>
-
-              <div className="pt-3 md:pt-5 md:flex md:justify-end">
-                <Link
-                  href={defaultButtonHref}
-                  className="inline-flex items-center gap-2 text-sm font-bold text-secondary transition hover:translate-x-1 hover:text-black"
-                >
-                  {defaultButtonLabel}
-                  <span aria-hidden>→</span>
-                </Link>
+              <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-brand-shell-deep/32 via-transparent to-transparent" aria-hidden />
+              <div className="absolute left-4 top-4 rounded-full border border-white/20 bg-white/85 px-3 py-1.5 text-[0.6rem] font-black uppercase tracking-[0.16em] text-brand-primary backdrop-blur-md sm:text-[0.64rem] sm:tracking-[0.18em]">
+                Euromiti
               </div>
             </div>
           </div>

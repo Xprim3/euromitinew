@@ -10,9 +10,9 @@ import type { NewsSummary } from "@/types/public"
 import { cn } from "@/lib/utils"
 
 const BADGE_BY_SLUG: Record<string, { label: string; className: string }> = {
-  "expansion-in-prishtina": { label: "Risi në rrjet", className: "bg-black text-white" },
+  "expansion-in-prishtina": { label: "Risi në rrjet", className: "bg-brand-shell-deep text-white" },
   "path-to-zero-emissions": { label: "Qëndrueshmëri", className: "bg-green-600 text-white" },
-  "premium-diesel-launch": { label: "Inovacion", className: "bg-black text-white" },
+  "premium-diesel-launch": { label: "Inovacion", className: "bg-brand-shell-deep text-white" },
 }
 
 function badgeForHomeNews(item: NewsSummary): { label: string; className: string } {
@@ -21,8 +21,8 @@ function badgeForHomeNews(item: NewsSummary): { label: string; className: string
   const cat = item.category ?? "Përditësime"
   const label = item.teaserLabel ?? cat
   if (cat === "Sustainability") return { label, className: "bg-green-600 text-white" }
-  if (cat === "Innovation" || cat === "Community") return { label, className: "bg-black text-white" }
-  return { label, className: "bg-white text-black" }
+  if (cat === "Innovation" || cat === "Community") return { label, className: "bg-brand-shell-deep text-white" }
+  return { label, className: "bg-white text-brand-shell-deep" }
 }
 
 export async function HomeNewsInsights() {

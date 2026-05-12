@@ -24,13 +24,13 @@ function FooterView({ data }: { data: SiteFooterPublic }) {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="mt-auto border-white/8 border-t bg-black py-14 text-white md:py-16">
+    <footer className="mt-auto border-white/8 border-t bg-brand-shell-deep py-14 text-white md:py-16">
       <Container>
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-10 lg:gap-y-14">
           <div className="lg:col-span-5">
             <Link
               href="/"
-              className="inline-flex max-w-full items-center gap-3 font-[family-name:var(--font-montserrat)] text-xl font-extrabold tracking-tighter text-white uppercase transition hover:text-brand-accent-soft"
+              className="inline-flex max-w-full items-center gap-3 font-(family-name:--font-montserrat) text-xl font-extrabold tracking-tighter text-white uppercase transition hover:text-brand-accent-soft"
             >
               {data.logoUrl ? (
                 <span className="relative block h-9 w-28 shrink-0">

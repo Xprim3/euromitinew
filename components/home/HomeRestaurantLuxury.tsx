@@ -1,16 +1,16 @@
-import Image from "next/image"
 import Link from "next/link"
 
-import { EuromitiMotionClasses, ImageHoverZoom, Reveal } from "@/components/motion"
+import { Reveal } from "@/components/motion"
 import { MaterialSymbol } from "@/components/ui/MaterialSymbol"
 import { SectionAccentRule } from "@/components/ui/SectionAccentRule"
 import { getPublicHomepageSingleton, restaurantLuxuryFromCMS } from "@/lib/data/homepage-singleton-public"
-import { cn } from "@/lib/utils"
+
+import { HomeRestaurantImageSwitcher } from "./HomeRestaurantImageSwitcher"
 
 export function HomeRestaurantLuxurySkeleton() {
   return (
     <section
-      className="relative overflow-hidden bg-[#090909] py-14 sm:py-16 md:py-20 lg:py-24"
+      className="relative overflow-hidden bg-brand-shell-deep py-14 sm:py-16 md:py-20 lg:py-24"
       aria-busy
       aria-label="Loading restaurant highlight"
     >
@@ -36,11 +36,11 @@ export function HomeRestaurantLuxurySkeleton() {
 export function HomeRestaurantLuxuryView(r: ReturnType<typeof restaurantLuxuryFromCMS>) {
   return (
     <section
-      className="relative overflow-hidden bg-[#090909] py-14 sm:py-16 md:py-20 lg:py-24"
+      className="relative overflow-hidden bg-brand-shell-deep py-14 sm:py-16 md:py-20 lg:py-24"
       aria-labelledby="restaurant-luxury-heading"
     >
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(255,180,171,0.1),transparent_34%),linear-gradient(135deg,#090909_0%,#111111_48%,#050505_100%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(255,180,171,0.1),transparent_34%),linear-gradient(135deg,var(--brand-shell-deep)_0%,var(--brand-shell)_48%,var(--brand-primary-hover)_100%)]"
         aria-hidden
       />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/18" aria-hidden />
@@ -66,13 +66,12 @@ export function HomeRestaurantLuxuryView(r: ReturnType<typeof restaurantLuxuryFr
             <SectionAccentRule />
             <Link
               href={r.ctaHref}
-              className={cn(
-                "group inline-flex w-full max-w-none items-center justify-center gap-2.5 rounded-full bg-white px-6 py-3.5 text-sm font-extrabold tracking-[0.04em] text-black shadow-[0_18px_45px_rgba(0,0,0,0.35)] transition duration-300 hover:bg-[#ffb4ab] sm:w-auto sm:justify-start sm:px-7",
-                EuromitiMotionClasses.buttonHover
-              )}
+              className="group inline-flex w-full max-w-none items-center justify-between gap-4 rounded-[0.85rem] border border-white/16 bg-white/7 px-4 py-3 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_18px_45px_rgba(15,23,42,0.24)] backdrop-blur-md transition-colors duration-300 hover:border-brand-accent-soft/45 hover:bg-white/10 sm:w-auto sm:min-w-64 sm:px-5"
             >
-              Shiko Restaurantin
-              <MaterialSymbol name="arrow_forward" className="text-base transition-transform group-hover:translate-x-1" />
+              <span>Shiko Restaurantin</span>
+              <span className="grid size-8 shrink-0 place-items-center rounded-full bg-brand-accent-soft text-brand-shell-deep transition-transform duration-300 group-hover:translate-x-1">
+                <MaterialSymbol name="arrow_forward" className="text-base" />
+              </span>
             </Link>
           </div>
 
@@ -81,41 +80,13 @@ export function HomeRestaurantLuxuryView(r: ReturnType<typeof restaurantLuxuryFr
             once
             className="relative w-full lg:col-span-7"
           >
-            <div className="absolute -inset-5 rounded-[1.75rem] bg-white/8 blur-3xl" aria-hidden />
-            <div className="relative overflow-hidden rounded-[1.25rem] border border-white/14 bg-white/8 p-2 shadow-[0_34px_90px_rgba(0,0,0,0.45)]">
-              <div className="relative min-h-88 overflow-hidden rounded-[0.9rem] sm:min-h-112 lg:min-h-128">
-                <ImageHoverZoom className="absolute inset-0 h-full w-full">
-                  <Image
-                    src={r.mainImage}
-                    alt={r.mainImageAlt}
-                    fill
-                    sizes="(max-width: 1023px) 100vw, 55vw"
-                    className="object-cover"
-                  />
-                </ImageHoverZoom>
-                <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/46 via-transparent to-transparent" />
-              </div>
-            </div>
-            <div className="mt-4 grid grid-cols-2 gap-3 sm:absolute sm:-bottom-8 sm:right-6 sm:mt-0 sm:w-[42%] sm:min-w-72">
-              <div className="relative aspect-4/3 overflow-hidden rounded-[0.85rem] border border-white/18 bg-white/8 shadow-[0_18px_45px_rgba(0,0,0,0.28)]">
-                <Image
-                  src={r.float1}
-                  alt={r.float1Alt}
-                  fill
-                  sizes="(max-width: 639px) 45vw, 18vw"
-                  className="object-cover"
-                />
-              </div>
-              <div className="relative aspect-4/3 overflow-hidden rounded-[0.85rem] border border-white/18 bg-white/8 shadow-[0_18px_45px_rgba(0,0,0,0.28)]">
-                <Image
-                  src={r.float2}
-                  alt={r.float2Alt}
-                  fill
-                  sizes="(max-width: 639px) 45vw, 18vw"
-                  className="object-cover"
-                />
-              </div>
-            </div>
+            <HomeRestaurantImageSwitcher
+              images={[
+                { src: r.mainImage, alt: r.mainImageAlt },
+                { src: r.float1, alt: r.float1Alt },
+                { src: r.float2, alt: r.float2Alt },
+              ]}
+            />
           </Reveal>
         </div>
       </div>

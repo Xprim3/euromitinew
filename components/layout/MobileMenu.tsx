@@ -83,7 +83,7 @@ export function MobileMenu({ className }: MobileMenuProps) {
             <>
               <div
                 aria-hidden="true"
-                className="fixed inset-0 z-[100] bg-[#131b2e]/72 backdrop-blur-sm"
+                className="euromiti-mobile-menu-overlay fixed inset-0 z-[100] bg-brand-shell-deep/76 backdrop-blur-sm"
                 onClick={() => setOpen(false)}
               />
 
@@ -92,23 +92,25 @@ export function MobileMenu({ className }: MobileMenuProps) {
                 aria-modal="true"
                 role="dialog"
                 aria-label="Mobile navigation"
-                className="fixed top-0 right-0 z-[101] flex h-dvh w-[min(100vw,21rem)] max-w-full flex-col overflow-hidden border-slate-200 border-l bg-white text-[#141b2b] shadow-[0_24px_70px_rgba(15,23,42,0.22)]"
+                className="euromiti-mobile-menu-panel fixed top-0 right-0 z-[101] flex h-dvh w-[min(100vw,21rem)] max-w-full flex-col overflow-hidden border-white/10 border-l bg-brand-shell-deep text-white shadow-[0_24px_70px_rgba(0,0,0,0.36)]"
               >
                 <div
-                  className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-[#b6191a]"
+                  className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_10%,rgba(255,180,171,0.12),transparent_36%),linear-gradient(180deg,var(--brand-shell)_0%,var(--brand-shell-deep)_100%)]"
                   aria-hidden
                 />
-                <div className="relative flex items-center justify-between gap-4 border-slate-200 border-b px-6 py-5">
-                  <div>
-                    <p className="font-[family-name:var(--font-montserrat)] text-lg font-bold tracking-[-0.02em] text-[#141b2b]">
+                <div className="relative flex items-center justify-between gap-4 border-white/10 border-b px-6 py-5">
+                  <div className="min-w-0">
+                    <p className="font-(family-name:--font-montserrat) text-lg font-black tracking-[0.12em] text-white uppercase">
                       Euromiti
                     </p>
-                    <p className="mt-1 text-xs leading-relaxed text-[#45464d]">Navigimi kryesor</p>
+                    <p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-white/45">
+                      Petrol & Restaurant
+                    </p>
                   </div>
                   <button
                     type="button"
                     aria-label="Close navigation"
-                    className="flex size-10 shrink-0 items-center justify-center rounded-[var(--rounded-DEFAULT)] border border-slate-200 text-[#141b2b] transition hover:bg-slate-50 focus-visible:border-[#131b2e] focus-visible:ring-2 focus-visible:ring-[#131b2e]/20 focus-visible:outline-none"
+                    className="flex size-10 shrink-0 items-center justify-center rounded-[var(--rounded-DEFAULT)] border border-white/14 bg-white/8 text-white transition hover:border-brand-accent-soft/45 hover:bg-white/12 focus-visible:border-brand-accent-soft focus-visible:ring-2 focus-visible:ring-brand-accent-soft/30 focus-visible:outline-none"
                     onClick={() => setOpen(false)}
                   >
                     <MaterialSymbol name="close" className="text-xl!" />
@@ -124,10 +126,10 @@ export function MobileMenu({ className }: MobileMenuProps) {
                         ref={i === 0 ? firstLinkRef : undefined}
                         href={href}
                         className={cn(
-                          "group flex min-h-12 items-center gap-3 rounded-[var(--rounded-DEFAULT)] border border-transparent px-3 py-2.5 font-semibold text-sm tracking-wide transition focus-visible:border-[#131b2e] focus-visible:ring-2 focus-visible:ring-[#131b2e]/20 focus-visible:outline-none",
+                          "group flex min-h-12 items-center gap-3 rounded-[var(--rounded-DEFAULT)] border border-transparent px-3 py-2.5 text-sm font-bold tracking-wide transition focus-visible:border-brand-accent-soft focus-visible:ring-2 focus-visible:ring-brand-accent-soft/30 focus-visible:outline-none",
                           active
-                            ? "border-slate-200 bg-[#f1f3ff] text-[#131b2e]"
-                            : "text-[#45464d] hover:bg-[#f9f9ff] hover:text-[#141b2b]"
+                            ? "border-brand-accent-soft/30 bg-white/10 text-brand-accent-soft"
+                            : "text-white/68 hover:border-white/10 hover:bg-white/7 hover:text-white"
                         )}
                         onClick={() => setOpen(false)}
                       >
@@ -135,8 +137,8 @@ export function MobileMenu({ className }: MobileMenuProps) {
                           className={cn(
                             "flex size-8 shrink-0 items-center justify-center rounded-[var(--rounded-sm)] transition",
                             active
-                              ? "bg-[#b6191a] text-white"
-                              : "text-[#76777d] group-hover:text-[#141b2b]"
+                              ? "bg-brand-accent-soft text-brand-shell-deep"
+                              : "text-white/42 group-hover:text-white"
                           )}
                         >
                           <MaterialSymbol name={navIcons[href] ?? "arrow_forward"} className="text-[1.15rem]" />
@@ -146,7 +148,7 @@ export function MobileMenu({ className }: MobileMenuProps) {
                           name="chevron_right"
                           className={cn(
                             "text-base transition group-hover:translate-x-0.5",
-                            active ? "text-[#131b2e]/45" : "text-[#76777d] group-hover:text-[#141b2b]"
+                            active ? "text-brand-accent-soft/70" : "text-white/30 group-hover:text-white/70"
                           )}
                         />
                       </Link>
@@ -154,15 +156,18 @@ export function MobileMenu({ className }: MobileMenuProps) {
                   })}
                 </nav>
 
-                <div className="relative border-slate-200 border-t px-6 py-5">
-                  <Link
-                    href="/contact"
-                    className="flex min-h-12 items-center justify-center gap-2 rounded-[var(--rounded-DEFAULT)] bg-[#b6191a] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#d9352f]"
-                    onClick={() => setOpen(false)}
-                  >
-                    Kontakti
-                    <MaterialSymbol name="arrow_forward" className="text-base" />
-                  </Link>
+                <div className="relative border-white/10 border-t px-6 py-5">
+                  <p className="text-center text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-white/38">
+                    Design By{" "}
+                    <a
+                      href="https://www.denisjanuzi.dev"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-white/62 transition hover:text-brand-accent-soft"
+                    >
+                      Denis Januzi
+                    </a>
+                  </p>
                 </div>
               </aside>
             </>,

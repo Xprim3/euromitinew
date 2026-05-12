@@ -35,7 +35,7 @@ export function HomeHeroSlider({ slides }: { slides: HomeHeroSlideResolved[] }) 
 
   return (
     <section
-      className="relative isolate min-h-[calc(100svh-5rem)] scroll-mt-20 overflow-hidden bg-[#131b2e] sm:min-h-[clamp(34rem,82svh,49rem)]"
+      className="relative isolate min-h-[calc(100svh-5rem)] scroll-mt-20 overflow-hidden bg-brand-shell-mid sm:min-h-[clamp(34rem,82svh,49rem)]"
       onTouchStart={(event) => {
         touchStartX.current = event.touches[0]?.clientX ?? null
       }}
@@ -71,10 +71,10 @@ export function HomeHeroSlider({ slides }: { slides: HomeHeroSlideResolved[] }) 
         ))}
       </div>
 
-      <div className="absolute inset-0 z-10 bg-black/6" aria-hidden />
-      <div className="absolute inset-0 z-10 bg-linear-to-r from-black/46 via-black/14 to-transparent" aria-hidden />
+      <div className="absolute inset-0 z-10 bg-brand-shell-deep/8" aria-hidden />
+      <div className="absolute inset-0 z-10 bg-linear-to-r from-brand-shell-deep/48 via-brand-shell/16 to-transparent" aria-hidden />
       <div className="euromiti-hero-readable-shadow absolute inset-x-0 bottom-0 z-10 h-[68%]" aria-hidden />
-      <div className="absolute inset-x-0 bottom-0 z-10 h-[24%] bg-linear-to-t from-black/52 via-black/20 to-transparent" aria-hidden />
+      <div className="absolute inset-x-0 bottom-0 z-10 h-[24%] bg-linear-to-t from-brand-shell-deep/54 via-brand-shell/22 to-transparent" aria-hidden />
       <div
         className="absolute left-0 top-0 z-10 hidden h-full w-2/3 bg-[linear-gradient(135deg,rgba(255,255,255,0.08)_0_1px,transparent_1px_18px)] opacity-20 md:block"
         aria-hidden
@@ -83,7 +83,7 @@ export function HomeHeroSlider({ slides }: { slides: HomeHeroSlideResolved[] }) 
       <div className="relative z-20 mx-auto flex min-h-[calc(100svh-5rem)] w-full max-w-[1280px] items-end px-4 pt-28 pb-24 sm:min-h-[clamp(34rem,82svh,49rem)] sm:items-end sm:px-6 sm:pt-16 sm:pb-24 lg:px-12">
         <div key={normalizedIndex} className="euromiti-hero-copy-slide max-w-2xl">
           <div className="euromiti-hero-copy-readable border-white/18 border-l pl-4 sm:pl-5">
-            <p className="mb-3 text-[0.58rem] font-extrabold uppercase tracking-[0.18em] text-[#ffb4ab] sm:mb-4 sm:text-[0.66rem] sm:tracking-[0.2em]">
+            <p className="mb-3 text-[0.58rem] font-extrabold uppercase tracking-[0.18em] text-brand-accent-soft sm:mb-4 sm:text-[0.66rem] sm:tracking-[0.2em]">
               Euromiti
             </p>
             <h1 className="font-(family-name:--font-montserrat) text-[clamp(2rem,9.5vw,2.65rem)] font-extrabold leading-[1.05] tracking-[-0.04em] text-white sm:text-[clamp(2.5rem,4.8vw,3.9rem)] sm:leading-[1.02] sm:tracking-[-0.045em]">

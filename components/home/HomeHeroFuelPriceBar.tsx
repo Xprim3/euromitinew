@@ -15,14 +15,14 @@ function formatHeroUpdatedAgo(isoDate: string) {
 function FuelPriceBarContent({ items }: { items: HomepageFuelCard[] }) {
   if (!items.length) {
     return (
-      <div className="rounded-(--rounded-DEFAULT) border border-white/12 bg-black/88 px-5 py-4 text-sm font-semibold text-white/72 shadow-[0_22px_55px_rgba(0,0,0,0.28)] backdrop-blur-md">
+      <div className="rounded-(--rounded-DEFAULT) border border-white/12 bg-brand-shell/88 px-5 py-4 text-sm font-semibold text-white/72 shadow-[0_22px_55px_rgba(0,0,0,0.28)] backdrop-blur-md">
         Çmimet e karburanteve do të shfaqen së shpejti.
       </div>
     )
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-white/12 bg-black/90 shadow-[0_22px_55px_rgba(0,0,0,0.3)] backdrop-blur-md">
+    <div className="overflow-hidden rounded-lg border border-white/12 bg-brand-shell/90 shadow-[0_22px_55px_rgba(0,0,0,0.3)] backdrop-blur-md">
       <div className="grid grid-cols-1 divide-y divide-white/12 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
         {items.slice(0, 3).map((p) => (
           <div
@@ -41,7 +41,7 @@ function FuelPriceBarContent({ items }: { items: HomepageFuelCard[] }) {
               <span className="text-2xl font-black tracking-tight text-white sm:text-3xl">
                 {p.price.toFixed(p.currencyCode === "EUR" ? 2 : 3)}
               </span>
-              <span className="text-xs font-extrabold text-[#ffb4ab] sm:text-sm">
+              <span className="text-xs font-extrabold text-brand-accent-soft sm:text-sm">
                 {p.currencyCode === "EUR" ? "€/L" : `${p.currencyCode}/L`}
               </span>
             </div>
@@ -55,12 +55,12 @@ function FuelPriceBarContent({ items }: { items: HomepageFuelCard[] }) {
 export function HomeHeroFuelPriceBarSkeleton() {
   return (
     <section
-      className="relative z-20 bg-black px-4 py-6 sm:px-6 sm:py-8 lg:px-12"
+      className="relative z-20 bg-brand-shell-deep px-4 py-6 sm:px-6 sm:py-8 lg:px-12"
       aria-busy
       aria-label="Loading fuel prices"
     >
       <div className="mx-auto max-w-[1280px]">
-        <div className="grid overflow-hidden rounded-lg border border-white/12 bg-black/90 shadow-[0_22px_55px_rgba(0,0,0,0.3)] sm:grid-cols-3">
+        <div className="grid overflow-hidden rounded-lg border border-white/12 bg-brand-shell/90 shadow-[0_22px_55px_rgba(0,0,0,0.3)] sm:grid-cols-3">
           {[0, 1, 2].map((i) => (
             <div
               key={i}
@@ -81,7 +81,7 @@ export async function HomeHeroFuelPriceBar() {
   const result = await getHomepageFuelPrices()
 
   return (
-    <section className="relative z-20 bg-black px-4 py-6 sm:px-6 sm:py-8 lg:px-12">
+    <section className="relative z-20 bg-brand-shell-deep px-4 py-6 sm:px-6 sm:py-8 lg:px-12">
       <div className="mx-auto max-w-[1280px]">
         <FuelPriceBarContent items={result.items} />
       </div>
