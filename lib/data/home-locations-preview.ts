@@ -132,17 +132,18 @@ export function locationsBandCopyFromCMS(row: HomepageContentRow | null) {
   if (!row) {
     return {
       kicker: "Lokacionet",
-      heading: "Stacionet tona në qytet",
-      subtitle: "Prishtinë, Ferizaj dhe Gjilan - hapni cilëndo kartë për detaje të plota të lokacionit.",
+      heading: "Afër jush në çdo ndalesë",
+      subtitle:
+        "Zgjidhni lokacionin që ju përshtatet dhe shikoni detajet e plota për shërbimet, orarin dhe informacionet e stacionit Euromiti.",
     }
   }
 
   return {
     kicker: textOrFallback(row.locations_band_kicker, "Lokacionet"),
-    heading: textOrFallback(row.locations_band_heading, "Stacionet tona në qytet"),
+    heading: textOrFallback(row.locations_band_heading, "Afër jush në çdo ndalesë"),
     subtitle: textOrFallback(
       row.locations_band_subtitle,
-      "Prishtinë, Ferizaj dhe Gjilan - hapni cilëndo kartë për detaje të plota të lokacionit."
+      "Zgjidhni lokacionin që ju përshtatet dhe shikoni detajet e plota për shërbimet, orarin dhe informacionet e stacionit Euromiti."
     ),
   }
 }
