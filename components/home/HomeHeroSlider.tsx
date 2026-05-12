@@ -53,8 +53,8 @@ export function HomeHeroSlider({ slides }: { slides: HomeHeroSlideResolved[] }) 
           <div
             key={`${slide.title}-${index}`}
             className={[
-              "absolute inset-0 transition-opacity duration-700 ease-out",
-              index === normalizedIndex ? "opacity-100" : "opacity-0",
+              "absolute inset-0 transition-[transform,opacity] duration-900 ease-[cubic-bezier(0.22,1,0.36,1)]",
+              index === normalizedIndex ? "z-10 translate-x-0 opacity-100" : "z-0 translate-x-full opacity-0",
             ].join(" ")}
             aria-hidden={index !== normalizedIndex}
           >
@@ -73,14 +73,15 @@ export function HomeHeroSlider({ slides }: { slides: HomeHeroSlideResolved[] }) 
 
       <div className="absolute inset-0 bg-[#131b2e]/28" aria-hidden />
       <div className="absolute inset-0 bg-linear-to-r from-[#131b2e]/76 via-[#131b2e]/36 to-[#131b2e]/6" aria-hidden />
-      <div className="absolute inset-x-0 bottom-0 h-48 bg-linear-to-t from-black/72 via-black/28 to-transparent backdrop-blur-[2px]" aria-hidden />
+      <div className="absolute inset-x-0 bottom-0 h-[68%] bg-linear-to-t from-black/92 via-black/58 to-transparent backdrop-blur-[2px]" aria-hidden />
+      <div className="absolute inset-x-0 bottom-0 h-56 bg-linear-to-t from-black via-black/52 to-transparent" aria-hidden />
       <div
         className="absolute left-0 top-0 hidden h-full w-2/3 bg-[linear-gradient(135deg,rgba(255,255,255,0.08)_0_1px,transparent_1px_18px)] opacity-20 md:block"
         aria-hidden
       />
 
       <div className="relative z-10 mx-auto flex min-h-[calc(100svh-5rem)] w-full max-w-[1280px] items-end px-4 pt-28 pb-24 sm:min-h-[clamp(34rem,82svh,49rem)] sm:items-center sm:px-6 sm:py-16 lg:px-12">
-        <div key={activeIndex} className="max-w-3xl">
+        <div key={normalizedIndex} className="euromiti-hero-copy-slide max-w-3xl">
           <div className="border-white/14 border-l pl-4 sm:pl-5">
             <p className="mb-3 text-[0.6rem] font-extrabold uppercase tracking-[0.2em] text-[#ffb4ab] sm:mb-4 sm:text-[0.68rem] sm:tracking-[0.22em]">
               Euromiti
