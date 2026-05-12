@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils"
 export function HomeRestaurantLuxurySkeleton() {
   return (
     <section
-      className="relative overflow-hidden bg-brand-shell-deep py-10 sm:py-14 md:py-16 lg:py-18 xl:py-20"
+      className="relative overflow-hidden bg-[#090909] py-14 sm:py-16 md:py-20 lg:py-24"
       aria-busy
       aria-label="Loading restaurant highlight"
     >
@@ -36,19 +36,20 @@ export function HomeRestaurantLuxurySkeleton() {
 export function HomeRestaurantLuxuryView(r: ReturnType<typeof restaurantLuxuryFromCMS>) {
   return (
     <section
-      className="relative overflow-hidden bg-brand-shell-deep py-10 sm:py-14 md:py-16 lg:py-18 xl:py-20"
+      className="relative overflow-hidden bg-[#090909] py-14 sm:py-16 md:py-20 lg:py-24"
       aria-labelledby="restaurant-luxury-heading"
     >
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_8%_14%,rgba(217,53,47,0.26),transparent_40%),radial-gradient(circle_at_92%_82%,rgba(255,180,171,0.16),transparent_42%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(255,180,171,0.1),transparent_34%),linear-gradient(135deg,#090909_0%,#111111_48%,#050505_100%)]"
         aria-hidden
       />
-      <div className="relative z-10 mx-auto max-w-[1440px] px-5 sm:px-6 lg:px-10 xl:px-14">
-        <div className="grid grid-cols-1 items-start gap-8 sm:gap-9 lg:grid-cols-12 lg:items-center lg:gap-10 xl:gap-12">
-          <div className="mx-auto max-w-2xl space-y-5 rounded-3xl bg-white/[0.03] p-5 ring-1 ring-white/8 sm:space-y-5 sm:p-6 lg:col-span-5 lg:mx-0 lg:max-w-none lg:bg-transparent lg:p-0 lg:ring-0 xl:space-y-6">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/18" aria-hidden />
+      <div className="relative z-10 mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-12">
+        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-12 xl:gap-16">
+          <div className="max-w-2xl space-y-6 lg:col-span-5">
             <h2
               id="restaurant-luxury-heading"
-              className="max-w-[14ch] text-balance font-playfair text-[clamp(1.7rem,7.2vw,2.35rem)] font-bold leading-[1.08] tracking-tight text-white sm:max-w-[18ch] sm:text-[clamp(1.85rem,4.4vw,2.35rem)] md:text-[clamp(2.05rem,3.7vw,2.75rem)] lg:max-w-none lg:text-[clamp(2.1rem,2.6vw,2.85rem)]"
+              className="font-(family-name:--font-montserrat) text-[clamp(2.05rem,8vw,3rem)] font-extrabold leading-[1.02] tracking-tighter text-white sm:text-[clamp(2.45rem,4.8vw,4.25rem)]"
             >
               {r.headlineParts.main}
               {r.headlineParts.accent ? (
@@ -58,7 +59,7 @@ export function HomeRestaurantLuxuryView(r: ReturnType<typeof restaurantLuxuryFr
                 </>
               ) : null}
             </h2>
-            <p className="max-w-xl text-[0.95rem] leading-[1.75] text-white/82 sm:text-base md:leading-relaxed">
+            <p className="max-w-xl text-[1rem] leading-8 text-white/72 md:text-[1.08rem]">
               {r.body}
             </p>
 
@@ -66,7 +67,7 @@ export function HomeRestaurantLuxuryView(r: ReturnType<typeof restaurantLuxuryFr
             <Link
               href={r.ctaHref}
               className={cn(
-                "group flex w-full max-w-none items-center justify-center gap-2.5 rounded-full bg-linear-to-r from-brand-red-vivid to-secondary px-6 py-3.5 text-sm font-bold tracking-[0.06em] text-white shadow-(--shadow-euromiti-secondary-sm) transition duration-300 hover:brightness-110 sm:inline-flex sm:w-auto sm:justify-start sm:px-7 md:py-3.5",
+                "group inline-flex w-full max-w-none items-center justify-center gap-2.5 rounded-full bg-white px-6 py-3.5 text-sm font-extrabold tracking-[0.04em] text-black shadow-[0_18px_45px_rgba(0,0,0,0.35)] transition duration-300 hover:bg-[#ffb4ab] sm:w-auto sm:justify-start sm:px-7",
                 EuromitiMotionClasses.buttonHover
               )}
             >
@@ -78,41 +79,42 @@ export function HomeRestaurantLuxuryView(r: ReturnType<typeof restaurantLuxuryFr
           <Reveal
             variant="fade-up"
             once
-            className="grid w-full grid-cols-2 gap-2.5 gap-y-3 sm:grid-cols-6 sm:gap-4 lg:col-span-7"
+            className="relative w-full lg:col-span-7"
           >
-            <div className="relative col-span-2 aspect-4/3 min-h-47 overflow-hidden rounded-xl sm:col-span-4 sm:row-span-2 sm:aspect-auto sm:min-h-65 sm:rounded-2xl md:min-h-74 lg:min-h-80 xl:min-h-88">
-              <ImageHoverZoom className="absolute inset-0 h-full w-full">
-                <Image
-                  src={r.mainImage}
-                  alt={r.mainImageAlt}
-                  fill
-                  sizes="(max-width: 639px) 100vw, (max-width: 1023px) 70vw, 45vw"
-                  className="object-cover"
-                />
-              </ImageHoverZoom>
-              <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/55 via-transparent to-transparent" />
+            <div className="absolute -inset-5 rounded-[1.75rem] bg-white/8 blur-3xl" aria-hidden />
+            <div className="relative overflow-hidden rounded-[1.25rem] border border-white/14 bg-white/8 p-2 shadow-[0_34px_90px_rgba(0,0,0,0.45)]">
+              <div className="relative min-h-88 overflow-hidden rounded-[0.9rem] sm:min-h-112 lg:min-h-128">
+                <ImageHoverZoom className="absolute inset-0 h-full w-full">
+                  <Image
+                    src={r.mainImage}
+                    alt={r.mainImageAlt}
+                    fill
+                    sizes="(max-width: 1023px) 100vw, 55vw"
+                    className="object-cover"
+                  />
+                </ImageHoverZoom>
+                <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/46 via-transparent to-transparent" />
+              </div>
             </div>
-            <div className="relative col-span-1 aspect-5/6 min-h-28 overflow-hidden rounded-xl sm:col-span-2 sm:aspect-auto sm:min-h-43 sm:rounded-2xl md:min-h-45">
-              <ImageHoverZoom className="absolute inset-0 h-full w-full">
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:absolute sm:-bottom-8 sm:right-6 sm:mt-0 sm:w-[42%] sm:min-w-72">
+              <div className="relative aspect-4/3 overflow-hidden rounded-[0.85rem] border border-white/18 bg-white/8 shadow-[0_18px_45px_rgba(0,0,0,0.28)]">
                 <Image
                   src={r.float1}
                   alt={r.float1Alt}
                   fill
-                  sizes="(max-width: 639px) 45vw, (max-width: 1023px) 32vw, 18vw"
+                  sizes="(max-width: 639px) 45vw, 18vw"
                   className="object-cover"
                 />
-              </ImageHoverZoom>
-            </div>
-            <div className="relative col-span-1 aspect-5/6 min-h-28 overflow-hidden rounded-xl sm:col-span-2 sm:aspect-auto sm:min-h-43 sm:rounded-2xl md:min-h-45">
-              <ImageHoverZoom className="absolute inset-0 h-full w-full">
+              </div>
+              <div className="relative aspect-4/3 overflow-hidden rounded-[0.85rem] border border-white/18 bg-white/8 shadow-[0_18px_45px_rgba(0,0,0,0.28)]">
                 <Image
                   src={r.float2}
                   alt={r.float2Alt}
                   fill
-                  sizes="(max-width: 639px) 45vw, (max-width: 1023px) 32vw, 18vw"
+                  sizes="(max-width: 639px) 45vw, 18vw"
                   className="object-cover"
                 />
-              </ImageHoverZoom>
+              </div>
             </div>
           </Reveal>
         </div>
