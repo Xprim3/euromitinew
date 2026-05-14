@@ -249,3 +249,49 @@ export async function deleteJobAction(_prev: JobDeleteState, formData: FormData)
     return { ok: false, message: e instanceof Error ? e.message : "Unexpected error" }
   }
 }
+
+export async function deleteJobApplicationAction(
+  _prev: JobDeleteState,
+  formData: FormData
+): Promise<JobDeleteState> {
+  try {
+    const supabase = await createSupabaseServerClient()
+    const {
+      data: { user },
+      error: authErr,
+    } = await supabase.auth.getUser()
+    if (authErr || !user) return { ok: false, message: "You must be signed in as an admin." }
+
+    const adminReady = await ensureAdminProfile(supabase, user)
+    if (!adminReady.ok) return { ok: false, message: adminReady.message }
+
+    const id = String(formData.get("id") ?? "").trim()
+    if (!id) return { ok: false, message: "Missing application id." }
+
+    const { data: row, error: fetchErr } = await supabase
+      .from("job_applications")
+      .select("cv_bucket, cv_object_path")
+      .eq("id", id)
+      .maybeSingle()
+
+    if (fetchErr) return { ok: false, message: fetchErr.message }
+    if (!row) return { ok: false, message: "Application not found." }
+
+    const bucket = typeof row.cv_bucket === "string" ? row.cv_bucket.trim() : ""
+    const objectPath = typeof row.cv_object_path === "string" ? row.cv_object_path.trim() : ""
+
+    const { error: delErr } = await supabase.from("job_applications").delete().eq("id", id)
+    if (delErr) return { ok: false, message: delErr.message }
+
+    if (bucket && objectPath) {
+      const { error: storageErr } = await supabase.storage.from(bucket).remove([objectPath])
+      if (storageErr) console.warn("[deleteJobApplicationAction] storage remove:", storageErr.message)
+    }
+
+    revalidatePath("/admin/careers/applications")
+    revalidatePath(`/admin/careers/applications/${id}`)
+    return { ok: true, message: "Application removed." }
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : "Unexpected error" }
+  }
+}

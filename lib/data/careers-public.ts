@@ -34,10 +34,10 @@ export function textArrayFromJson(raw: unknown): string[] {
 }
 
 export function applyLabel(job: JobRow) {
-  if (job.apply_channel === "email" && job.apply_email) return "Apply by email"
-  if (job.apply_channel === "phone" && job.apply_phone) return "Call to apply"
-  if (job.apply_channel === "url" && job.apply_url) return "Apply online"
-  return "How to apply"
+  if (job.apply_channel === "email" && job.apply_email) return "Apliko me email"
+  if (job.apply_channel === "phone" && job.apply_phone) return "Apliko me telefon"
+  if (job.apply_channel === "url" && job.apply_url) return "Apliko në platformë"
+  return "Udhëzime aplikimi"
 }
 
 export function applyHref(job: JobRow): string | null {

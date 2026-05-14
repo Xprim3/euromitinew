@@ -216,6 +216,22 @@ export type NewsPostRow = {
   updated_at: string
 }
 
+/** Row from `public.job_applications` (admin / SQL reads). */
+export type JobApplicationRow = {
+  id: string
+  job_id: string
+  full_name: string
+  email: string
+  phone: string
+  cover_letter: string
+  cv_bucket: string
+  cv_object_path: string
+  cv_original_filename: string | null
+  cv_mime_type: string
+  cv_byte_size: number
+  created_at: string
+}
+
 /** Row from `public.jobs`. */
 export type JobRow = {
   id: string
@@ -277,6 +293,12 @@ export type ContactInfoRow = {
   weekend_hours: string | null
   careers_email: string | null
   careers_apply_instructions: string | null
+  /** /contact HQ band — upper label */
+  hq_eyebrow: string
+  /** /contact HQ band — main title */
+  hq_heading: string
+  /** /contact HQ band — intro paragraph */
+  hq_description: string
   updated_at: string
   updated_by: string | null
 }

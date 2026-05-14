@@ -2,22 +2,11 @@ import type { Metadata } from "next"
 
 import { saveSiteContactAction } from "@/app/admin/(panel)/site/actions"
 import { SiteContactForm } from "@/components/admin/SiteContactForm"
-import { getContactInfoAdmin, getLogoPreviewUrlAdmin, getSiteSettingsAdmin } from "@/lib/data/site-contact-admin"
-import type { ContactInfoRow, SiteSettingsRow } from "@/types/supabase-cms"
+import { getContactInfoAdmin } from "@/lib/data/site-contact-admin"
+import type { ContactInfoRow } from "@/types/supabase-cms"
 
 export const metadata: Metadata = {
   title: "Site & contact",
-}
-
-const siteFallback: SiteSettingsRow = {
-  id: 1,
-  logo_media_id: null,
-  company_name: "Euromiti",
-  social_links: [],
-  footer_body: "",
-  footer_copyright_line: "Euromiti Kosovo",
-  updated_at: "",
-  updated_by: null,
 }
 
 const contactFallback: ContactInfoRow = {
@@ -31,19 +20,20 @@ const contactFallback: ContactInfoRow = {
   weekend_hours: null,
   careers_email: null,
   careers_apply_instructions: null,
+  hq_eyebrow: "",
+  hq_heading: "",
+  hq_description: "",
   updated_at: "",
   updated_by: null,
 }
 
 export default async function AdminSiteContactPage() {
-  const [siteRow, contactRow] = await Promise.all([getSiteSettingsAdmin(), getContactInfoAdmin()])
-  const site = siteRow ?? siteFallback
+  const contactRow = await getContactInfoAdmin()
   const contact = contactRow ?? contactFallback
-  const logoPreviewUrl = await getLogoPreviewUrlAdmin(site.logo_media_id)
 
   return (
     <div className="space-y-6">
-      <SiteContactForm site={site} contact={contact} logoPreviewUrl={logoPreviewUrl} submitAction={saveSiteContactAction} />
+      <SiteContactForm contact={contact} submitAction={saveSiteContactAction} />
     </div>
   )
 }

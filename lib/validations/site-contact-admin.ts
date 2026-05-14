@@ -6,8 +6,6 @@ const optionalUrl = z
   .max(2000)
   .refine((s) => s.length === 0 || /^https?:\/\//i.test(s), "Use a full URL starting with http:// or https://")
 
-const careersEmailSchema = z.union([z.literal(""), z.string().trim().email()])
-
 export const siteContactFormSchema = z.object({
   phone: z.string().trim().min(1, "Phone is required.").max(120),
   email: z.string().trim().min(1, "Email is required.").email(),
@@ -15,11 +13,9 @@ export const siteContactFormSchema = z.object({
   map_link: optionalUrl,
   weekday_hours: z.string().trim().max(500).optional(),
   weekend_hours: z.string().trim().max(500).optional(),
-  careers_email: careersEmailSchema,
-  careers_apply_instructions: z.string().trim().max(200).optional(),
-  company_name: z.string().trim().min(1).max(120),
-  footer_body: z.string().max(12000),
-  footer_copyright_line: z.string().trim().max(240),
+  hq_eyebrow: z.string().trim().max(200).optional(),
+  hq_heading: z.string().trim().max(500).optional(),
+  hq_description: z.string().trim().max(4000).optional(),
 })
 
 export type SiteContactFormParsed = z.infer<typeof siteContactFormSchema>

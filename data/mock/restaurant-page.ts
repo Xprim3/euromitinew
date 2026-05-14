@@ -156,8 +156,8 @@ export type RestaurantExperiencePillarsMock = typeof restaurantExperiencePillars
 /** Section 5 — dark-band atmospheric mosaic (hero + stack + wide strip). Slots: [hero, stackTop, stackBottom, bottomLead, bottomWide]. */
 export const restaurantAtmosphereGalleryMock = {
   headingId: "restaurant-atmosphere-heading",
-  title: "Atmosphere",
-  label: "Vignettes",
+  title: "Atmosfera",
+  label: "Momente",
   slots: [
     {
       src: "https://lh3.googleusercontent.com/aida-public/AB6AXuCR1xtchlPTysXXn1qvIjEsuoAaAlWULNR3KcJPsnq6sOlg2bd50Uy1_pQjHr9ANkfYpg249jal3oR0TjTCF6Ag7TlmhfwuRJW_yeYlhKnx6tnb1VZFoyP9rwQ_mJFXAbVH-kMZbaH1ApA5-TzqmIY6k_b_j2J7ydgn_qifKxeEIOor6j9q_oYLcaDnc5oGs4Rkgvc1CqlPbAD8RXBaIbjh1CCQVtXz6k80FvzJ1M-Ww3Z8pm0MvWeIGW73M-WirsyL1VRCs759dC0N",

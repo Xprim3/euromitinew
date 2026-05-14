@@ -20,6 +20,7 @@ function navLinkTone(href: string, pathname: string) {
   if (href === "/locations") return pathname.startsWith("/locations") ? accent : muted
   if (href === "/restaurant") return pathname.startsWith("/restaurant") ? accent : muted
   if (href === "/news") return pathname.startsWith("/news") ? accent : muted
+  if (href === "/careers") return pathname.startsWith("/careers") ? accent : muted
   if (href === "/contact") return pathname.startsWith("/contact") ? accent : muted
   return muted
 }

@@ -4,27 +4,23 @@ import { Container } from "@/components/layout/Container"
 import { PageImageHero } from "@/components/layout/PageImageHero"
 import { SectionReveal } from "@/components/motion/SectionReveal"
 import { SectionAccentRule } from "@/components/ui/SectionAccentRule"
-import { Button } from "@/components/ui/button"
 import { MaterialSymbol } from "@/components/ui/MaterialSymbol"
 import { contactPageMock } from "@/data/mock/contact"
 import { homeHeroDesign } from "@/data/mock/homepage-visual"
 import { getLocationsPublicCached } from "@/lib/data/locations-public"
+import { resolveRestaurantReservationStations } from "@/lib/data/restaurant-reservation-stations-public"
 import { getContactDetailsPublic, type SocialLinkItem } from "@/lib/data/site-contact-public"
-import { cn } from "@/lib/utils"
+import { telHrefFromDisplayPhone } from "@/lib/utils"
 
 export const metadata: Metadata = {
-  title: "Contact",
+  title: "Kontakt",
   description:
-    "Euromiti headquarters in Prishtina — phone, email, hours, forecourt locations across Kosovo, and careers.",
+    "Selia e Euromitit në Prishtinë — telefon, email dhe orari. Na kontaktoni për çdo pyetje.",
 }
 
 export const dynamic = "force-dynamic"
 
 export const revalidate = 120
-
-function telHref(phone: string) {
-  return `tel:${phone.replace(/\s/g, "")}`
-}
 
 function socialLinkClass() {
   return "text-sm font-semibold text-foreground underline-offset-4 hover:text-brand-red-vivid hover:underline"
@@ -34,7 +30,7 @@ function SocialRow({ links }: { links: readonly SocialLinkItem[] }) {
   if (!links.length) return null
   return (
     <div className="mt-8 flex flex-wrap gap-x-5 gap-y-2 border-border/60 border-t pt-8">
-      <p className="w-full text-[0.6rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">Connect</p>
+      <p className="w-full text-[0.6rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">Rrjetet sociale</p>
       {links.map((s) => (
         <a key={`${s.platform}-${s.url}`} href={s.url} className={socialLinkClass()} target="_blank" rel="noopener noreferrer">
           {s.platform}
@@ -46,20 +42,17 @@ function SocialRow({ links }: { links: readonly SocialLinkItem[] }) {
 
 export default async function ContactPage() {
   const [c, locationsResult] = await Promise.all([getContactDetailsPublic(), getLocationsPublicCached()])
-  const locations = locationsResult.ok ? locationsResult.rows : []
+  const stationPhones = resolveRestaurantReservationStations(locationsResult.ok ? locationsResult.rows : [])
   const m = contactPageMock
   const mailHref = `mailto:${c.email}`
-  const careersEmail = c.careersEmail.trim()
-  const careersMailHref = `mailto:${careersEmail}?subject=Career%20enquiry%20%E2%80%94%20Euromiti`
-  const careersCtaLabel = c.careersApplyCtaLabel.trim()
 
   return (
     <>
       <PageImageHero
         imageSrc={homeHeroDesign.imageSrc}
-        imageAlt="Euromiti — hospitality and operations"
-        trail={[{ label: "Home", href: "/" }, { label: "Contact" }]}
-        title="Contact"
+        imageAlt="Euromiti — mikpritje dhe operacione"
+        trail={[{ label: "Ballina", href: "/" }, { label: "Kontakt" }]}
+        title="Kontakt"
         visualPreset="flat-heavy"
         priority
       />
@@ -107,12 +100,12 @@ export default async function ContactPage() {
               </div>
 
               <div className="order-1 lg:order-2">
-                <p className="text-[0.65rem] font-black uppercase tracking-[0.34em] text-brand-red-vivid">{m.hqEyebrow}</p>
+                <p className="text-[0.65rem] font-black uppercase tracking-[0.34em] text-brand-red-vivid">{c.hqEyebrow}</p>
                 <h2 className="mt-3 font-heading text-[clamp(1.75rem,3.8vw,2.5rem)] font-bold tracking-tight text-foreground lg:mt-4">
-                  {m.hqHeading}
+                  {c.hqHeading}
                 </h2>
                 <p className="mt-4 max-w-md text-[0.95rem] leading-relaxed text-muted-foreground md:text-base md:leading-relaxed">
-                  {m.hqDescription}
+                  {c.hqDescription}
                 </p>
                 <SectionAccentRule className="mt-8 max-w-24" />
 
@@ -120,7 +113,7 @@ export default async function ContactPage() {
                   <div className="flex gap-3">
                     <MaterialSymbol name="location_on" className="mt-0.5 shrink-0 text-xl! text-muted-foreground" aria-hidden />
                     <div>
-                      <dt className="text-[0.6rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">Address</dt>
+                      <dt className="text-[0.6rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">Adresa</dt>
                       <dd className="mt-1 max-w-sm text-muted-foreground text-[0.8125rem] leading-snug">
                         {c.mapLink.trim() ? (
                           <a
@@ -139,12 +132,33 @@ export default async function ContactPage() {
                   </div>
                   <div className="flex gap-3">
                     <MaterialSymbol name="call" className="mt-0.5 shrink-0 text-xl! text-muted-foreground" aria-hidden />
-                    <div>
-                      <dt className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">Phone</dt>
-                      <dd className="mt-1">
-                        <a className="font-semibold text-foreground text-lg hover:text-brand-red-vivid" href={telHref(c.phone)}>
-                          {c.phone}
-                        </a>
+                    <div className="min-w-0">
+                      <dt className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">Telefoni</dt>
+                      <dd className="mt-2 space-y-4">
+                        {stationPhones.map((station) => {
+                          const href = telHrefFromDisplayPhone(station.phone)
+                          return (
+                            <div key={station.slug}>
+                              <p className="text-[0.58rem] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+                                {station.city}
+                              </p>
+                              <div className="mt-1">
+                                {href ? (
+                                  <a
+                                    href={href}
+                                    className="inline-block font-medium text-[0.9375rem] text-muted-foreground transition-colors hover:text-brand-red-vivid"
+                                  >
+                                    {station.phone}
+                                  </a>
+                                ) : (
+                                  <span className="text-[0.9375rem] font-medium text-muted-foreground">
+                                    {station.phone}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          )
+                        })}
                       </dd>
                     </div>
                   </div>
@@ -162,14 +176,14 @@ export default async function ContactPage() {
                   <div className="flex gap-3">
                     <MaterialSymbol name="schedule" className="mt-0.5 shrink-0 text-xl! text-muted-foreground" aria-hidden />
                     <div>
-                      <dt className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">Weekdays</dt>
+                      <dt className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">Java e punës</dt>
                       <dd className="mt-1 text-foreground">{c.weekdayHours}</dd>
                     </div>
                   </div>
                   <div className="flex gap-3">
                     <MaterialSymbol name="today" className="mt-0.5 shrink-0 text-xl! text-muted-foreground" aria-hidden />
                     <div>
-                      <dt className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">Weekend</dt>
+                      <dt className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">Fundjava</dt>
                       <dd className="mt-1 text-foreground">{c.weekendHours}</dd>
                     </div>
                   </div>
@@ -180,138 +194,6 @@ export default async function ContactPage() {
             </div>
           </SectionReveal>
         </Container>
-      </section>
-
-      {/* 2 · Locations band */}
-      <section className="border-border/60 border-y bg-brand-surface-tinted py-16 md:py-20 lg:py-24">
-        <Container>
-          <SectionReveal once variant="fade-up">
-            <div className="grid gap-6 md:grid-cols-3 lg:gap-8">
-              {locations.map((loc) => {
-                const guestMailHref =
-                  loc.contactEmailDisplay && loc.contactEmailDisplay !== "—" ? `mailto:${loc.contactEmailDisplay}` : null
-                const routeHint = loc.pageHeading && loc.pageHeading !== `${loc.city} station` ? loc.pageHeading : null
-                return (
-                  <article
-                    key={loc.id}
-                    className="flex flex-col overflow-hidden rounded-xl border border-border/80 bg-background shadow-sm transition-[box-shadow,transform] hover:shadow-xl"
-                  >
-                    <div className="relative aspect-4/3 h-52 w-full shrink-0 md:aspect-auto md:h-52">
-                      <Image
-                        src={loc.mainImageSrc}
-                        alt={loc.mainImageAlt}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                        className="object-cover"
-                      />
-                    </div>
-                    <div className="flex flex-1 flex-col px-6 pt-6 pb-5">
-                      <div className="flex flex-wrap items-start justify-between gap-3">
-                        <div>
-                          <h3 className="font-heading text-xl font-bold text-foreground">{loc.city}</h3>
-                          {loc.pageSummary ? (
-                            <p className="mt-1 text-sm leading-snug font-medium text-brand-body-soft">{loc.pageSummary}</p>
-                          ) : null}
-                        </div>
-                      </div>
-
-                      {routeHint ? (
-                        <p className="mt-4 text-[0.8rem] leading-relaxed text-muted-foreground italic md:text-sm">
-                          {routeHint}
-                        </p>
-                      ) : null}
-
-                      <dl className="mt-5 space-y-4 text-sm">
-                        <div className="flex gap-3">
-                          <MaterialSymbol name="location_on" className="mt-0.5 shrink-0 text-xl! text-muted-foreground" aria-hidden />
-                          <div>
-                            <dt className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-muted-foreground">Address</dt>
-                            <dd className="mt-1 leading-snug text-foreground">{loc.address}</dd>
-                          </div>
-                        </div>
-                        <div className="flex gap-3">
-                          <MaterialSymbol name="call" className="mt-0.5 shrink-0 text-xl! text-muted-foreground" aria-hidden />
-                          <div>
-                            <dt className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-muted-foreground">Phone</dt>
-                            <dd className="mt-1">
-                              <a className="font-semibold text-foreground hover:text-brand-red-vivid" href={telHref(loc.phone)}>
-                                {loc.phone}
-                              </a>
-                            </dd>
-                          </div>
-                        </div>
-                        <div className="flex gap-3">
-                          <MaterialSymbol name="schedule" className="mt-0.5 shrink-0 text-xl! text-muted-foreground" aria-hidden />
-                          <div>
-                            <dt className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-muted-foreground">Opening hours</dt>
-                            <dd className="mt-1 leading-snug text-foreground">{loc.openingHours}</dd>
-                          </div>
-                        </div>
-                        {guestMailHref ? (
-                          <div className="flex gap-3">
-                            <MaterialSymbol name="restaurant_menu" className="mt-0.5 shrink-0 text-xl! text-muted-foreground" aria-hidden />
-                            <div>
-                              <dt className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-muted-foreground">
-                                Guest / restaurant enquiries
-                              </dt>
-                              <dd className="mt-1">
-                                <a className="break-all font-medium text-foreground hover:text-brand-red-vivid" href={guestMailHref}>
-                                  {loc.contactEmailDisplay}
-                                </a>
-                              </dd>
-                            </div>
-                          </div>
-                        ) : null}
-                      </dl>
-                    </div>
-                  </article>
-                )
-              })}
-            </div>
-          </SectionReveal>
-        </Container>
-      </section>
-
-      {/* 3 · Careers / partnerships */}
-      <section className="relative flex min-h-[min(100svh,36rem)] items-center justify-center overflow-hidden md:min-h-112 lg:min-h-128">
-        <Image
-          src={m.careersImage}
-          alt={m.careersImageAlt}
-          fill
-          priority={false}
-          sizes="100vw"
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-brand-shell-deep/72 backdrop-blur-[2px]" aria-hidden />
-        <div className="relative z-10 mx-auto w-full max-w-3xl px-4 py-14 text-center sm:px-6">
-          <SectionReveal once variant="fade-up">
-            <h2 className="font-heading text-[clamp(1.75rem,4.5vw,3rem)] font-bold tracking-tight text-white">{m.careersTitle}</h2>
-            <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-white/90 md:text-[1.125rem]">{m.careersSupporting}</p>
-            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">
-              <Button
-                variant="default"
-                size="lg"
-                className="min-h-14 rounded-full px-8 text-lg shadow-xl transition hover:brightness-105 sm:min-w-50 sm:px-10"
-                render={<a href={telHref(c.phone)} />}
-              >
-                <MaterialSymbol name="call" className="text-xl!" />
-                {c.phone}
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className={cn(
-                  "min-h-14 rounded-full border-white/35 bg-transparent px-8 text-lg text-white sm:min-w-50 sm:px-10",
-                  "shadow-xl hover:bg-white/12 hover:text-white"
-                )}
-                render={<a href={careersMailHref} />}
-              >
-                <MaterialSymbol name="mail" className="text-xl!" />
-                {careersCtaLabel}
-              </Button>
-            </div>
-          </SectionReveal>
-        </div>
       </section>
     </>
   )

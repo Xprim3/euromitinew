@@ -1,18 +1,7 @@
 import type { Metadata } from "next"
 import type { ReactNode } from "react"
-import {
-  Activity,
-  Briefcase,
-  Flame,
-  Fuel,
-  Home,
-  ImageIcon,
-  Info,
-  MapPin,
-  Newspaper,
-  Settings,
-  UtensilsCrossed,
-} from "lucide-react"
+import Link from "next/link"
+import { Briefcase, Fuel, ImageIcon, Inbox, MapPin, Newspaper } from "lucide-react"
 
 import {
   AdminContentGrid,
@@ -25,7 +14,8 @@ import {
   AdminTableTh,
   DashboardMetricCard,
   QuickActionCard,
-  StatusBadge,
+  cnDs,
+  dsBtnGhost,
 } from "@/components/admin/design-system"
 import { formatAdminStamp } from "@/lib/format-admin-datetime"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
@@ -41,24 +31,32 @@ type DashboardMetric = {
   icon: ReactNode
 }
 
-type RecentContentRow = {
+type RecentApplicationRow = {
   id: string
-  area: string
-  title: string
-  status: "published" | "draft" | "active" | "inactive" | "updated"
-  updatedAt: string
+  full_name: string
+  email: string
+  job_title: string
+  created_at: string
 }
 
 type DashboardData = {
   metrics: DashboardMetric[]
-  recent: RecentContentRow[]
+  recentApplications: RecentApplicationRow[]
 }
 
 async function loadDashboardData(): Promise<DashboardData> {
   try {
     const supabase = await createSupabaseServerClient()
 
-    const [publishedNews, activeLocations, activeFuel, mediaAssets, activeJobs] = await Promise.all([
+    const [
+      applicationsRes,
+      publishedNews,
+      activeLocations,
+      activeFuel,
+      mediaAssets,
+      activeJobs,
+    ] = await Promise.all([
+      supabase.from("job_applications").select("*", { count: "exact", head: true }),
       supabase.from("news_posts").select("*", { count: "exact", head: true }).eq("status", "published"),
       supabase.from("locations").select("*", { count: "exact", head: true }).eq("is_active", true),
       supabase.from("fuel_prices").select("*", { count: "exact", head: true }).eq("is_active", true),
@@ -66,99 +64,118 @@ async function loadDashboardData(): Promise<DashboardData> {
       supabase.from("jobs").select("*", { count: "exact", head: true }).eq("is_active", true),
     ])
 
-    const { data: newsRows } = await supabase
-      .from("news_posts")
-      .select("id, title, status, updated_at")
-      .order("updated_at", { ascending: false })
-      .limit(4)
+    const { data: appRows, error: appErr } = await supabase
+      .from("job_applications")
+      .select("id, job_id, full_name, email, created_at")
+      .order("created_at", { ascending: false })
+      .limit(8)
 
-    const { data: locationRows } = await supabase
-      .from("locations")
-      .select("id, city, is_active, updated_at")
-      .order("updated_at", { ascending: false })
-      .limit(3)
+    let recentApplications: RecentApplicationRow[] = []
+    if (!appErr && appRows?.length) {
+      const jobIds = [...new Set(appRows.map((r) => r.job_id).filter(Boolean))]
+      const titleByJob = new Map<string, string>()
+      if (jobIds.length) {
+        const { data: jobs } = await supabase.from("jobs").select("id, title").in("id", jobIds)
+        for (const j of jobs ?? []) {
+          const o = j as { id?: string; title?: string }
+          const id = String(o.id ?? "")
+          if (id) titleByJob.set(id, typeof o.title === "string" ? o.title.trim() || "—" : "—")
+        }
+      }
+      recentApplications = appRows.map((r) => ({
+        id: String(r.id ?? ""),
+        full_name: typeof r.full_name === "string" ? r.full_name : "—",
+        email: typeof r.email === "string" ? r.email : "—",
+        job_title: titleByJob.get(String(r.job_id ?? "")) ?? "—",
+        created_at: typeof r.created_at === "string" ? r.created_at : "",
+      }))
+    }
 
-    const recent: RecentContentRow[] = [
-      ...(newsRows ?? []).map((row: { id: string; title: string; status: string; updated_at: string }) => ({
-        id: `news-${row.id}`,
-        area: "News",
-        title: row.title,
-        status: row.status === "published" ? ("published" as const) : ("draft" as const),
-        updatedAt: row.updated_at,
-      })),
-      ...(locationRows ?? []).map((row: { id: string; city: string; is_active: boolean; updated_at: string }) => ({
-        id: `location-${row.id}`,
-        area: "Locations",
-        title: row.city,
-        status: row.is_active ? ("active" as const) : ("inactive" as const),
-        updatedAt: row.updated_at,
-      })),
-    ]
-      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
-      .slice(0, 6)
+    const appCount = applicationsRes.count ?? 0
 
     return {
       metrics: [
         {
-          label: "Published News",
+          label: "Job applications",
+          value: String(appCount),
+          hint: "Total submissions from the public careers form.",
+          icon: <Inbox className="size-5" aria-hidden />,
+        },
+        {
+          label: "Active job posts",
+          value: String(activeJobs.count ?? 0),
+          hint: "Open listings on the public careers page.",
+          icon: <Briefcase className="size-5" aria-hidden />,
+        },
+        {
+          label: "Published news",
           value: String(publishedNews.count ?? 0),
-          hint: "Visible on the public News page.",
+          hint: "Posts visible on the public News page.",
           icon: <Newspaper className="size-5" aria-hidden />,
         },
         {
-          label: "Active Locations",
+          label: "Active locations",
           value: String(activeLocations.count ?? 0),
-          hint: "Public forecourt records.",
+          hint: "Stations shown on Locations and related blocks.",
           icon: <MapPin className="size-5" aria-hidden />,
         },
         {
-          label: "Active Fuel SKUs",
+          label: "Active fuel SKUs",
           value: String(activeFuel.count ?? 0),
-          hint: "Shown in fuel price widgets.",
+          hint: "Prices used in fuel widgets sitewide.",
           icon: <Fuel className="size-5" aria-hidden />,
         },
         {
-          label: "Media Assets",
+          label: "Media library",
           value: String(mediaAssets.count ?? 0),
-          hint: "Images available in the media library.",
+          hint: "Uploads available for pages and galleries.",
           icon: <ImageIcon className="size-5" aria-hidden />,
         },
-        {
-          label: "Active Jobs",
-          value: String(activeJobs.count ?? 0),
-          hint: "Open positions in Careers admin.",
-          icon: <Briefcase className="size-5" aria-hidden />,
-        },
       ],
-      recent,
+      recentApplications,
     }
   } catch {
     return {
       metrics: [
-        { label: "Published News", value: "—", hint: "Connect Supabase to load counts.", icon: <Newspaper className="size-5" aria-hidden /> },
-        { label: "Active Locations", value: "—", hint: "Connect Supabase to load counts.", icon: <MapPin className="size-5" aria-hidden /> },
-        { label: "Active Fuel SKUs", value: "—", hint: "Connect Supabase to load counts.", icon: <Fuel className="size-5" aria-hidden /> },
-        { label: "Media Assets", value: "—", hint: "Connect Supabase to load counts.", icon: <ImageIcon className="size-5" aria-hidden /> },
-        { label: "Active Jobs", value: "—", hint: "Connect Supabase to load counts.", icon: <Briefcase className="size-5" aria-hidden /> },
+        { label: "Job applications", value: "—", hint: "Connect Supabase to load counts.", icon: <Inbox className="size-5" aria-hidden /> },
+        { label: "Active job posts", value: "—", hint: "Connect Supabase to load counts.", icon: <Briefcase className="size-5" aria-hidden /> },
+        { label: "Published news", value: "—", hint: "Connect Supabase to load counts.", icon: <Newspaper className="size-5" aria-hidden /> },
+        { label: "Active locations", value: "—", hint: "Connect Supabase to load counts.", icon: <MapPin className="size-5" aria-hidden /> },
+        { label: "Active fuel SKUs", value: "—", hint: "Connect Supabase to load counts.", icon: <Fuel className="size-5" aria-hidden /> },
+        { label: "Media library", value: "—", hint: "Connect Supabase to load counts.", icon: <ImageIcon className="size-5" aria-hidden /> },
       ],
-      recent: [],
+      recentApplications: [],
     }
   }
 }
 
-function statusTone(status: RecentContentRow["status"]): "success" | "warning" | "neutral" | "info" {
-  if (status === "published" || status === "active") return "success"
-  if (status === "draft") return "warning"
-  if (status === "updated") return "info"
-  return "neutral"
-}
-
 export default async function AdminDashboardPage() {
   const data = await loadDashboardData()
+  const appTotal = Number.parseInt(data.metrics[0]?.value ?? "0", 10)
+  const hasNewApplications = Number.isFinite(appTotal) && appTotal > 0
 
   return (
-    <div className="space-y-6">
-      <AdminContentGrid columns={4}>
+    <div className="min-w-0 space-y-6">
+      <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="font-[family-name:var(--font-montserrat)] text-xl font-bold tracking-tight text-[var(--admin-text)] sm:text-2xl">
+            Overview
+          </h1>
+          <p className="mt-1 max-w-2xl text-sm text-[var(--admin-text-muted)]">
+            Live counts from Supabase. Review new job applications below when candidates apply.
+          </p>
+        </div>
+        {hasNewApplications ? (
+          <Link
+            href="/admin/careers/applications"
+            className={cnDs(dsBtnGhost, "shrink-0 self-start text-xs sm:self-auto")}
+          >
+            All applications
+          </Link>
+        ) : null}
+      </div>
+
+      <AdminContentGrid columns={3}>
         {data.metrics.map((metric) => (
           <DashboardMetricCard
             key={metric.label}
@@ -166,106 +183,96 @@ export default async function AdminDashboardPage() {
             value={metric.value}
             hint={metric.hint}
             icon={metric.icon}
+            className={metric.label === "Job applications" && hasNewApplications ? "ring-2 ring-[var(--admin-accent-active)]/25" : undefined}
           />
         ))}
       </AdminContentGrid>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_24rem]">
-        <AdminSectionCard
-          title="Recent content changes"
-          description="Latest updated records from the editable content tables."
-          headerActions={<StatusBadge tone="info">Live CMS</StatusBadge>}
-        >
-          <AdminTable>
+      <AdminSectionCard
+        title="Recent job applications"
+        description="Latest candidates from the public careers form. Opens the full record in admin."
+        headerActions={
+          <Link href="/admin/careers/applications" className={cnDs(dsBtnGhost, "min-h-9 px-3 text-xs")}>
+            Open inbox
+          </Link>
+        }
+      >
+        <AdminTable>
             <AdminTableHead>
               <AdminTableRow>
-                <AdminTableTh>Area</AdminTableTh>
-                <AdminTableTh>Content</AdminTableTh>
-                <AdminTableTh>Status</AdminTableTh>
-                <AdminTableTh>Updated</AdminTableTh>
+                <AdminTableTh>Submitted</AdminTableTh>
+                <AdminTableTh>Applicant</AdminTableTh>
+                <AdminTableTh>Email</AdminTableTh>
+                <AdminTableTh>Role</AdminTableTh>
+                <AdminTableTh className="text-right"> </AdminTableTh>
               </AdminTableRow>
             </AdminTableHead>
             <AdminTableBody>
-              {data.recent.length === 0 ? (
+              {data.recentApplications.length === 0 ? (
                 <AdminTableRow>
-                  <AdminTableTd colSpan={4} className="py-10 text-center text-[var(--admin-text-muted)]">
-                    No recent records found yet.
+                  <AdminTableTd colSpan={5} className="py-10 text-center text-[var(--admin-text-muted)]">
+                    No applications yet. When someone applies from{" "}
+                    <Link className="text-primary underline" href="/careers">
+                      Careers
+                    </Link>
+                    , they will appear here.
                   </AdminTableTd>
                 </AdminTableRow>
               ) : (
-                data.recent.map((row) => (
+                data.recentApplications.map((row) => (
                   <AdminTableRow key={row.id}>
-                    <AdminTableTd className="font-medium">{row.area}</AdminTableTd>
-                    <AdminTableTd>{row.title}</AdminTableTd>
-                    <AdminTableTd>
-                      <StatusBadge tone={statusTone(row.status)}>{row.status}</StatusBadge>
+                    <AdminTableTd className="whitespace-nowrap text-sm">
+                      {row.created_at ? formatAdminStamp(row.created_at) : "—"}
                     </AdminTableTd>
-                    <AdminTableTd className="whitespace-nowrap">
-                      {row.updatedAt ? formatAdminStamp(row.updatedAt) : "—"}
+                    <AdminTableTd className="font-medium">{row.full_name}</AdminTableTd>
+                    <AdminTableTd>
+                      <a className="text-primary hover:underline" href={`mailto:${row.email}`}>
+                        {row.email}
+                      </a>
+                    </AdminTableTd>
+                    <AdminTableTd className="max-w-[12rem] truncate text-sm">{row.job_title}</AdminTableTd>
+                    <AdminTableTd className="text-right">
+                      <Link
+                        href={`/admin/careers/applications/${row.id}`}
+                        className={cnDs(dsBtnGhost, "inline-flex min-h-9 px-3 text-xs")}
+                      >
+                        Open
+                      </Link>
                     </AdminTableTd>
                   </AdminTableRow>
                 ))
               )}
             </AdminTableBody>
           </AdminTable>
-        </AdminSectionCard>
+      </AdminSectionCard>
 
-        <AdminSectionCard title="Quick actions" description="Jump into the most common admin tasks.">
-          <div className="space-y-3">
-            <QuickActionCard
-              href="/admin/homepage"
-              title="Edit homepage"
-              description="Hero, sections, and homepage media."
-              icon={<Home className="size-5" aria-hidden />}
-            />
-            <QuickActionCard
-              href="/admin/about"
-              title="Edit About page"
-              description="Hero, story, mission, values, and images."
-              icon={<Info className="size-5" aria-hidden />}
-            />
-            <QuickActionCard
-              href="/admin/fuel-prices"
-              title="Manage fuel prices"
-              description="Diesel, petrol, and LPG pricing."
-              icon={<Flame className="size-5" aria-hidden />}
-            />
-            <QuickActionCard
-              href="/admin/locations"
-              title="Stations & addresses"
-              description="Locations, services, maps, and galleries."
-              icon={<MapPin className="size-5" aria-hidden />}
-            />
-            <QuickActionCard
-              href="/admin/news"
-              title="Edit news archive"
-              description="Publish, draft, and manage posts."
-              icon={<Newspaper className="size-5" aria-hidden />}
-            />
-            <QuickActionCard
-              href="/admin/restaurant"
-              title="Restaurant content"
-              description="Hero, menu cards, gallery, and contact."
-              icon={<UtensilsCrossed className="size-5" aria-hidden />}
-            />
-            <QuickActionCard
-              href="/admin/settings"
-              title="Account settings"
-              description="Profile, password, and logout."
-              icon={<Settings className="size-5" aria-hidden />}
-            />
-          </div>
-        </AdminSectionCard>
-      </div>
-
-      <AdminSectionCard
-        title="Admin status"
-        description="The dashboard now uses the shared admin design-system components and live CMS counts where Supabase is available."
-        headerActions={<Activity className="size-5 text-[var(--admin-text-muted)]" aria-hidden />}
-      >
-        <p className="text-sm leading-6 text-[var(--admin-text-muted)]">
-          Use the sidebar or quick actions to manage content. Public pages revalidate from their individual admin save actions.
-        </p>
+      <AdminSectionCard title="Shortcuts" description="Common admin destinations.">
+        <AdminContentGrid columns={2}>
+          <QuickActionCard
+            href="/admin/careers/applications"
+            title="Job applications"
+            description="Inbox, CVs, and applicant details."
+            icon={<Inbox className="size-5" aria-hidden />}
+          />
+          <QuickActionCard
+            href="/admin/careers"
+            title="Careers & jobs"
+            description="Edit listings and apply channels."
+            icon={<Briefcase className="size-5" aria-hidden />}
+          />
+          <QuickActionCard
+            href="/admin/news"
+            title="News"
+            description="Publish and manage posts."
+            icon={<Newspaper className="size-5" aria-hidden />}
+          />
+          <QuickActionCard
+            href="/admin/media"
+            title="Media library"
+            description="Uploads and reusable images."
+            icon={<ImageIcon className="size-5" aria-hidden />}
+          />
+        </AdminContentGrid>
       </AdminSectionCard>
     </div>
   )

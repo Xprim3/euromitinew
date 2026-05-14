@@ -8,14 +8,13 @@ import {
   AdminContentGrid,
   AdminSectionCard,
   ErrorMessage,
-  FileUploadInput,
   SaveBar,
   SuccessMessage,
   TextareaInput,
   TextInput,
 } from "@/components/admin/design-system"
 import { parseSocialLinks, type SocialLinkItem } from "@/lib/data/site-contact-public"
-import type { ContactInfoRow, SiteSettingsRow } from "@/types/supabase-cms"
+import type { ContactInfoRow } from "@/types/supabase-cms"
 
 const initialState: SiteContactSaveState = { ok: null }
 
@@ -28,13 +27,11 @@ function padSocial(links: SocialLinkItem[]): SocialLinkItem[] {
 }
 
 type SiteContactFormProps = {
-  site: SiteSettingsRow
   contact: ContactInfoRow
-  logoPreviewUrl: string | null
   submitAction: (prev: SiteContactSaveState, formData: FormData) => Promise<SiteContactSaveState>
 }
 
-export function SiteContactForm({ site, contact, logoPreviewUrl, submitAction }: SiteContactFormProps) {
+export function SiteContactForm({ contact, submitAction }: SiteContactFormProps) {
   const router = useRouter()
   const formRef = useRef<HTMLFormElement>(null)
   const [state, formAction] = useActionState(submitAction, initialState)
@@ -46,14 +43,12 @@ export function SiteContactForm({ site, contact, logoPreviewUrl, submitAction }:
     if (state.ok === true) router.refresh()
   }, [router, state.ok])
 
-  const socialRows = padSocial(parseSocialLinks(site.social_links))
+  const socialRows = padSocial(parseSocialLinks(contact.social_links))
 
   return (
     <form ref={formRef} action={formAction} className="space-y-6 pb-24">
       {state.ok === true ? (
-        <SuccessMessage title="Contact and footer saved">
-          {state.message}
-        </SuccessMessage>
+        <SuccessMessage title="Saved">{state.message}</SuccessMessage>
       ) : null}
       {state.ok === false && "message" in state ? (
         <ErrorMessage title="Could not save contact info">
@@ -68,6 +63,34 @@ export function SiteContactForm({ site, contact, logoPreviewUrl, submitAction }:
 
       <AdminSectionCard title="Contact Info" description="Company contact details used by the public contact page.">
         <div className="space-y-5">
+          <div className="rounded-lg border border-border/60 bg-muted/20 p-4">
+            <p className="mb-3 text-muted-foreground text-xs">
+              Headquarters intro (top of /contact — eyebrow, title, paragraph). Leave blank to use site defaults.
+            </p>
+            <div className="space-y-4">
+              <TextInput
+                label="HQ eyebrow"
+                name="hq_eyebrow"
+                defaultValue={contact.hq_eyebrow}
+                placeholder="Euromiti · Prishtina"
+                error={fieldErrors?.hq_eyebrow?.[0]}
+              />
+              <TextInput
+                label="HQ heading"
+                name="hq_heading"
+                defaultValue={contact.hq_heading}
+                placeholder="Selia qendrore"
+                error={fieldErrors?.hq_heading?.[0]}
+              />
+              <TextareaInput
+                label="HQ intro paragraph"
+                name="hq_description"
+                rows={5}
+                defaultValue={contact.hq_description}
+                error={fieldErrors?.hq_description?.[0]}
+              />
+            </div>
+          </div>
           <AdminContentGrid columns={2}>
             <TextInput
               label="Company phone"
@@ -105,61 +128,13 @@ export function SiteContactForm({ site, contact, logoPreviewUrl, submitAction }:
             <TextInput label="Weekday hours" name="weekday_hours" defaultValue={contact.weekday_hours ?? ""} />
             <TextInput label="Weekend hours" name="weekend_hours" defaultValue={contact.weekend_hours ?? ""} />
           </AdminContentGrid>
-          <AdminContentGrid columns={2}>
-            <TextInput
-              label="Careers email"
-              name="careers_email"
-              type="email"
-              defaultValue={contact.careers_email ?? ""}
-              error={fieldErrors?.careers_email?.[0]}
-            />
-            <TextInput
-              label="Careers CTA button label"
-              name="careers_apply_instructions"
-              defaultValue={contact.careers_apply_instructions ?? ""}
-              placeholder="Apply by Email"
-            />
-          </AdminContentGrid>
         </div>
       </AdminSectionCard>
 
-      <AdminSectionCard title="Footer & Brand" description="Global footer text, copyright line, and logo image.">
-        <div className="space-y-5">
-          <TextInput
-            label="Company name"
-            name="company_name"
-            required
-            defaultValue={site.company_name}
-            error={fieldErrors?.company_name?.[0]}
-          />
-          <TextareaInput
-            label="Footer text"
-            name="footer_body"
-            rows={5}
-            defaultValue={site.footer_body}
-            maxLength={12000}
-            showCharacterCount
-            error={fieldErrors?.footer_body?.[0]}
-          />
-          <TextInput
-            label="Copyright line"
-            name="footer_copyright_line"
-            defaultValue={site.footer_copyright_line ?? ""}
-            placeholder="Euromiti Kosovo"
-            error={fieldErrors?.footer_copyright_line?.[0]}
-          />
-          <FileUploadInput
-            label="Logo upload"
-            name="logo_image"
-            previewUrl={logoPreviewUrl}
-            previewAlt={site.company_name}
-            removeInputName="clear_logo"
-            helperText="Shown in the footer next to the company name. JPEG, PNG, WebP, or GIF up to 5 MB."
-          />
-        </div>
-      </AdminSectionCard>
-
-      <AdminSectionCard title="Social Media Links" description="Saved to both contact and footer settings so public pages stay aligned.">
+      <AdminSectionCard
+        title="Social Media Links"
+        description="Synced to site settings for the public footer. Footer copy and logo are fixed in code."
+      >
         <div className="space-y-3">
           {socialRows.map((row, i) => (
             <AdminContentGrid key={i} columns={2}>
@@ -177,10 +152,10 @@ export function SiteContactForm({ site, contact, logoPreviewUrl, submitAction }:
 
       <SaveBar
         hasUnsavedChanges
-        unsavedLabel="Review contact/footer changes"
+        unsavedLabel="Review contact changes"
         cancelLabel="Reset changes"
         onCancel={() => formRef.current?.reset()}
-        submitLabel="Save contact & footer"
+        submitLabel="Save contact & social"
         submitPendingLabel="Saving…"
       />
     </form>

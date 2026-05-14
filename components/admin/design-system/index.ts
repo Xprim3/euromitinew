@@ -3,6 +3,7 @@
 export { adminRouteHeaderMeta } from "./admin-panel-routes"
 export { AdminPanelChrome } from "./AdminPanelChrome"
 export { AdminContentGrid } from "./AdminContentGrid"
+export { AdminDialog, AdminDialogActions, type AdminDialogCloseHelpers, type AdminDialogProps, type AdminDialogSize } from "./AdminDialog"
 export { AdminFormComponentsPreview } from "./AdminFormComponentsPreview"
 export { AdminHeader, type AdminHeaderBreadcrumb, type AdminHeaderProps } from "./AdminHeader"
 export { AdminLayout, type AdminLayoutProps } from "./AdminLayout"

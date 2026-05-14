@@ -14,6 +14,7 @@ export const TOPBAR_NAV_LINKS = [
   { href: "/locations", label: "Lokacionet" },
   { href: "/restaurant", label: "Restaurant" },
   { href: "/news", label: "Lajme" },
+  { href: "/careers", label: "Karriera" },
   { href: "/contact", label: "Kontakti" },
 ] as const
 

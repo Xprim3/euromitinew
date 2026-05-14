@@ -39,6 +39,11 @@
   box-sizing: border-box;
 }
 
+/* Reserve scrollbar gutter on admin routes so locking scroll (modal) does not change layout width. */
+html:has([data-admin-design-system]) {
+  scrollbar-gutter: stable;
+}
+
 .euromiti-admin-ds {
   color: var(--admin-text);
   background-color: var(--admin-canvas);
@@ -48,4 +53,27 @@
 .euromiti-admin-ds *::before,
 .euromiti-admin-ds *::after {
   box-sizing: border-box;
+}
+
+/* AdminDialog centered panel (see AdminDialog.tsx): enter motion; respect reduced motion. */
+@keyframes euromiti-admin-dialog-surface-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.euromiti-admin-dialog-surface {
+  animation: euromiti-admin-dialog-surface-in 0.24s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .euromiti-admin-dialog-surface {
+    animation: none;
+  }
 }

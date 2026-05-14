@@ -26,6 +26,9 @@ function normalizeContactInfo(raw: Record<string, unknown>): ContactInfoRow {
     weekend_hours: typeof raw.weekend_hours === "string" ? raw.weekend_hours : null,
     careers_email: typeof raw.careers_email === "string" ? raw.careers_email : null,
     careers_apply_instructions: typeof raw.careers_apply_instructions === "string" ? raw.careers_apply_instructions : null,
+    hq_eyebrow: typeof raw.hq_eyebrow === "string" ? raw.hq_eyebrow : "",
+    hq_heading: typeof raw.hq_heading === "string" ? raw.hq_heading : "",
+    hq_description: typeof raw.hq_description === "string" ? raw.hq_description : "",
     updated_at: typeof raw.updated_at === "string" ? raw.updated_at : "",
     updated_by: typeof raw.updated_by === "string" ? raw.updated_by : null,
   }

@@ -17,7 +17,7 @@ export function AdminPageShell({ children, flush = false, className }: AdminPage
   return (
     <div
       className={cnDs(
-        "mx-auto w-full max-w-[var(--admin-content-max)] flex-1",
+        "mx-auto min-w-0 w-full max-w-[var(--admin-content-max)] flex-1",
         flush ? "py-6" : "px-4 py-6 sm:px-6 lg:px-8 lg:py-8",
         className
       )}

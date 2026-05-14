@@ -108,6 +108,27 @@ export function adminRouteHeaderMeta(pathname: string): AdminRouteHeaderMeta {
     }
   }
 
+  if (p === "/admin/careers/applications" || p === "/admin/careers/applications/") {
+    return {
+      title: "Job applications",
+      subtitle: "Applicants who submitted the public careers form.",
+      breadcrumbs: [crumbAdmin, { label: "Careers", href: "/admin/careers" }, { label: "Applications" }],
+    }
+  }
+
+  if (p.startsWith("/admin/careers/applications/")) {
+    return {
+      title: "Applicant",
+      subtitle: "Review contact details and download the CV.",
+      breadcrumbs: [
+        crumbAdmin,
+        { label: "Careers", href: "/admin/careers" },
+        { label: "Applications", href: "/admin/careers/applications" },
+        { label: "Detail" },
+      ],
+    }
+  }
+
   if (p.startsWith("/admin/careers/")) {
     return {
       title: "Edit job",

@@ -20,6 +20,7 @@ import {
   cnDs,
   dsBtnGhost,
   dsBtnPrimary,
+  dsBtnTertiary,
 } from "@/components/admin/design-system"
 import { formatNewsDate } from "@/lib/format-news-date"
 import type { JobRow } from "@/types/supabase-cms"
@@ -53,9 +54,14 @@ export function CareersManagementClient({ rows }: CareersManagementClientProps) 
       title="Careers / jobs management"
       description="Create, edit, filter, activate, and remove open positions."
       headerActions={
-        <Link href="/admin/careers/new" className={cnDs(dsBtnPrimary, "min-h-10 px-4 text-xs")}>
-          Add job
-        </Link>
+        <>
+          <Link href="/admin/careers/applications" className={cnDs(dsBtnTertiary, "min-h-10 px-4 text-xs")}>
+            Applications
+          </Link>
+          <Link href="/admin/careers/new" className={cnDs(dsBtnPrimary, "min-h-10 px-4 text-xs")}>
+            Add job
+          </Link>
+        </>
       }
     >
       <div className="space-y-5">

@@ -30,8 +30,8 @@ export type AdminSidebarProps = {
  * `AdminHeader` `showMobileNavTrigger` or call `useAdminSidebarState().setMobileOpen(true)`.
  */
 export function AdminSidebar({
-  brandTitle = "Euromiti",
-  brandSubtitle = "Admin",
+  brandTitle = "Admin Panel",
+  brandSubtitle,
   brandHref = "/admin/dashboard",
   items,
   footer,
@@ -119,8 +119,13 @@ export function AdminSidebar({
             href={brandHref}
             className="block font-[family-name:var(--font-montserrat)] text-lg font-extrabold tracking-tight text-[var(--admin-sidebar-foreground)]"
           >
-            {brandTitle}{" "}
-            <span className="font-semibold text-[var(--admin-sidebar-muted)]">{brandSubtitle}</span>
+            {brandTitle}
+            {brandSubtitle?.trim() ? (
+              <>
+                {" "}
+                <span className="font-semibold text-[var(--admin-sidebar-muted)]">{brandSubtitle}</span>
+              </>
+            ) : null}
           </Link>
           <button
             type="button"

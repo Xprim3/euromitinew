@@ -39,7 +39,7 @@ export function AdminSidebar() {
     <aside className="flex w-[17rem] shrink-0 flex-col border-zinc-800 border-r bg-zinc-950">
       <div className="border-zinc-800 border-b px-5 py-5">
         <Link href="/admin/dashboard" className="font-[family-name:var(--font-montserrat)] text-lg font-extrabold tracking-tight text-white">
-          Euromiti <span className="font-semibold text-zinc-500">Admin</span>
+          Admin Panel
         </Link>
         <p className="mt-1 text-xs text-zinc-500">Supabase CMS · homepage wired</p>
       </div>
