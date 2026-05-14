@@ -12,7 +12,6 @@ function LocationsPageErrorBanner({ message }: { message: string }) {
         imageAlt="Euromiti locations in Kosovo"
         trail={[{ label: "Home", href: "/" }, { label: "Locations" }]}
         title="Locations"
-        description="Three flagship Euromiti forecourts across Kosovo — each with full address, contact, opening hours, and on-site services."
         priority
       />
       <section className="bg-muted">
@@ -38,7 +37,6 @@ function LocationsEmptyState() {
         imageAlt="Euromiti locations in Kosovo"
         trail={[{ label: "Home", href: "/" }, { label: "Locations" }]}
         title="Locations"
-        description="Three flagship Euromiti forecourts across Kosovo — each with full address, contact, opening hours, and on-site services."
         priority
       />
       <section className="bg-muted">

@@ -27,9 +27,6 @@ export default async function NewsPage() {
         imageAlt="Euromiti network insights and roadside updates"
         trail={[{ label: "Home", href: "/" }, { label: "News & Insights" }]}
         title="News & Insights"
-        description={
-          "Operational updates, fuels innovation, and community initiatives from Euromiti’s Kosovo network."
-        }
         visualPreset="flat-heavy"
         priority
       />

@@ -29,7 +29,6 @@ export function ServicesPageView({ data }: ServicesPageViewProps) {
         imageAlt={data.heroImageAlt}
         trail={[{ label: "Home", href: "/" }, { label: "Services" }]}
         title={data.heroTitle}
-        description={data.heroSubtitle}
         visualPreset="flat-heavy"
         priority
       />

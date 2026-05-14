@@ -38,7 +38,6 @@ export default async function CareerDetailPage({ params }: Props) {
     <>
       <PageHeader
         title={job.title}
-        description={job.summary ?? "Euromiti open role"}
         breadcrumbs={
           <>
             <Link href="/">Home</Link>

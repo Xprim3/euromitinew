@@ -60,7 +60,6 @@ export default async function ContactPage() {
         imageAlt="Euromiti — hospitality and operations"
         trail={[{ label: "Home", href: "/" }, { label: "Contact" }]}
         title="Contact"
-        description="Headquarters in Prishtina, forecourts across Kosovo — direct lines for guests, partners, and careers."
         visualPreset="flat-heavy"
         priority
       />

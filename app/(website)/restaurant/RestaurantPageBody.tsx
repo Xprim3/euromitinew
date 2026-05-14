@@ -26,7 +26,6 @@ export async function RestaurantPageBody() {
         imageAlt={data.pageHeroImageAlt}
         trail={[{ label: "Home", href: "/" }, { label: "Restaurant" }]}
         title={data.pageHeroTitle}
-        description={data.pageHeroSubtitle}
         visualPreset="restaurant"
         priority
       />

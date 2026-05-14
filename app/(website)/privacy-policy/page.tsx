@@ -16,7 +16,6 @@ export default function PrivacyPolicyPage() {
     <>
       <PageHeader
         title="Privacy Policy"
-        description="Placeholder policy for layout and routing — replace with counsel-approved legal text before launch."
         breadcrumbs={
           <>
             <Link href="/">Home</Link>

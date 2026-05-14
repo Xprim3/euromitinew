@@ -16,7 +16,6 @@ export default function TermsPage() {
     <>
       <PageHeader
         title="Terms & Legal"
-        description="Placeholder legal terms for development — must be superseded by final counsel-reviewed language."
         breadcrumbs={
           <>
             <Link href="/">Home</Link>

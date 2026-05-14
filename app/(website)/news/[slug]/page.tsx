@@ -45,7 +45,6 @@ export default async function NewsArticlePage({ params }: Props) {
     <>
       <PageHeader
         title={article.title}
-        description={article.excerpt}
         breadcrumbs={
           <>
             <Link href="/">Home</Link>

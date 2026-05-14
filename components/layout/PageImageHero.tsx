@@ -19,8 +19,8 @@ const PRESET_CLASSES: Record<
 > = {
   elevated: {
     tint: "bg-black/48",
-    bottomGradientHeight: "h-[48%]",
-    bottomGradientRgbEnd: 0.76,
+    bottomGradientHeight: "h-[38%]",
+    bottomGradientRgbEnd: 0.72,
   },
   "flat-heavy": {
     tint: "bg-black/52",
@@ -29,8 +29,8 @@ const PRESET_CLASSES: Record<
   },
   restaurant: {
     tint: "bg-black/50",
-    bottomGradientHeight: "h-[45%]",
-    bottomGradientRgbEnd: 0.75,
+    bottomGradientHeight: "h-[36%]",
+    bottomGradientRgbEnd: 0.72,
   },
 }
 
@@ -60,7 +60,6 @@ type PageImageHeroProps = {
   imageSrc: string
   imageAlt: string
   title: string
-  description?: ReactNode
   /** Use when breadcrumbs are not Home / trailing label */
   breadcrumbs?: ReactNode
   trail?: readonly PageImageHeroCrumbItem[]
@@ -74,7 +73,6 @@ export function PageImageHero({
   imageSrc,
   imageAlt,
   title,
-  description,
   breadcrumbs,
   trail,
   priority,
@@ -94,7 +92,7 @@ export function PageImageHero({
   return (
     <section
       className={cn(
-        "relative isolate min-h-[clamp(15.5rem,44svh,26rem)] overflow-hidden bg-black text-white md:min-h-[clamp(17rem,38svh,28rem)]",
+        "relative isolate min-h-[clamp(11rem,28svh,18rem)] overflow-hidden bg-black text-white md:min-h-[clamp(12rem,24svh,20rem)]",
         className
       )}
     >
@@ -110,16 +108,9 @@ export function PageImageHero({
         />
       ) : null}
       <Container className="relative z-10 py-[var(--section-header-y)]">
-        <div className={cn("max-w-4xl space-y-5 md:space-y-6", innerClassName)}>
+        <div className={cn("max-w-4xl space-y-4 md:space-y-5", innerClassName)}>
           {crumbContent}
           <h1 className="euromiti-type-display font-heading font-bold text-white">{title}</h1>
-          {description !== undefined ? (
-            typeof description === "string" ? (
-              <p className="max-w-prose text-[0.9375rem] leading-relaxed text-white/85 md:text-base">{description}</p>
-            ) : (
-              <div className="max-w-prose text-[0.9375rem] leading-relaxed text-white/85 md:text-base">{description}</div>
-            )
-          ) : null}
         </div>
       </Container>
     </section>

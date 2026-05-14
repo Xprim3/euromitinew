@@ -3,8 +3,9 @@ import Link from "next/link"
 
 import { Container } from "@/components/layout/Container"
 import { PageImageHero } from "@/components/layout/PageImageHero"
-import { EuromitiMotionClasses, ImageHoverZoom, Reveal, Stagger } from "@/components/motion"
+import { EuromitiMotionClasses, Reveal, Stagger } from "@/components/motion"
 import { Button } from "@/components/ui/button"
+import { MaterialSymbol } from "@/components/ui/MaterialSymbol"
 import { homeHeroDesign } from "@/data/mock/homepage-visual"
 import { LOCATION_PAGE_SERVICE_LABELS, type ResolvedPublicLocation } from "@/lib/data/locations-public"
 import { cn } from "@/lib/utils"
@@ -12,6 +13,197 @@ import type { LocationAmenity } from "@/types/public"
 
 export type LocationsPageViewProps = {
   locations: ResolvedPublicLocation[]
+}
+
+function telHref(phone: string) {
+  const digits = phone.replace(/[^\d+]/g, "")
+  return digits ? `tel:${digits}` : undefined
+}
+
+function mailHref(display: string) {
+  const t = display.trim()
+  if (t.length < 5 || t.includes("—")) return undefined
+  if (!t.includes("@")) return undefined
+  return `mailto:${t}`
+}
+
+/** Primary split uses the hero image; secondary split prefers a different gallery frame when available. */
+function splitVisual(entry: ResolvedPublicLocation, imageLeft: boolean): { src: string; alt: string } {
+  if (imageLeft) {
+    return { src: entry.mainImageSrc, alt: entry.mainImageAlt }
+  }
+  const distinct = entry.gallery.find((g) => g.src !== entry.mainImageSrc)
+  if (distinct) return distinct
+  return entry.gallery[1] ?? entry.gallery[0] ?? { src: entry.mainImageSrc, alt: entry.mainImageAlt }
+}
+
+type LocationInfoPanelProps = {
+  entry: ResolvedPublicLocation
+  index: number
+  phoneHref: string | undefined
+  emailHref: string | undefined
+  variant: "light" | "dark"
+}
+
+function LocationInfoPanel({ entry, index, phoneHref, emailHref, variant }: LocationInfoPanelProps) {
+  const dark = variant === "dark"
+  const label = dark ? "text-brand-accent-gold/90" : "text-secondary"
+  const bodyMuted = dark ? "text-white/70" : "text-muted-foreground"
+  const heading = dark ? "text-white" : "text-foreground"
+  const line = dark ? "border-white/15" : "border-border/60"
+  const icon = dark ? "text-brand-accent-gold" : "text-secondary"
+  const chip = dark
+    ? "border-white/20 bg-white/[0.06] text-white/85"
+    : "border-brand-shell-deep/12 bg-white/80 text-foreground/80"
+
+  return (
+    <div
+      className={cn(
+        "relative flex flex-col justify-center px-6 py-14 sm:px-10 lg:px-14 lg:py-20 xl:px-20",
+        dark ? "bg-brand-shell-deep" : "bg-[#faf8f5]"
+      )}
+    >
+      <span
+        className={cn(
+          "pointer-events-none select-none font-playfair text-[clamp(4.5rem,14vw,9rem)] font-light leading-none tracking-tight",
+          dark ? "absolute right-6 top-10 text-white/6 lg:right-10 lg:top-14" : "absolute right-6 top-8 text-brand-shell-deep/6 lg:right-12 lg:top-12"
+        )}
+        aria-hidden
+      >
+        {String(index + 1).padStart(2, "0")}
+      </span>
+
+      <div className="relative max-w-xl">
+        <p className={cn("text-[0.65rem] font-semibold uppercase tracking-[0.32em]", label)}>Euromiti forecourt</p>
+        <h2 className={cn("mt-4 font-heading text-[clamp(1.75rem,3.2vw,2.35rem)] font-semibold leading-[1.12] tracking-tight", heading)}>
+          {entry.pageHeading}
+        </h2>
+        <p className={cn("mt-5 text-base leading-relaxed md:text-[1.05rem]", bodyMuted)}>{entry.pageSummary}</p>
+
+        <div
+          className={cn(
+            "my-10 h-px w-16 bg-linear-to-r from-brand-accent-gold/80 to-transparent",
+            dark && "from-brand-accent-gold to-white/10"
+          )}
+          aria-hidden
+        />
+
+        <ul className={cn("space-y-4 border-t pt-8 text-sm leading-snug md:text-[0.95rem]", line, heading)}>
+          <li className="flex gap-3.5">
+            <MaterialSymbol name="location_on" className={cn("mt-0.5 shrink-0 text-[1.25rem]", icon)} />
+            <span className={dark ? "text-white/90" : undefined}>{entry.address}</span>
+          </li>
+          <li className="flex gap-3.5">
+            <MaterialSymbol name="call" className={cn("mt-0.5 shrink-0 text-[1.25rem]", icon)} />
+            {phoneHref ? (
+              <a
+                href={phoneHref}
+                className={cn(
+                  "font-medium underline-offset-4 hover:underline",
+                  dark ? "text-white hover:text-brand-accent-gold" : "text-foreground hover:text-secondary"
+                )}
+              >
+                {entry.phone}
+              </a>
+            ) : (
+              <span className={dark ? "text-white/90" : undefined}>{entry.phone}</span>
+            )}
+          </li>
+          <li className="flex gap-3.5">
+            <MaterialSymbol name="mail" className={cn("mt-0.5 shrink-0 text-[1.25rem]", icon)} />
+            {emailHref ? (
+              <a
+                href={emailHref}
+                className={cn(
+                  "break-all font-medium underline-offset-4 hover:underline",
+                  dark ? "text-white hover:text-brand-accent-gold" : "text-foreground hover:text-secondary"
+                )}
+              >
+                {entry.contactEmailDisplay}
+              </a>
+            ) : (
+              <span className={cn("break-all", dark ? "text-white/90" : undefined)}>{entry.contactEmailDisplay}</span>
+            )}
+          </li>
+          <li className="flex gap-3.5">
+            <MaterialSymbol name="schedule" className={cn("mt-0.5 shrink-0 text-[1.25rem]", icon)} />
+            <span className={dark ? "text-white/90" : undefined}>{entry.openingHours}</span>
+          </li>
+        </ul>
+
+        <div className="mt-8 flex flex-wrap gap-2">
+          {entry.services.map((service: LocationAmenity) => (
+            <span
+              key={service}
+              className={cn(
+                "border px-3 py-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em]",
+                chip
+              )}
+            >
+              {LOCATION_PAGE_SERVICE_LABELS[service]}
+            </span>
+          ))}
+        </div>
+
+        <div className="mt-10">
+          <Button
+            variant={dark ? "outline" : "outlinePrimary"}
+            render={<Link href={entry.googleMapsUrl} />}
+            className={cn(
+              "min-h-12 w-full max-w-sm border-foreground/25 sm:w-auto",
+              dark &&
+                "border-white/35 bg-transparent text-white shadow-none hover:bg-white/10 hover:text-white [&_svg]:text-brand-accent-gold",
+              !dark && EuromitiMotionClasses.buttonHover
+            )}
+            size="lg"
+          >
+            <MaterialSymbol name="map" className="mr-2 text-[1.15rem]" />
+            Directions
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+type LocationImagePanelProps = {
+  entry: ResolvedPublicLocation
+  visual: { src: string; alt: string }
+  priority?: boolean
+  tone?: "light" | "dark"
+}
+
+function LocationImagePanel({ entry, visual, priority, tone = "light" }: LocationImagePanelProps) {
+  const dark = tone === "dark"
+  return (
+    <div
+      className={cn(
+        "relative min-h-[min(52vw,22rem)] w-full overflow-hidden sm:min-h-96 lg:min-h-[min(40rem,78svh)]",
+        dark ? "bg-brand-shell-deep" : "bg-neutral-900"
+      )}
+    >
+      <Image
+        src={visual.src}
+        alt={visual.alt}
+        fill
+        sizes="(max-width: 1024px) 100vw, 50vw"
+        className="object-cover transition duration-[1.1s] ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.03]"
+        priority={priority}
+      />
+      <div
+        className="pointer-events-none absolute inset-0 bg-linear-to-tr from-black/50 via-black/10 to-transparent mix-blend-multiply"
+        aria-hidden
+      />
+      <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-black/20" aria-hidden />
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-black/55 to-transparent" aria-hidden />
+      <div className="absolute bottom-8 left-6 right-6 sm:left-10 lg:bottom-12 lg:left-14 xl:left-20">
+        <p className="font-playfair text-[clamp(1.85rem,4vw,3rem)] font-normal leading-tight tracking-tight text-white drop-shadow-md">
+          {entry.city}
+        </p>
+        <p className="mt-2 max-w-sm text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-white/75">Kosovo</p>
+      </div>
+    </div>
+  )
 }
 
 export function LocationsPageView({ locations }: LocationsPageViewProps) {
@@ -22,95 +214,80 @@ export function LocationsPageView({ locations }: LocationsPageViewProps) {
         imageAlt="Euromiti locations in Kosovo"
         trail={[{ label: "Home", href: "/" }, { label: "Locations" }]}
         title="Locations"
-        description="Three flagship Euromiti forecourts across Kosovo — each with full address, contact, opening hours, and on-site services."
         priority
       />
 
-      {locations.map((entry, index) => {
-        const reverse = index % 2 === 1
-        const bg = index % 2 === 0 ? "bg-white" : "bg-muted"
+      <section className="border-t border-brand-shell-deep/10 bg-white">
+        <Container className="euromiti-section-loose">
+          <Reveal variant="fade-up" once>
+            <div className="mx-auto max-w-3xl text-center">
+              <p className="font-playfair text-lg text-brand-accent-gold md:text-xl">The network</p>
+              <div className="mx-auto mt-5 h-px w-12 bg-linear-to-r from-transparent via-brand-accent-gold/80 to-transparent" aria-hidden />
+              <h2 className="mt-6 font-heading text-[clamp(1.6rem,2.6vw,2.1rem)] font-semibold tracking-tight text-foreground">
+                Three destinations, one standard of hospitality
+              </h2>
+              <p className="mt-4 text-sm leading-relaxed text-muted-foreground md:text-base">
+                Prishtina, Ferizaj, and Gjilan — refined forecourts where fuel, dining, car care, and retail sit under one
+                roof. Choose a station for directions, hours, and on-site services.
+              </p>
+            </div>
+          </Reveal>
+        </Container>
+      </section>
 
-        return (
-          <section key={entry.id} className={bg}>
-            <Container className="euromiti-section">
-              <Reveal variant="fade-up" once>
-                <div className="grid items-center gap-8 lg:grid-cols-12 lg:gap-11">
-                  <div className={reverse ? "space-y-5 lg:col-span-5 lg:order-2" : "space-y-5 lg:col-span-5"}>
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">{entry.city}</p>
-                    <h2 className="font-heading text-[clamp(1.65rem,3.1vw,2.45rem)] font-bold tracking-tight text-foreground">
-                      {entry.pageHeading}
-                    </h2>
-                    <p className="text-sm leading-relaxed text-muted-foreground md:text-base">{entry.pageSummary}</p>
-                    <div className="space-y-2 text-sm text-foreground/85 md:text-base">
-                      <p>
-                        <strong>Address:</strong> {entry.address}
-                      </p>
-                      <p>
-                        <strong>Phone:</strong> {entry.phone}
-                      </p>
-                      <p>
-                        <strong>Email:</strong> {entry.contactEmailDisplay}
-                      </p>
-                      <p>
-                        <strong>Hours:</strong> {entry.openingHours}
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap gap-2 pt-1">
-                      {entry.services.map((service: LocationAmenity) => (
-                        <span
-                          key={service}
-                          className="rounded-full bg-primary/8 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-foreground/80"
-                        >
-                          {LOCATION_PAGE_SERVICE_LABELS[service]}
-                        </span>
-                      ))}
-                    </div>
-                    <Button
-                      variant="outlinePrimary"
-                      render={<Link href={entry.googleMapsUrl} />}
-                      className={cn(EuromitiMotionClasses.buttonHover)}
-                    >
-                      Open in Google Maps
-                    </Button>
-                  </div>
+      <Stagger once className="flex flex-col">
+        {locations.map((entry, index) => {
+          const imageLeft = index % 2 === 0
+          const phoneHref = telHref(entry.phone)
+          const emailHref = mailHref(entry.contactEmailDisplay)
+          const visual = splitVisual(entry, imageLeft)
+          const editorialDark = index % 2 === 1
+          const infoVariant = editorialDark ? "dark" : "light"
 
-                  <div className={reverse ? "space-y-4 lg:col-span-7 lg:order-1" : "space-y-4 lg:col-span-7"}>
-                    <div className="relative min-h-[240px] overflow-hidden rounded-lg border border-border/70 shadow-[0_24px_58px_-34px_rgb(15_23_42/0.45)] md:min-h-[340px] lg:min-h-[380px]">
-                      <ImageHoverZoom className="absolute inset-0 h-full w-full">
-                        <Image
-                          src={entry.mainImageSrc}
-                          alt={entry.mainImageAlt}
-                          fill
-                          sizes="(max-width: 1024px) 100vw, 58vw"
-                          className="object-cover"
-                        />
-                      </ImageHoverZoom>
-                    </div>
-                    <Stagger once className="grid grid-cols-2 gap-3 md:gap-4">
-                      {entry.gallery.map((tile, gIdx) => (
-                        <div
-                          key={`${entry.id}-g-${gIdx}`}
-                          className="relative min-h-[120px] overflow-hidden rounded-[var(--rounded-md)] border border-border/70 shadow-[0_16px_36px_-30px_rgb(15_23_42/0.4)] md:min-h-[128px]"
-                        >
-                          <ImageHoverZoom className="absolute inset-0 h-full w-full">
-                            <Image
-                              src={tile.src}
-                              alt={tile.alt}
-                              fill
-                              sizes="(max-width: 1024px) 50vw, 28vw"
-                              className="object-cover"
-                            />
-                          </ImageHoverZoom>
-                        </div>
-                      ))}
-                    </Stagger>
-                  </div>
-                </div>
-              </Reveal>
-            </Container>
-          </section>
-        )
-      })}
+          const imageEl = (
+            <LocationImagePanel
+              entry={entry}
+              visual={visual}
+              priority={index === 0}
+              tone={editorialDark ? "dark" : "light"}
+            />
+          )
+          const infoEl = (
+            <LocationInfoPanel
+              entry={entry}
+              index={index}
+              phoneHref={phoneHref}
+              emailHref={emailHref}
+              variant={infoVariant}
+            />
+          )
+
+          return (
+            <section
+              key={entry.id}
+              className={cn(
+                "border-t border-black/6",
+                editorialDark ? "bg-brand-shell-deep" : "bg-[#ebe6df]"
+              )}
+            >
+              <div className="grid grid-cols-1 lg:grid-cols-2">
+                {imageLeft ? (
+                  <>
+                    <div className="min-h-0 max-lg:row-start-1">{imageEl}</div>
+                    <div className="min-h-0 max-lg:row-start-2">{infoEl}</div>
+                  </>
+                ) : (
+                  <>
+                    {/* DOM: copy then image for desktop (text left). Mobile: image above copy via row-start. */}
+                    <div className="min-h-0 max-lg:col-start-1 max-lg:row-start-2">{infoEl}</div>
+                    <div className="min-h-0 max-lg:col-start-1 max-lg:row-start-1">{imageEl}</div>
+                  </>
+                )}
+              </div>
+            </section>
+          )
+        })}
+      </Stagger>
     </>
   )
 }

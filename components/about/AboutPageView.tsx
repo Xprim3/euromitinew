@@ -19,7 +19,6 @@ export function AboutPageView({ data }: { data: ResolvedAboutPage }) {
         imageAlt={data.heroImageAlt}
         trail={[{ label: "Ballina", href: "/" }, { label: "Rreth nesh" }]}
         title={data.heroTitle}
-        description={data.heroSubtitle}
         priority
       />
 

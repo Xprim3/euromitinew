@@ -29,7 +29,6 @@ export default async function CareersPage() {
         imageAlt="Euromiti careers and operations"
         trail={[{ label: "Home", href: "/" }, { label: "Careers" }]}
         title="Careers"
-        description="Join the Euromiti teams serving drivers, guests, and partners across Kosovo."
         visualPreset="flat-heavy"
         priority
       />
