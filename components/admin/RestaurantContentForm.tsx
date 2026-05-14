@@ -27,6 +27,10 @@ type RestaurantContentFormProps = {
   submitAction: (prev: RestaurantSaveState, fd: FormData) => Promise<RestaurantSaveState>
   initial: RestaurantContentRow
   heroPreviewUrl: string | null
+  editorialPreviewUrl: string | null
+  editorialImageAltFromMedia: string | null
+  introPreviewUrl: string | null
+  introImageAltFromMedia: string | null
   skanomPreviewUrl: string | null
   skanomImageAltFromMedia: string | null
   menuDrafts: MenuSlotDraft[]
@@ -88,6 +92,10 @@ export function RestaurantContentForm({
   submitAction,
   initial,
   heroPreviewUrl,
+  editorialPreviewUrl,
+  editorialImageAltFromMedia,
+  introPreviewUrl,
+  introImageAltFromMedia,
   skanomPreviewUrl,
   skanomImageAltFromMedia,
   menuDrafts,
@@ -126,10 +134,14 @@ export function RestaurantContentForm({
 
       <AdminSectionCard
         title="Restaurant content"
-        description="Edit restaurant hero, editorial description, menu cards, gallery images, hours, and contact details."
+        description="Sections follow the public /restaurant page top to bottom: page hero, Playfair band, dining-room intro (headlines + copy + image), food gallery, Skanom, atmosphere gallery, then desk details. Experience pillars stay code-only."
       >
         <div className="space-y-3">
-          <EditorAccordion title="Hero & main description" description="Top restaurant page content and hero image." defaultOpen>
+          <EditorAccordion
+            title="1 · Page hero (top banner)"
+            description="Full-width image header on /restaurant — H1 title, optional hero subtitle, and hero image."
+            defaultOpen
+          >
             <div className="space-y-5">
               <TextInput
                 label="Hero title"
@@ -146,16 +158,6 @@ export function RestaurantContentForm({
                 showCharacterCount
                 error={fieldErrors?.hero_subtitle?.[0]}
               />
-              <TextareaInput
-                label="Main description"
-                name="hero_description"
-                rows={10}
-                defaultValue={initial.hero_description}
-                helperText="Separate paragraphs with a blank line."
-                maxLength={12000}
-                showCharacterCount
-                error={fieldErrors?.hero_description?.[0]}
-              />
               <FileUploadInput
                 label="Hero image"
                 name="hero_image"
@@ -168,8 +170,139 @@ export function RestaurantContentForm({
           </EditorAccordion>
 
           <EditorAccordion
-            title="Menu highlights & food category cards"
-            description={`Up to ${ADMIN_RESTAURANT_MENU_SLOTS} cards. Empty rows are skipped.`}
+            title="2 · Editorial hero (Playfair band)"
+            description="Large headline block directly under the page hero — eyebrow, two-line title, body, quote slab, optional right image (falls back to hero image if empty)."
+          >
+            <div className="space-y-5">
+              <TextInput
+                label="Eyebrow / kicker"
+                name="editorial_eyebrow"
+                defaultValue={initial.editorial_eyebrow}
+                maxLength={160}
+                error={fieldErrors?.editorial_eyebrow?.[0]}
+              />
+              <AdminContentGrid columns={2}>
+                <TextInput
+                  label="Title line 1"
+                  name="editorial_title_line1"
+                  defaultValue={initial.editorial_title_line1}
+                  maxLength={240}
+                  error={fieldErrors?.editorial_title_line1?.[0]}
+                />
+                <TextInput
+                  label="Title line 2"
+                  name="editorial_title_line2"
+                  defaultValue={initial.editorial_title_line2}
+                  maxLength={240}
+                  error={fieldErrors?.editorial_title_line2?.[0]}
+                />
+              </AdminContentGrid>
+              <TextareaInput
+                label="Description"
+                name="editorial_description"
+                rows={5}
+                defaultValue={initial.editorial_description}
+                maxLength={2400}
+                showCharacterCount
+                error={fieldErrors?.editorial_description?.[0]}
+              />
+              <TextareaInput
+                label="Quote (floating slab, desktop)"
+                name="editorial_quote_line"
+                rows={2}
+                defaultValue={initial.editorial_quote_line}
+                maxLength={500}
+                showCharacterCount
+                error={fieldErrors?.editorial_quote_line?.[0]}
+              />
+              <TextInput
+                label="Quote attribution"
+                name="editorial_quote_attribution"
+                defaultValue={initial.editorial_quote_attribution}
+                maxLength={320}
+                error={fieldErrors?.editorial_quote_attribution?.[0]}
+              />
+              <FileUploadInput
+                label="Editorial hero image"
+                name="editorial_image"
+                previewUrl={editorialPreviewUrl}
+                previewAlt="Editorial hero image"
+                removeInputName="clear_editorial_image"
+                replaceLabel="Replace image"
+                acceptedFileTypesLabel="JPG, PNG, WebP, or GIF"
+                helperText="Large image on the right of this section. Leave empty to reuse the main page hero image."
+              />
+              <TextInput
+                label="Editorial image alt text"
+                name="editorial_image_alt"
+                placeholder="Describe the editorial hero image"
+                maxLength={500}
+                defaultValue={editorialImageAltFromMedia ?? ""}
+              />
+            </div>
+          </EditorAccordion>
+
+          <EditorAccordion
+            title="3 · Dining room intro (headline + copy + image)"
+            description="Muted band after the Playfair hero — eyebrow, two-line Playfair headline, body copy, and optional image (falls back to page hero image when empty)."
+          >
+            <div className="space-y-5">
+              <TextInput
+                label="Eyebrow / kicker"
+                name="intro_eyebrow"
+                defaultValue={initial.intro_eyebrow}
+                maxLength={160}
+                error={fieldErrors?.intro_eyebrow?.[0]}
+              />
+              <AdminContentGrid columns={2}>
+                <TextInput
+                  label="Headline line 1 (roman)"
+                  name="intro_headline_line1"
+                  defaultValue={initial.intro_headline_line1}
+                  maxLength={240}
+                  error={fieldErrors?.intro_headline_line1?.[0]}
+                />
+                <TextInput
+                  label="Headline line 2 (italic)"
+                  name="intro_headline_line2"
+                  defaultValue={initial.intro_headline_line2}
+                  maxLength={240}
+                  error={fieldErrors?.intro_headline_line2?.[0]}
+                />
+              </AdminContentGrid>
+              <TextareaInput
+                label="Body copy"
+                name="intro_body"
+                rows={10}
+                defaultValue={initial.intro_body.trim() ? initial.intro_body : initial.hero_description}
+                helperText="Separate paragraphs with a blank line."
+                maxLength={12000}
+                showCharacterCount
+                error={fieldErrors?.intro_body?.[0]}
+              />
+              <FileUploadInput
+                label="Section image"
+                name="intro_image"
+                previewUrl={introPreviewUrl}
+                previewAlt="Dining room intro image"
+                removeInputName="clear_intro_image"
+                replaceLabel="Replace image"
+                acceptedFileTypesLabel="JPG, PNG, WebP, or GIF"
+                helperText="Shown beside the copy on desktop. Leave empty to reuse the page hero image."
+              />
+              <TextInput
+                label="Image alt text"
+                name="intro_image_alt"
+                placeholder="Describe the intro section image"
+                maxLength={500}
+                defaultValue={introImageAltFromMedia ?? ""}
+              />
+            </div>
+          </EditorAccordion>
+
+          <EditorAccordion
+            title="4 · Seasonal food gallery (menu cards)"
+            description={`Mosaic food cards in the banded gallery section on the public page. Up to ${ADMIN_RESTAURANT_MENU_SLOTS} cards; empty rows are skipped.`}
           >
             <div className="grid gap-5 lg:grid-cols-2">
               {menuDrafts.map((slot, i) => (
@@ -192,8 +325,8 @@ export function RestaurantContentForm({
           </EditorAccordion>
 
           <EditorAccordion
-            title="Digital menu (Skanom)"
-            description="The band with the large image and headline before Experience pillars — same order as the public Restaurant page."
+            title="5 · Digital menu (Skanom)"
+            description="Section before Experience pillars — large image, headline, CTA. Static pillars are not editable here."
           >
             <div className="space-y-5">
               <TextInput
@@ -256,8 +389,8 @@ export function RestaurantContentForm({
           </EditorAccordion>
 
           <EditorAccordion
-            title="Gallery images"
-            description={`Manage ${ADMIN_RESTAURANT_GALLERY_SLOTS} ordered atmosphere gallery tiles.`}
+            title="6 · Atmosphere gallery"
+            description={`After Experience pillars on the public page. ${ADMIN_RESTAURANT_GALLERY_SLOTS} ordered tiles.`}
           >
             <ImageGalleryManager
               label="Atmosphere gallery"
@@ -273,7 +406,10 @@ export function RestaurantContentForm({
             />
           </EditorAccordion>
 
-          <EditorAccordion title="Opening hours & contact info" description="Restaurant desk details shown on the public page.">
+          <EditorAccordion
+            title="7 · Reservations / desk (hours & contact)"
+            description="Shown in the reservation band at the bottom of the restaurant page."
+          >
             <div className="space-y-5">
               <TextareaInput
                 label="Opening hours"

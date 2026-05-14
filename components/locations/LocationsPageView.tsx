@@ -153,13 +153,12 @@ function LocationInfoPanel({ entry, index, phoneHref, emailHref, variant }: Loca
 }
 
 type LocationImagePanelProps = {
-  entry: ResolvedPublicLocation
   visual: { src: string; alt: string }
   priority?: boolean
   tone?: "light" | "dark"
 }
 
-function LocationImagePanel({ entry, visual, priority, tone = "light" }: LocationImagePanelProps) {
+function LocationImagePanel({ visual, priority, tone = "light" }: LocationImagePanelProps) {
   const dark = tone === "dark"
   return (
     <div
@@ -181,12 +180,6 @@ function LocationImagePanel({ entry, visual, priority, tone = "light" }: Locatio
         aria-hidden
       />
       <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-black/20" aria-hidden />
-      <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-black/55 to-transparent" aria-hidden />
-      <div className="absolute bottom-8 left-6 right-6 sm:left-10 lg:bottom-12 lg:left-14 xl:left-20">
-        <p className="font-playfair text-[clamp(1.85rem,4vw,3rem)] font-normal leading-tight tracking-tight text-white drop-shadow-md">
-          {entry.city}
-        </p>
-      </div>
     </div>
   )
 }
@@ -231,7 +224,6 @@ export function LocationsPageView({ locations }: LocationsPageViewProps) {
 
           const imageEl = (
             <LocationImagePanel
-              entry={entry}
               visual={visual}
               priority={index === 0}
               tone={editorialDark ? "dark" : "light"}

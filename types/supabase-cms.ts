@@ -149,6 +149,11 @@ export type RestaurantContentRow = {
   hero_title: string
   hero_subtitle: string
   hero_description: string
+  intro_eyebrow: string
+  intro_headline_line1: string
+  intro_headline_line2: string
+  intro_body: string
+  intro_image_media_id: string | null
   hero_image_media_id: string | null
   opening_hours: string
   contact_phone: string | null
@@ -162,6 +167,13 @@ export type RestaurantContentRow = {
   skanom_image_media_id: string | null
   skanom_cta_label: string
   skanom_cta_href: string
+  editorial_eyebrow: string
+  editorial_title_line1: string
+  editorial_title_line2: string
+  editorial_description: string
+  editorial_quote_line: string
+  editorial_quote_attribution: string
+  editorial_image_media_id: string | null
   updated_at: string
   updated_by: string | null
 }

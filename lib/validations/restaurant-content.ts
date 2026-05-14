@@ -8,7 +8,10 @@ export const ADMIN_RESTAURANT_GALLERY_SLOTS = 2
 export const restaurantContentFormSchema = z.object({
   hero_title: text.max(240),
   hero_subtitle: text.max(1200),
-  hero_description: text.max(12000),
+  intro_eyebrow: text.max(160),
+  intro_headline_line1: text.max(240),
+  intro_headline_line2: text.max(240),
+  intro_body: text.max(12000),
   opening_hours: text.max(2400),
   contact_phone: text.max(160),
   contact_email: z
@@ -24,6 +27,14 @@ export const restaurantContentFormSchema = z.object({
   skanom_cta_label: text.max(120),
   skanom_cta_href: text.max(500),
   skanom_image_alt: text.max(500).optional(),
+  editorial_eyebrow: text.max(160),
+  editorial_title_line1: text.max(240),
+  editorial_title_line2: text.max(240),
+  editorial_description: text.max(2400),
+  editorial_quote_line: text.max(500),
+  editorial_quote_attribution: text.max(320),
+  editorial_image_alt: text.max(500).optional(),
+  intro_image_alt: text.max(500).optional(),
 })
 
 export type RestaurantContentFormParsed = z.infer<typeof restaurantContentFormSchema>

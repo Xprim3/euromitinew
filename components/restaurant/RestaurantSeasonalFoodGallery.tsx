@@ -12,10 +12,11 @@ type RestaurantSeasonalFoodGalleryProps = {
 }
 
 /**
- * Editorial food gallery — banded surface, dual headline row, staggered 3-column mosaic (even columns dropped on md+).
+ * Editorial food gallery — banded surface, section header + staggered 3-column mosaic (even columns offset on md+).
  */
 export function RestaurantSeasonalFoodGallery({ data, className }: RestaurantSeasonalFoodGalleryProps) {
   const { sectionId, headingId, eyebrow, title, lead, items } = data
+  const leadTrimmed = typeof lead === "string" ? lead.trim() : ""
 
   return (
     <section
@@ -28,21 +29,21 @@ export function RestaurantSeasonalFoodGallery({ data, className }: RestaurantSea
     >
       <Container size="wide">
         <Reveal variant="fade-up" once>
-          <div className="mb-12 flex flex-col items-start justify-between gap-6 md:mb-16 md:flex-row md:items-end">
-            <div className="max-w-xl">
-              <span className="mb-4 block font-heading text-[0.7rem] font-semibold uppercase tracking-[0.35em] text-secondary">
-                {eyebrow}
-              </span>
-              <h2
-                id={headingId}
-                className="font-playfair text-[clamp(1.95rem,3.6vw,2.85rem)] font-normal leading-[1.12] tracking-tight text-primary"
-              >
-                {title}
-              </h2>
-            </div>
-            <p className="max-w-sm font-sans text-base font-light leading-relaxed text-muted-foreground md:text-[1.05rem]">
-              {lead}
-            </p>
+          <div className="mb-12 max-w-5xl md:mb-16">
+            <span className="mb-4 block font-heading text-[0.7rem] font-semibold tracking-wide text-secondary">
+              {eyebrow}
+            </span>
+            <h2
+              id={headingId}
+              className="font-playfair text-[clamp(1.95rem,3.6vw,2.85rem)] font-normal leading-[1.12] tracking-tight text-primary"
+            >
+              {title}
+            </h2>
+            {leadTrimmed ? (
+              <p className="mt-6 w-full font-sans text-base font-light leading-relaxed text-muted-foreground md:mt-7 md:text-[1.0625rem] md:leading-[1.75]">
+                {leadTrimmed}
+              </p>
+            ) : null}
           </div>
         </Reveal>
 

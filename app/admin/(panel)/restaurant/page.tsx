@@ -18,6 +18,10 @@ async function loadRestaurantContent(): Promise<
       ok: true
       row: RestaurantContentRow
       heroPreviewUrl: string | null
+      editorialPreviewUrl: string | null
+      editorialImageAltFromMedia: string | null
+      introPreviewUrl: string | null
+      introImageAltFromMedia: string | null
       skanomPreviewUrl: string | null
       skanomImageAltFromMedia: string | null
       menuDrafts: ReturnType<typeof menuDraftsFromRow>
@@ -39,6 +43,8 @@ async function loadRestaurantContent(): Promise<
 
     const ids: string[] = []
     if (row.hero_image_media_id) ids.push(row.hero_image_media_id)
+    if (row.editorial_image_media_id) ids.push(row.editorial_image_media_id)
+    if (row.intro_image_media_id) ids.push(row.intro_image_media_id)
     if (row.skanom_image_media_id) ids.push(row.skanom_image_media_id)
 
     const menuHl = Array.isArray(row.menu_highlights_json) ? row.menu_highlights_json : []
@@ -68,6 +74,20 @@ async function loadRestaurantContent(): Promise<
     const heroPreviewUrl =
       row.hero_image_media_id && urlMap[row.hero_image_media_id] ? urlMap[row.hero_image_media_id]! : null
 
+    const editorialPreviewUrl =
+      row.editorial_image_media_id && urlMap[row.editorial_image_media_id]
+        ? urlMap[row.editorial_image_media_id]!
+        : null
+    const editorialImageAltFromMedia = row.editorial_image_media_id
+      ? altById[row.editorial_image_media_id] ?? null
+      : null
+
+    const introPreviewUrl =
+      row.intro_image_media_id && urlMap[row.intro_image_media_id] ? urlMap[row.intro_image_media_id]! : null
+    const introImageAltFromMedia = row.intro_image_media_id
+      ? altById[row.intro_image_media_id] ?? null
+      : null
+
     const skanomPreviewUrl =
       row.skanom_image_media_id && urlMap[row.skanom_image_media_id] ? urlMap[row.skanom_image_media_id]! : null
     const skanomImageAltFromMedia = row.skanom_image_media_id
@@ -78,6 +98,10 @@ async function loadRestaurantContent(): Promise<
       ok: true,
       row,
       heroPreviewUrl,
+      editorialPreviewUrl,
+      editorialImageAltFromMedia,
+      introPreviewUrl,
+      introImageAltFromMedia,
       skanomPreviewUrl,
       skanomImageAltFromMedia,
       menuDrafts: menuDraftsFromRow(row, urlMap),
@@ -102,8 +126,8 @@ export default async function AdminRestaurantPage() {
         <>
           <SuccessMessage title="Public revalidation">
             Saves revalidate <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">/restaurant</code> automatically.
-            Experience pillars and reservation cards stay static; hero, Skanom digital menu, menu cards, gallery, hours, and
-            contact use the fields below.
+            Accordion order matches the page top to bottom. Experience pillars and reservation city cards stay static; hero,
+            Playfair band, dining-room intro, food cards, Skanom, atmosphere gallery, and desk details are editable below.
           </SuccessMessage>
           <AdminSectionCard>
             <p className="text-sm text-[var(--admin-text-muted)]">
@@ -115,6 +139,10 @@ export default async function AdminRestaurantPage() {
             submitAction={saveRestaurantContent}
             initial={result.row}
             heroPreviewUrl={result.heroPreviewUrl}
+            editorialPreviewUrl={result.editorialPreviewUrl}
+            editorialImageAltFromMedia={result.editorialImageAltFromMedia}
+            introPreviewUrl={result.introPreviewUrl}
+            introImageAltFromMedia={result.introImageAltFromMedia}
             skanomPreviewUrl={result.skanomPreviewUrl}
             skanomImageAltFromMedia={result.skanomImageAltFromMedia}
             menuDrafts={result.menuDrafts}

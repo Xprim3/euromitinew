@@ -172,6 +172,50 @@ async function resolveSkanomMedia(opts: {
   return { next: undefined }
 }
 
+async function resolveEditorialHeroMedia(opts: {
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>
+  editorId: string
+  formData: FormData
+}): Promise<{ next: OptionalUuid } | { error: string }> {
+  if (truthyCheckbox(opts.formData.get("clear_editorial_image"))) {
+    return { next: null }
+  }
+  const file = opts.formData.get("editorial_image")
+  const alt = String(opts.formData.get("editorial_image_alt") ?? "").trim()
+  if (file instanceof File && file.size > 0) {
+    const up = await uploadHomepageAssetRow(opts.supabase, opts.editorId, file, {
+      altText: alt,
+      usageSection: "restaurant-editorial-hero",
+      category: "restaurant",
+    })
+    if ("message" in up) return { error: up.message }
+    return { next: up.id }
+  }
+  return { next: undefined }
+}
+
+async function resolveIntroSectionMedia(opts: {
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>
+  editorId: string
+  formData: FormData
+}): Promise<{ next: OptionalUuid } | { error: string }> {
+  if (truthyCheckbox(opts.formData.get("clear_intro_image"))) {
+    return { next: null }
+  }
+  const file = opts.formData.get("intro_image")
+  const alt = String(opts.formData.get("intro_image_alt") ?? "").trim()
+  if (file instanceof File && file.size > 0) {
+    const up = await uploadHomepageAssetRow(opts.supabase, opts.editorId, file, {
+      altText: alt,
+      usageSection: "restaurant-intro",
+      category: "restaurant",
+    })
+    if ("message" in up) return { error: up.message }
+    return { next: up.id }
+  }
+  return { next: undefined }
+}
+
 export async function saveRestaurantContent(
   _prev: RestaurantSaveState,
   formData: FormData
@@ -193,7 +237,10 @@ export async function saveRestaurantContent(
     const parsed = restaurantContentFormSchema.safeParse({
       hero_title: formData.get("hero_title"),
       hero_subtitle: formData.get("hero_subtitle"),
-      hero_description: formData.get("hero_description"),
+      intro_eyebrow: formData.get("intro_eyebrow"),
+      intro_headline_line1: formData.get("intro_headline_line1"),
+      intro_headline_line2: formData.get("intro_headline_line2"),
+      intro_body: formData.get("intro_body"),
       opening_hours: formData.get("opening_hours"),
       contact_phone: formData.get("contact_phone") ?? "",
       contact_email: formData.get("contact_email") ?? "",
@@ -205,6 +252,14 @@ export async function saveRestaurantContent(
       skanom_cta_label: formData.get("skanom_cta_label"),
       skanom_cta_href: formData.get("skanom_cta_href"),
       skanom_image_alt: formData.get("skanom_image_alt") ?? "",
+      editorial_eyebrow: formData.get("editorial_eyebrow"),
+      editorial_title_line1: formData.get("editorial_title_line1"),
+      editorial_title_line2: formData.get("editorial_title_line2"),
+      editorial_description: formData.get("editorial_description"),
+      editorial_quote_line: formData.get("editorial_quote_line"),
+      editorial_quote_attribution: formData.get("editorial_quote_attribution"),
+      editorial_image_alt: formData.get("editorial_image_alt") ?? "",
+      intro_image_alt: formData.get("intro_image_alt") ?? "",
     })
 
     if (!parsed.success) {
@@ -218,6 +273,12 @@ export async function saveRestaurantContent(
 
     const skanomR = await resolveSkanomMedia({ supabase, editorId, formData })
     if ("error" in skanomR) return { ok: false, message: skanomR.error }
+
+    const editorialR = await resolveEditorialHeroMedia({ supabase, editorId, formData })
+    if ("error" in editorialR) return { ok: false, message: editorialR.error }
+
+    const introR = await resolveIntroSectionMedia({ supabase, editorId, formData })
+    if ("error" in introR) return { ok: false, message: introR.error }
 
     const menuR = await collectMenuHighlights(supabase, editorId, formData)
     if (!menuR.ok) return { ok: false, message: menuR.message }
@@ -233,7 +294,11 @@ export async function saveRestaurantContent(
       id: 1,
       hero_title: v.hero_title,
       hero_subtitle: v.hero_subtitle,
-      hero_description: v.hero_description,
+      hero_description: v.intro_body,
+      intro_eyebrow: v.intro_eyebrow,
+      intro_headline_line1: v.intro_headline_line1,
+      intro_headline_line2: v.intro_headline_line2,
+      intro_body: v.intro_body,
       opening_hours: v.opening_hours,
       contact_phone: phoneTrim.length ? phoneTrim : null,
       contact_email: emailTrim.length ? emailTrim : null,
@@ -245,11 +310,19 @@ export async function saveRestaurantContent(
       skanom_description: v.skanom_description,
       skanom_cta_label: v.skanom_cta_label,
       skanom_cta_href: v.skanom_cta_href,
+      editorial_eyebrow: v.editorial_eyebrow,
+      editorial_title_line1: v.editorial_title_line1,
+      editorial_title_line2: v.editorial_title_line2,
+      editorial_description: v.editorial_description,
+      editorial_quote_line: v.editorial_quote_line,
+      editorial_quote_attribution: v.editorial_quote_attribution,
       updated_by: editorId,
     }
 
     if (heroR.next !== undefined) patch.hero_image_media_id = heroR.next
     if (skanomR.next !== undefined) patch.skanom_image_media_id = skanomR.next
+    if (editorialR.next !== undefined) patch.editorial_image_media_id = editorialR.next
+    if (introR.next !== undefined) patch.intro_image_media_id = introR.next
 
     const { error: upErr } = await supabase.from("restaurant_content").upsert(patch, { onConflict: "id" })
     if (upErr) return { ok: false, message: upErr.message }

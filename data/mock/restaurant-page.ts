@@ -39,10 +39,10 @@ export type RestaurantEditorialIntroMock = typeof restaurantEditorialIntroMock
 export const restaurantSeasonalFoodGalleryMock = {
   sectionId: "menu-highlights",
   headingId: "restaurant-seasonal-menu-heading",
-  eyebrow: "Curated selection",
-  title: "The Seasonal Menu",
+  eyebrow: "Nga kuzhina në tryezë",
+  title: "Shije të përgatitura me kujdes",
   lead:
-    "Exceptional quality in every bite — prepared daily with ingredients at their peak and plates tuned to the Kosovo calendar.",
+    "Në Restaurant Euromiti, çdo pjatë përgatitet me përkushtim, duke kombinuar përbërës cilësorë, shije të balancuar dhe prezantim të kujdesshëm. Qëllimi ynë është të ofrojmë ushqim të shijshëm, të freskët dhe të përshtatshëm për çdo moment të ditës.",
   items: [
     {
       title: "The Breakfast Service",

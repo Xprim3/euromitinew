@@ -64,6 +64,11 @@ export function normalizeRestaurantContentRow(raw: Record<string, unknown>): Res
     hero_title: typeof raw.hero_title === "string" ? raw.hero_title : "",
     hero_subtitle: typeof raw.hero_subtitle === "string" ? raw.hero_subtitle : "",
     hero_description: typeof raw.hero_description === "string" ? raw.hero_description : "",
+    intro_eyebrow: typeof raw.intro_eyebrow === "string" ? raw.intro_eyebrow : "",
+    intro_headline_line1: typeof raw.intro_headline_line1 === "string" ? raw.intro_headline_line1 : "",
+    intro_headline_line2: typeof raw.intro_headline_line2 === "string" ? raw.intro_headline_line2 : "",
+    intro_body: typeof raw.intro_body === "string" ? raw.intro_body : "",
+    intro_image_media_id: fk("intro_image_media_id"),
     hero_image_media_id: fk("hero_image_media_id"),
     opening_hours: typeof raw.opening_hours === "string" ? raw.opening_hours : "",
     contact_phone: fk("contact_phone"),
@@ -77,6 +82,13 @@ export function normalizeRestaurantContentRow(raw: Record<string, unknown>): Res
     skanom_image_media_id: fk("skanom_image_media_id"),
     skanom_cta_label: typeof raw.skanom_cta_label === "string" ? raw.skanom_cta_label : "",
     skanom_cta_href: typeof raw.skanom_cta_href === "string" ? raw.skanom_cta_href : "",
+    editorial_eyebrow: typeof raw.editorial_eyebrow === "string" ? raw.editorial_eyebrow : "",
+    editorial_title_line1: typeof raw.editorial_title_line1 === "string" ? raw.editorial_title_line1 : "",
+    editorial_title_line2: typeof raw.editorial_title_line2 === "string" ? raw.editorial_title_line2 : "",
+    editorial_description: typeof raw.editorial_description === "string" ? raw.editorial_description : "",
+    editorial_quote_line: typeof raw.editorial_quote_line === "string" ? raw.editorial_quote_line : "",
+    editorial_quote_attribution: typeof raw.editorial_quote_attribution === "string" ? raw.editorial_quote_attribution : "",
+    editorial_image_media_id: fk("editorial_image_media_id"),
     updated_at: typeof raw.updated_at === "string" ? raw.updated_at : new Date().toISOString(),
     updated_by: fk("updated_by"),
   }
@@ -169,7 +181,18 @@ export const getRestaurantContentPublic = cache(async (): Promise<{ row: Restaur
 
   const galleryIds = row.gallery_media_ids ?? []
 
-  const allIds = [...new Set([row.hero_image_media_id, row.skanom_image_media_id, ...menuIds, ...galleryIds].filter((x): x is string => Boolean(x)))]
+  const allIds = [
+    ...new Set(
+      [
+        row.hero_image_media_id,
+        row.skanom_image_media_id,
+        row.editorial_image_media_id,
+        row.intro_image_media_id,
+        ...menuIds,
+        ...galleryIds,
+      ].filter((x): x is string => Boolean(x))
+    ),
+  ]
 
   let media: MediaMap = {}
   if (allIds.length) {
@@ -253,20 +276,49 @@ export function resolveRestaurantPage(row: RestaurantContentRow | null, media: M
   const pageHeroTitle = row.hero_title
   const pageHeroSubtitle = row.hero_subtitle
 
+  const edImgId = row.editorial_image_media_id
+  const edM = edImgId ? media[edImgId] : undefined
+  const editorialUrl = edM?.public_url?.trim()
+  const editorialHeroImageSrc =
+    editorialUrl && editorialUrl.length > 0
+      ? editorialUrl
+      : pageHeroImageSrc
+  const editorialHeroImageAlt = edM?.alt_text?.trim() || pageHeroImageAlt
+
   const editorialHero = {
-    ...restaurantEditorialHeroMock,
-    imageSrc: pageHeroImageSrc,
-    imageAlt: pageHeroImageAlt,
+    eyebrow: row.editorial_eyebrow.trim() || restaurantEditorialHeroMock.eyebrow,
+    titleLine1: row.editorial_title_line1.trim() || restaurantEditorialHeroMock.titleLine1,
+    titleLine2: row.editorial_title_line2.trim() || restaurantEditorialHeroMock.titleLine2,
+    description:
+      row.editorial_description.trim() || restaurantEditorialHeroMock.description,
+    quote: {
+      line: row.editorial_quote_line.trim() || restaurantEditorialHeroMock.quote.line,
+      attribution:
+        row.editorial_quote_attribution.trim() || restaurantEditorialHeroMock.quote.attribution,
+    },
+    imageSrc: editorialHeroImageSrc,
+    imageAlt: editorialHeroImageAlt,
   } as RestaurantEditorialHeroMock
 
-  const desc = row.hero_description.trim()
-  const cmsParas = paragraphsFromDescription(desc)
+  const introBodyRaw = row.intro_body.trim() || row.hero_description.trim()
+  const cmsParas = paragraphsFromDescription(introBodyRaw)
+  const introParagraphs =
+    cmsParas.length > 0 ? cmsParas : [...restaurantEditorialIntroMock.paragraphs]
+
+  const introImgId = row.intro_image_media_id
+  const introM = introImgId ? media[introImgId] : undefined
+  const introUrl = introM?.public_url?.trim()
+  const introImageSrc = introUrl && introUrl.length > 0 ? introUrl : pageHeroImageSrc
+  const introImageAlt = introM?.alt_text?.trim() || pageHeroImageAlt
 
   const editorialIntro = {
     ...restaurantEditorialIntroMock,
-    paragraphs: cmsParas as readonly string[],
-    imageSrc: pageHeroImageSrc,
-    imageAlt: pageHeroImageAlt,
+    eyebrow: row.intro_eyebrow.trim() || restaurantEditorialIntroMock.eyebrow,
+    headlineLine1: row.intro_headline_line1.trim() || restaurantEditorialIntroMock.headlineLine1,
+    headlineLine2: row.intro_headline_line2.trim() || restaurantEditorialIntroMock.headlineLine2,
+    paragraphs: introParagraphs as readonly string[],
+    imageSrc: introImageSrc,
+    imageAlt: introImageAlt,
   } as RestaurantEditorialIntroMock
 
   const menuItems = menuCardsFromDb(row.menu_highlights_json, media)
