@@ -1,7 +1,7 @@
 import Link from "next/link"
 
 import { Container } from "@/components/layout/Container"
-import { EuromitiMotionClasses, Reveal } from "@/components/motion"
+import { Reveal } from "@/components/motion"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import type { LocationSummary } from "@/types/public"
@@ -32,7 +32,7 @@ export function RestaurantReservationStations({ section, className }: Restaurant
   return (
     <section id={sectionId} aria-labelledby={headingId} className={cn("bg-muted py-[clamp(3rem,6.8vw,5.85rem)]", className)}>
       <Container>
-        <Reveal variant="fade-up" once>
+        <Reveal variant="fade" once>
           <header className="mx-auto mb-10 max-w-3xl text-center md:mb-14">
             <p className="mb-5 font-heading text-[0.65rem] font-semibold uppercase tracking-[0.38em] text-secondary">
               {eyebrow}
@@ -44,7 +44,7 @@ export function RestaurantReservationStations({ section, className }: Restaurant
           </header>
         </Reveal>
 
-        <Reveal variant="fade-up" once>
+        <Reveal variant="fade" once>
         <ul className="mx-auto grid max-w-7xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
           {stations.map((loc) => {
             const tagline =
@@ -57,7 +57,7 @@ export function RestaurantReservationStations({ section, className }: Restaurant
                 <article
                   className={cn(
                     "flex h-full flex-col overflow-hidden border border-primary/12 bg-linear-to-b from-background via-background to-muted/45",
-                    "shadow-(--shadow-euromiti-soft) md:transition-transform md:duration-300 md:will-change-transform md:hover:-translate-y-0.5"
+                    "shadow-(--shadow-euromiti-soft)"
                   )}
                 >
                   <div className="grow px-6 pb-8 pt-8 sm:px-8 sm:pb-9 sm:pt-9 lg:px-9">
@@ -113,10 +113,7 @@ export function RestaurantReservationStations({ section, className }: Restaurant
                     <Button
                       variant="secondary"
                       size="lg"
-                      className={cn(
-                        "mt-10 w-full rounded-full text-[0.65rem] font-semibold uppercase tracking-[0.24em]",
-                        EuromitiMotionClasses.buttonHover
-                      )}
+                      className="mt-10 w-full rounded-full text-[0.65rem] font-semibold uppercase tracking-[0.24em]"
                       render={<Link href={reservationHref} />}
                     >
                       {reservationCtaLabel}
