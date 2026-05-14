@@ -9,7 +9,7 @@ export default async function WebsiteLayout({
   const brand = await getSiteFooterPublic()
 
   return (
-    <div className="flex min-h-full flex-col">
+    <div className="flex min-h-svh min-h-full flex-col">
       <ScrollToTop />
       <Navbar brand={brand} />
       <main id="main-content" className="flex flex-1 flex-col">

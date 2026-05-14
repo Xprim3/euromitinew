@@ -22,7 +22,6 @@ export function MobileMenu({ className }: MobileMenuProps) {
     pathnameRef.current = pathname
   }, [pathname])
   const panelId = useId()
-  const closeButtonRef = useRef<HTMLButtonElement>(null)
 
   const mounted = phase !== "closed"
   const exiting = phase === "closing"
@@ -77,12 +76,6 @@ export function MobileMenu({ className }: MobileMenuProps) {
     }
   }, [mounted, closeMenu])
 
-  useEffect(() => {
-    if (phase !== "open") return undefined
-    const t = requestAnimationFrame(() => closeButtonRef.current?.focus({ preventScroll: true }))
-    return () => cancelAnimationFrame(t)
-  }, [phase])
-
   return (
     <div className={cn(className)}>
       <button
@@ -91,13 +84,13 @@ export function MobileMenu({ className }: MobileMenuProps) {
         aria-controls={panelId}
         aria-haspopup="dialog"
         aria-label={mounted ? "Close menu" : "Open menu"}
-        className="flex size-11 items-center justify-center rounded-[var(--rounded-sm)] border border-transparent text-white transition-colors hover:bg-white/12 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/55 focus-visible:outline-none"
+        className="group flex size-11 items-center justify-center rounded-[var(--rounded-sm)] border border-transparent text-white outline-none transition-colors [-webkit-tap-highlight-color:transparent] hover:text-brand-accent-soft focus-visible:outline-none focus-visible:ring-0"
         onClick={openMenu}
       >
         <span className="flex w-5 flex-col justify-center gap-[5px]" aria-hidden>
-          <span className="h-0.5 w-full rounded-full bg-current" />
-          <span className="h-0.5 w-full rounded-full bg-current" />
-          <span className="h-0.5 w-full rounded-full bg-current" />
+          <span className="h-0.5 w-full rounded-full bg-current transition-colors" />
+          <span className="h-0.5 w-full rounded-full bg-current transition-colors" />
+          <span className="h-0.5 w-full rounded-full bg-current transition-colors" />
         </span>
       </button>
 
@@ -129,10 +122,9 @@ export function MobileMenu({ className }: MobileMenuProps) {
                 />
                 <div className="relative flex items-center justify-start border-white/10 border-b px-3 py-3 sm:px-4 sm:py-4">
                   <button
-                    ref={closeButtonRef}
                     type="button"
                     aria-label="Close navigation"
-                    className="flex size-11 shrink-0 items-center justify-center rounded-sm text-white/88 transition-colors hover:text-brand-accent-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent-soft/45 focus-visible:ring-offset-2 focus-visible:ring-offset-brand-shell-deep"
+                    className="flex size-11 shrink-0 items-center justify-center rounded-sm bg-transparent text-white/88 outline-none transition-colors [-webkit-tap-highlight-color:transparent] hover:bg-transparent hover:text-brand-accent-soft active:bg-transparent focus-visible:outline-none focus-visible:ring-0"
                     onClick={closeMenu}
                   >
                     <svg

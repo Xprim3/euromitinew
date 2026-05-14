@@ -47,10 +47,10 @@ export function Navbar({ brand }: NavbarProps) {
             <Image
               src={logoSrc}
               alt={logoAlt}
-              width={260}
-              height={84}
+              width={220}
+              height={71}
               priority
-              className="block h-11 w-auto max-w-[min(52vw,12rem)] shrink-0 object-contain object-left sm:h-12 sm:max-w-52 md:h-[3.35rem] md:max-w-60"
+              className="block h-10 w-auto max-w-[min(46vw,10.5rem)] shrink-0 object-contain object-left sm:h-11 sm:max-w-48 md:h-12 md:max-w-52"
             />
           </Link>
         </div>
