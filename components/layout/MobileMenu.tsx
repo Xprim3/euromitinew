@@ -22,7 +22,7 @@ export function MobileMenu({ className }: MobileMenuProps) {
     pathnameRef.current = pathname
   }, [pathname])
   const panelId = useId()
-  const firstLinkRef = useRef<HTMLAnchorElement>(null)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
 
   const mounted = phase !== "closed"
   const exiting = phase === "closing"
@@ -79,7 +79,7 @@ export function MobileMenu({ className }: MobileMenuProps) {
 
   useEffect(() => {
     if (phase !== "open") return undefined
-    const t = requestAnimationFrame(() => firstLinkRef.current?.focus({ preventScroll: true }))
+    const t = requestAnimationFrame(() => closeButtonRef.current?.focus({ preventScroll: true }))
     return () => cancelAnimationFrame(t)
   }, [phase])
 
@@ -129,6 +129,7 @@ export function MobileMenu({ className }: MobileMenuProps) {
                 />
                 <div className="relative flex items-center justify-start border-white/10 border-b px-3 py-3 sm:px-4 sm:py-4">
                   <button
+                    ref={closeButtonRef}
                     type="button"
                     aria-label="Close navigation"
                     className="flex size-11 shrink-0 items-center justify-center rounded-sm text-white/88 transition-colors hover:text-brand-accent-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent-soft/45 focus-visible:ring-offset-2 focus-visible:ring-offset-brand-shell-deep"
@@ -162,17 +163,16 @@ export function MobileMenu({ className }: MobileMenuProps) {
 
                 <nav
                   aria-label="Mobile main"
-                  className="relative flex flex-1 flex-col divide-y divide-white/10 overflow-y-auto px-3 py-4"
+                  className="relative flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 py-4"
                 >
-                  {TOPBAR_NAV_LINKS.map(({ href, label }, i) => {
+                  {TOPBAR_NAV_LINKS.map(({ href, label }) => {
                     const active = href === "/" ? pathname === "/" : pathname.startsWith(href)
                     return (
                       <Link
                         key={href}
-                        ref={i === 0 ? firstLinkRef : undefined}
                         href={href}
                         className={cn(
-                          "group flex min-h-12 items-center justify-between gap-3 py-2.5 pr-1 pl-3 text-sm font-bold tracking-wide text-white/68 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent-soft/45 focus-visible:ring-offset-2 focus-visible:ring-offset-brand-shell-deep active:[&_svg]:translate-x-1",
+                          "flex min-h-12 items-center justify-between gap-3 rounded-sm py-2.5 pr-1 pl-3 text-sm font-bold tracking-wide text-white/68 outline-none [-webkit-tap-highlight-color:transparent] focus-visible:outline-none focus-visible:ring-0 focus-visible:underline focus-visible:decoration-brand-accent-soft/55 focus-visible:underline-offset-[6px]",
                           active && "text-brand-accent-soft"
                         )}
                         onClick={closeMenu}
@@ -180,7 +180,7 @@ export function MobileMenu({ className }: MobileMenuProps) {
                         <span className="min-w-0">{label}</span>
                         <svg
                           viewBox="0 0 24 24"
-                          className="pointer-events-none size-4 shrink-0 text-current opacity-55 transition-transform duration-200 ease-out group-hover:translate-x-0.5"
+                          className="pointer-events-none size-4 shrink-0 text-current opacity-50"
                           fill="none"
                           aria-hidden
                         >

@@ -12,6 +12,8 @@ export function HomeHeroSlider({ slides }: { slides: HomeHeroSlideResolved[] }) 
   const safeSlides = slides.length ? slides : []
   const [activeIndex, setActiveIndex] = useState(0)
   const touchStartX = useRef<number | null>(null)
+  /** While true, autoplay ticks are skipped (finger on screen / gesture in progress). */
+  const pauseAutoplayRef = useRef(false)
   const normalizedIndex = safeSlides.length ? activeIndex % safeSlides.length : 0
   const activeSlide = safeSlides[normalizedIndex] ?? safeSlides[0]
 
@@ -26,6 +28,7 @@ export function HomeHeroSlider({ slides }: { slides: HomeHeroSlideResolved[] }) 
   useEffect(() => {
     if (safeSlides.length <= 1) return undefined
     const timer = window.setInterval(() => {
+      if (pauseAutoplayRef.current) return
       setActiveIndex((current) => (current + 1) % safeSlides.length)
     }, ROTATE_MS)
     return () => window.clearInterval(timer)
@@ -37,15 +40,26 @@ export function HomeHeroSlider({ slides }: { slides: HomeHeroSlideResolved[] }) 
     <section
       className="relative isolate min-h-[calc(100svh-5rem)] scroll-mt-20 overflow-hidden bg-brand-shell-mid sm:min-h-[clamp(34rem,82svh,49rem)]"
       onTouchStart={(event) => {
+        pauseAutoplayRef.current = true
         touchStartX.current = event.touches[0]?.clientX ?? null
       }}
       onTouchEnd={(event) => {
-        if (touchStartX.current == null || safeSlides.length <= 1) return
+        if (touchStartX.current == null || safeSlides.length <= 1) {
+          touchStartX.current = null
+          pauseAutoplayRef.current = false
+          return
+        }
         const endX = event.changedTouches[0]?.clientX ?? touchStartX.current
         const deltaX = endX - touchStartX.current
         touchStartX.current = null
-        if (Math.abs(deltaX) < SWIPE_THRESHOLD) return
-        goTo(normalizedIndex + (deltaX < 0 ? 1 : -1))
+        if (Math.abs(deltaX) >= SWIPE_THRESHOLD) {
+          goTo(normalizedIndex + (deltaX < 0 ? 1 : -1))
+        }
+        pauseAutoplayRef.current = false
+      }}
+      onTouchCancel={() => {
+        touchStartX.current = null
+        pauseAutoplayRef.current = false
       }}
     >
       <div className="absolute inset-0 z-0">
