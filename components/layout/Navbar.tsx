@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -27,9 +28,13 @@ type NavbarProps = {
   brand?: Pick<SiteFooterPublic, "companyName" | "logoUrl" | "logoAlt">
 }
 
+const NAV_LOGO_FALLBACK = "/logo-white.svg"
+
 export function Navbar({ brand }: NavbarProps) {
   const pathname = usePathname()
   const companyName = brand?.companyName?.trim() || "Euromiti"
+  const logoSrc = brand?.logoUrl?.trim() || NAV_LOGO_FALLBACK
+  const logoAlt = brand?.logoAlt?.trim() || `${companyName} logo`
 
   return (
     <header className="sticky top-0 z-40 border-b border-white/5 bg-brand-shell-deep/95 shadow-lg backdrop-blur-md transition-all">
@@ -37,20 +42,16 @@ export function Navbar({ brand }: NavbarProps) {
         <div className="flex items-center gap-4 md:gap-5">
           <Link
             href="/"
-            className="group inline-flex min-w-0 items-center gap-3 md:gap-4"
+            className="group inline-flex shrink-0 rounded-sm outline-offset-4 transition-opacity hover:opacity-[0.92] focus-visible:outline-2 focus-visible:outline-ring"
           >
-            <span
-              aria-hidden
-              className="h-11 w-px shrink-0 bg-linear-to-b from-transparent via-brand-accent-gold/50 to-transparent sm:h-12"
+            <Image
+              src={logoSrc}
+              alt={logoAlt}
+              width={260}
+              height={84}
+              priority
+              className="block h-11 w-auto max-w-[min(52vw,12rem)] shrink-0 object-contain object-left sm:h-12 sm:max-w-52 md:h-[3.35rem] md:max-w-60"
             />
-            <span className="min-w-0 leading-none">
-              <span className="block truncate font-(family-name:--font-montserrat) text-[1.05rem] font-black uppercase tracking-[0.16em] text-white transition-colors group-hover:text-brand-accent-soft sm:text-lg">
-                {companyName}
-              </span>
-              <span className="mt-1 block truncate text-[0.57rem] font-bold uppercase tracking-[0.22em] text-white/48 sm:text-[0.62rem]">
-                Petrol & Restaurant
-              </span>
-            </span>
           </Link>
         </div>
 

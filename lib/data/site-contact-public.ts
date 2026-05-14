@@ -30,7 +30,7 @@ export type ContactDetailsPublic = {
 }
 
 const DEFAULT_FOOTER_BODY =
-  "Pioneering transit fuel and hospitality experiences in Kosovo — built on safety, brightness, and craft across Prishtina, Ferizaj, and Gjilan."
+  "Një rrjet modern karburanti dhe shërbimesh në Prishtinë, Ferizaj dhe Gjilan, që bashkon cilësinë, komoditetin dhe mikpritjen profesionale për një përvojë të plotë në çdo ndalesë."
 
 export function parseSocialLinks(raw: unknown): SocialLinkItem[] {
   if (!Array.isArray(raw)) return []

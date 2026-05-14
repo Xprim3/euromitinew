@@ -14,6 +14,9 @@ const legalLinks = [
   { href: "/terms", label: "Terms & Legal" },
 ] as const
 
+/** Public vector mark when no CMS footer logo is set (`public/logo-white.svg`). */
+const FOOTER_BRAND_MARK_SVG = "/logo-white.svg"
+
 const footerLinkClass =
   "text-[0.7rem] font-bold uppercase tracking-[0.16em] text-white/68 transition-colors duration-200 hover:text-brand-accent-soft"
 
@@ -30,22 +33,31 @@ function FooterView({ data }: { data: SiteFooterPublic }) {
           <div className="lg:col-span-5">
             <Link
               href="/"
-              className="inline-flex max-w-full items-center gap-3 font-(family-name:--font-montserrat) text-xl font-extrabold tracking-tighter text-white uppercase transition hover:text-brand-accent-soft"
+              className="group inline-flex max-w-full items-center rounded-sm outline-offset-4 transition-opacity hover:opacity-[0.92] focus-visible:outline-2 focus-visible:outline-ring"
             >
-              {data.logoUrl ? (
-                <span className="relative block h-9 w-28 shrink-0">
-                  <Image
-                    src={data.logoUrl}
-                    alt={data.logoAlt}
-                    fill
-                    sizes="7rem"
-                    className="object-contain object-left"
-                  />
-                </span>
-              ) : null}
-              <span className="min-w-0 leading-tight">{data.companyName}</span>
+              {data.logoUrl?.trim() ? (
+                <Image
+                  src={data.logoUrl.trim()}
+                  alt={data.logoAlt?.trim() || `${data.companyName} logo`}
+                  width={360}
+                  height={120}
+                  className="block h-10 w-auto max-w-[min(72vw,11rem)] object-contain object-left sm:h-11 sm:max-w-52 md:h-12 md:max-w-60"
+                  sizes="(max-width: 640px) 176px, (max-width: 1024px) 208px, 240px"
+                />
+              ) : (
+                // eslint-disable-next-line @next/next/no-img-element -- small static SVG mark; avoids raster optimization pipeline
+                <img
+                  src={FOOTER_BRAND_MARK_SVG}
+                  alt={data.logoAlt?.trim() || `${data.companyName} logo`}
+                  width={480}
+                  height={300}
+                  decoding="async"
+                  className="block h-16 w-auto max-w-[min(96vw,20rem)] object-contain object-left sm:h-18 md:h-20 md:max-w-104 lg:h-24 lg:max-w-[min(100%,32rem)]"
+                />
+              )}
+              <span className="sr-only">{data.companyName}</span>
             </Link>
-            <p className="mt-5 max-w-md whitespace-pre-line text-[0.9375rem] leading-[1.65] text-white/58">{data.footerBody}</p>
+            <p className="mt-2.5 max-w-md whitespace-pre-line text-[0.9375rem] leading-[1.65] text-white/58">{data.footerBody}</p>
             {data.socialLinks.length ? (
               <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2">
                 {data.socialLinks.map((s) => (
