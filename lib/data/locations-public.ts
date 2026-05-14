@@ -24,6 +24,8 @@ export type ResolvedPublicLocation = {
   pageSummary: string
   address: string
   phone: string
+  /** Raw contact email when set; use for `mailto:` and programmatic fallbacks. */
+  contactEmail: string | null
   contactEmailDisplay: string
   openingHours: string
   googleMapsUrl: string
@@ -117,6 +119,8 @@ export async function fetchLocationsPublicPageRows(): Promise<
     const google_maps_url = typeof loc.google_maps_url === "string" ? loc.google_maps_url : ""
     const contact_email = typeof loc.contact_email === "string" ? loc.contact_email : null
 
+    const emailTrim = contact_email?.trim() ?? null
+
     return {
       id: locId,
       slug,
@@ -125,7 +129,8 @@ export async function fetchLocationsPublicPageRows(): Promise<
       pageSummary: summary,
       address: address.trim(),
       phone: phone.trim(),
-      contactEmailDisplay: contact_email?.trim() ? contact_email.trim() : "—",
+      contactEmail: emailTrim && emailTrim.length > 0 ? emailTrim : null,
+      contactEmailDisplay: emailTrim && emailTrim.length > 0 ? emailTrim : "—",
       openingHours: opening_hours.trim(),
       googleMapsUrl: google_maps_url.trim(),
       services: normalizeServices(loc.services),

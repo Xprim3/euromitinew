@@ -128,7 +128,7 @@ export default async function AdminRestaurantPage() {
         <>
           <SuccessMessage title="Public revalidation">
             Saves revalidate <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">/restaurant</code> automatically.
-            Accordion order matches the page top to bottom. Reservation city cards stay mock-only; desk fields are saved but not shown as a summary on /restaurant. All other sections above are editable as labeled.
+            Accordion order matches the page top to bottom. Per-city reservation details are edited under Locations, not here.
           </SuccessMessage>
           <AdminSectionCard>
             <p className="text-sm text-[var(--admin-text-muted)]">

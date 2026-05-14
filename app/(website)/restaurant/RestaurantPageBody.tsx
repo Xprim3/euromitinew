@@ -7,14 +7,22 @@ import { RestaurantReservationStations } from "@/components/restaurant/Restauran
 import { RestaurantSeasonalFoodGallery } from "@/components/restaurant/RestaurantSeasonalFoodGallery"
 import { RestaurantSkanomSection } from "@/components/restaurant/RestaurantSkanomSection"
 import { restaurantReservationStationsSectionMock } from "@/data/mock/restaurant-page"
+import { getLocationsPublicCached } from "@/lib/data/locations-public"
 import {
   getRestaurantContentPublic,
   resolveRestaurantPage,
 } from "@/lib/data/restaurant-content-public"
+import { resolveRestaurantReservationStations } from "@/lib/data/restaurant-reservation-stations-public"
 
 export async function RestaurantPageBody() {
-  const { row, media } = await getRestaurantContentPublic()
+  const [{ row, media }, locationsResult] = await Promise.all([
+    getRestaurantContentPublic(),
+    getLocationsPublicCached(),
+  ])
   const data = resolveRestaurantPage(row, media)
+  const reservationStations = resolveRestaurantReservationStations(
+    locationsResult.ok ? locationsResult.rows : []
+  )
 
   return (
     <>
@@ -32,7 +40,10 @@ export async function RestaurantPageBody() {
       <RestaurantSkanomSection data={data.skanom} />
       <RestaurantExperiencePillars data={data.experiencePillars} />
       <RestaurantAtmosphereGallery data={data.atmosphereGallery} />
-      <RestaurantReservationStations section={restaurantReservationStationsSectionMock} />
+      <RestaurantReservationStations
+        section={restaurantReservationStationsSectionMock}
+        stations={reservationStations}
+      />
     </>
   )
 }

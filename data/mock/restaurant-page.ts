@@ -184,20 +184,15 @@ export const restaurantAtmosphereGalleryMock = {
 
 export type RestaurantAtmosphereGalleryMock = typeof restaurantAtmosphereGalleryMock
 
-/** Section framing for per-station reservation cards (addresses + contacts from `mockLocations`). */
+/** Section framing for per-station reservation cards (details from `locations` via resolver). */
 export const restaurantReservationStationsSectionMock = {
   sectionId: "restaurant-reservations-stations",
   headingId: "restaurant-reservations-stations-heading",
-  eyebrow: "Reservations",
-  title: "Choose your Euromiti table",
-  subtitle: "Each flagship routes guest care through its local desk—the same chefs, calibrated to the rhythm of Prishtina, Ferizaj, and Gjilan.",
-  reservationCtaLabel: "Make a reservation",
-  /** Short luxe line under each city name — Ferizaj mock has no licensed restaurant badge; concierge still anchors enquiries. */
-  stationTaglines: {
-    prishtina: "Flagship dining salon beside the motorway",
-    ferizaj: "Forecourt desk & traveller hospitality",
-    gjilan: "Regional dining salon & guest care",
-  } as const,
+  eyebrow: "Rezervime",
+  title: "Zgjidhni tryezën tuaj në Euromiti",
+  subtitle:
+    "Çdo stacion kryesor drejton kujdesin për mysafirët përmes tryezës së vet lokale të njëjtët shefa, të përshtatur me ritmin e Prishtinës, Ferizajit dhe Gjilanit.",
+  reservationCtaLabel: "Bëni rezervim",
 } as const
 
 export type RestaurantReservationStationsSectionMock = typeof restaurantReservationStationsSectionMock

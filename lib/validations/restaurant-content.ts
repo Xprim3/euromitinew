@@ -14,14 +14,6 @@ export const restaurantContentFormSchema = z.object({
   intro_headline_line1: text.max(240),
   intro_headline_line2: text.max(240),
   intro_body: text.max(12000),
-  opening_hours: text.max(2400),
-  contact_phone: text.max(160),
-  contact_email: z
-    .string()
-    .trim()
-    .max(200)
-    .refine((s) => s.length === 0 || z.string().email().safeParse(s).success, "Invalid email"),
-  contact_notes: text.max(2400),
   hero_image_alt: text.max(500).optional(),
   skanom_eyebrow: text.max(120),
   skanom_title: text.max(240),

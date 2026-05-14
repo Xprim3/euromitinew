@@ -6,16 +6,11 @@ import { Reveal, Stagger } from "@/components/motion"
 import { MaterialSymbol } from "@/components/ui/MaterialSymbol"
 import { homeHeroDesign } from "@/data/mock/homepage-visual"
 import { LOCATION_PAGE_SERVICE_LABELS, type ResolvedPublicLocation } from "@/lib/data/locations-public"
-import { cn } from "@/lib/utils"
+import { cn, telHrefFromDisplayPhone } from "@/lib/utils"
 import type { LocationAmenity } from "@/types/public"
 
 export type LocationsPageViewProps = {
   locations: ResolvedPublicLocation[]
-}
-
-function telHref(phone: string) {
-  const digits = phone.replace(/[^\d+]/g, "")
-  return digits ? `tel:${digits}` : undefined
 }
 
 function mailHref(display: string) {
@@ -216,7 +211,7 @@ export function LocationsPageView({ locations }: LocationsPageViewProps) {
       <Stagger once className="flex flex-col">
         {locations.map((entry, index) => {
           const imageLeft = index % 2 === 0
-          const phoneHref = telHref(entry.phone)
+          const phoneHref = telHrefFromDisplayPhone(entry.phone)
           const emailHref = mailHref(entry.contactEmailDisplay)
           const visual = { src: entry.mainImageSrc, alt: entry.mainImageAlt }
           const editorialDark = index % 2 === 1

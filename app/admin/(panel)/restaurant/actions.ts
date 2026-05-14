@@ -252,10 +252,6 @@ export async function saveRestaurantContent(
       intro_headline_line1: formData.get("intro_headline_line1"),
       intro_headline_line2: formData.get("intro_headline_line2"),
       intro_body: formData.get("intro_body"),
-      opening_hours: formData.get("opening_hours"),
-      contact_phone: formData.get("contact_phone") ?? "",
-      contact_email: formData.get("contact_email") ?? "",
-      contact_notes: formData.get("contact_notes") ?? "",
       hero_image_alt: formData.get("hero_image_alt") ?? "",
       skanom_eyebrow: formData.get("skanom_eyebrow"),
       skanom_title: formData.get("skanom_title"),
@@ -299,10 +295,6 @@ export async function saveRestaurantContent(
 
     const experiencePillarsJson = collectExperiencePillars(formData)
 
-    const phoneTrim = v.contact_phone?.trim() ?? ""
-    const emailTrim = v.contact_email?.trim() ?? ""
-    const notesTrim = v.contact_notes?.trim() ?? ""
-
     const patch: Record<string, unknown> = {
       id: 1,
       hero_title: v.hero_title,
@@ -312,10 +304,6 @@ export async function saveRestaurantContent(
       intro_headline_line1: v.intro_headline_line1,
       intro_headline_line2: v.intro_headline_line2,
       intro_body: v.intro_body,
-      opening_hours: v.opening_hours,
-      contact_phone: phoneTrim.length ? phoneTrim : null,
-      contact_email: emailTrim.length ? emailTrim : null,
-      contact_notes: notesTrim.length ? notesTrim : null,
       menu_highlights_json: menuR.value,
       experience_pillars_json: experiencePillarsJson,
       gallery_media_ids: galR.ids,

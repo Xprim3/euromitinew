@@ -145,7 +145,7 @@ export function RestaurantContentForm({
 
       <AdminSectionCard
         title="Restaurant content"
-        description="Sections follow the public /restaurant page top to bottom: page hero, Playfair band, dining-room intro, food gallery, Skanom, four experience pillars, atmosphere mosaic, then reservation city cards. Desk fields below are saved to CMS but not rendered as a network summary on this page. Reservation city cards stay mock-only for now."
+        description="Sections follow the public /restaurant page top to bottom: page hero, Playfair band, dining-room intro, food gallery, Skanom, four experience pillars, atmosphere mosaic, then per-city reservation cards. Station addresses, hours, phone, and email come from Locations (Prishtina, Ferizaj, Gjilan) — edit those under Locations in admin."
       >
         <div className="space-y-3">
           <EditorAccordion
@@ -430,39 +430,6 @@ export function RestaurantContentForm({
               existingMediaIdInputName={(_slot, index) => `gallery_media_id_${index}`}
               clearInputName={(_slot, index) => `gallery_clear_${index}`}
             />
-          </EditorAccordion>
-
-          <EditorAccordion
-            title="8 · Reservations / desk (hours & contact)"
-            description="Stored on the restaurant content record. Not shown as a summary card on /restaurant — city station cards use each location’s details."
-          >
-            <div className="space-y-5">
-              <TextareaInput
-                label="Opening hours"
-                name="opening_hours"
-                rows={4}
-                defaultValue={initial.opening_hours}
-                error={fieldErrors?.opening_hours?.[0]}
-              />
-              <AdminContentGrid columns={2}>
-                <TextInput label="Phone" name="contact_phone" defaultValue={initial.contact_phone ?? ""} />
-                <TextInput
-                  label="Email"
-                  name="contact_email"
-                  type="email"
-                  defaultValue={initial.contact_email ?? ""}
-                  error={fieldErrors?.contact_email?.[0]}
-                />
-              </AdminContentGrid>
-              <TextareaInput
-                label="Contact notes"
-                name="contact_notes"
-                rows={4}
-                defaultValue={initial.contact_notes ?? ""}
-                maxLength={2400}
-                showCharacterCount
-              />
-            </div>
           </EditorAccordion>
         </div>
       </AdminSectionCard>
