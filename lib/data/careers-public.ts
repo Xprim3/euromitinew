@@ -1,3 +1,4 @@
+import { unstable_noStore } from "next/cache"
 import { cache } from "react"
 
 import { createPublicSupabaseServerClient } from "@/lib/supabase/public-server-client"
@@ -50,6 +51,7 @@ export function applyHref(job: JobRow): string | null {
 }
 
 export const getActiveJobsPublic = cache(async (): Promise<JobRow[]> => {
+  unstable_noStore()
   const supabase = createPublicSupabaseServerClient()
   if (!supabase) return []
 
@@ -69,6 +71,7 @@ export const getActiveJobsPublic = cache(async (): Promise<JobRow[]> => {
 })
 
 export const getActiveJobBySlugPublic = cache(async (slug: string): Promise<JobRow | null> => {
+  unstable_noStore()
   const supabase = createPublicSupabaseServerClient()
   if (!supabase) return null
 

@@ -5,6 +5,8 @@ import { Briefcase, Fuel, ImageIcon, Inbox, MapPin, Newspaper } from "lucide-rea
 
 import {
   AdminContentGrid,
+  AdminPageLead,
+  AdminRecordCardList,
   AdminSectionCard,
   AdminTable,
   AdminTableBody,
@@ -13,9 +15,12 @@ import {
   AdminTableTd,
   AdminTableTh,
   DashboardMetricCard,
+  EmptyState,
   QuickActionCard,
   cnDs,
   dsBtnGhost,
+  dsBtnTertiary,
+  type AdminRecordCard,
 } from "@/components/admin/design-system"
 import { formatAdminStamp } from "@/lib/format-admin-datetime"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
@@ -42,6 +47,30 @@ type RecentApplicationRow = {
 type DashboardData = {
   metrics: DashboardMetric[]
   recentApplications: RecentApplicationRow[]
+}
+
+function applicationRowsToCards(rows: RecentApplicationRow[]): AdminRecordCard[] {
+  return rows.map((row) => ({
+    id: row.id,
+    title: row.full_name,
+    fields: [
+      { label: "Submitted", value: row.created_at ? formatAdminStamp(row.created_at) : "—" },
+      {
+        label: "Email",
+        value: (
+          <a className="break-all text-primary underline" href={`mailto:${row.email}`}>
+            {row.email}
+          </a>
+        ),
+      },
+      { label: "Role", value: <span className="break-words">{row.job_title}</span> },
+    ],
+    footer: (
+      <Link href={`/admin/careers/applications/${row.id}`} className={cnDs(dsBtnGhost, "min-h-9 px-3 text-xs")}>
+        Open
+      </Link>
+    ),
+  }))
 }
 
 async function loadDashboardData(): Promise<DashboardData> {
@@ -153,29 +182,23 @@ export default async function AdminDashboardPage() {
   const data = await loadDashboardData()
   const appTotal = Number.parseInt(data.metrics[0]?.value ?? "0", 10)
   const hasNewApplications = Number.isFinite(appTotal) && appTotal > 0
+  const applicationCards = applicationRowsToCards(data.recentApplications)
 
   return (
     <div className="min-w-0 space-y-6">
-      <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div className="min-w-0">
-          <h1 className="font-[family-name:var(--font-montserrat)] text-xl font-bold tracking-tight text-[var(--admin-text)] sm:text-2xl">
-            Overview
-          </h1>
-          <p className="mt-1 max-w-2xl text-sm text-[var(--admin-text-muted)]">
-            Live counts from Supabase. Review new job applications below when candidates apply.
-          </p>
-        </div>
-        {hasNewApplications ? (
-          <Link
-            href="/admin/careers/applications"
-            className={cnDs(dsBtnGhost, "shrink-0 self-start text-xs sm:self-auto")}
-          >
-            All applications
-          </Link>
-        ) : null}
-      </div>
+      <AdminPageLead
+        title="Overview"
+        description="Live counts from Supabase. Review new job applications below when candidates apply."
+        actions={
+          hasNewApplications ? (
+            <Link href="/admin/careers/applications" className={cnDs(dsBtnGhost, "inline-flex min-h-9 items-center justify-center px-4 text-xs")}>
+              All applications
+            </Link>
+          ) : undefined
+        }
+      />
 
-      <AdminContentGrid columns={3}>
+      <AdminContentGrid columns="dashboard-metrics">
         {data.metrics.map((metric) => (
           <DashboardMetricCard
             key={metric.label}
@@ -197,53 +220,64 @@ export default async function AdminDashboardPage() {
           </Link>
         }
       >
-        <AdminTable>
-            <AdminTableHead>
-              <AdminTableRow>
-                <AdminTableTh>Submitted</AdminTableTh>
-                <AdminTableTh>Applicant</AdminTableTh>
-                <AdminTableTh>Email</AdminTableTh>
-                <AdminTableTh>Role</AdminTableTh>
-                <AdminTableTh className="text-right"> </AdminTableTh>
-              </AdminTableRow>
-            </AdminTableHead>
-            <AdminTableBody>
-              {data.recentApplications.length === 0 ? (
-                <AdminTableRow>
-                  <AdminTableTd colSpan={5} className="py-10 text-center text-[var(--admin-text-muted)]">
-                    No applications yet. When someone applies from{" "}
-                    <Link className="text-primary underline" href="/careers">
-                      Careers
-                    </Link>
-                    , they will appear here.
-                  </AdminTableTd>
-                </AdminTableRow>
-              ) : (
-                data.recentApplications.map((row) => (
-                  <AdminTableRow key={row.id}>
-                    <AdminTableTd className="whitespace-nowrap text-sm">
-                      {row.created_at ? formatAdminStamp(row.created_at) : "—"}
-                    </AdminTableTd>
-                    <AdminTableTd className="font-medium">{row.full_name}</AdminTableTd>
-                    <AdminTableTd>
-                      <a className="text-primary hover:underline" href={`mailto:${row.email}`}>
-                        {row.email}
-                      </a>
-                    </AdminTableTd>
-                    <AdminTableTd className="max-w-[12rem] truncate text-sm">{row.job_title}</AdminTableTd>
-                    <AdminTableTd className="text-right">
-                      <Link
-                        href={`/admin/careers/applications/${row.id}`}
-                        className={cnDs(dsBtnGhost, "inline-flex min-h-9 px-3 text-xs")}
-                      >
-                        Open
-                      </Link>
-                    </AdminTableTd>
+        {data.recentApplications.length === 0 ? (
+          <EmptyState
+            title="No applications yet"
+            description={
+              <>
+                When someone applies from the public{" "}
+                <Link href="/careers" className="text-primary underline">
+                  Careers
+                </Link>{" "}
+                page, rows will show here.
+              </>
+            }
+            icon={<Inbox className="size-10 opacity-80" aria-hidden />}
+            action={
+              <Link href="/admin/careers/applications" className={cnDs(dsBtnTertiary, "inline-flex min-h-10 items-center px-4 text-xs")}>
+                Applications inbox
+              </Link>
+            }
+          />
+        ) : (
+          <>
+            <AdminRecordCardList ariaLabel="Recent job applications" records={applicationCards} />
+            <div className="hidden min-w-0 md:block">
+              <AdminTable>
+                <AdminTableHead>
+                  <AdminTableRow>
+                    <AdminTableTh>Submitted</AdminTableTh>
+                    <AdminTableTh>Applicant</AdminTableTh>
+                    <AdminTableTh>Email</AdminTableTh>
+                    <AdminTableTh>Role</AdminTableTh>
+                    <AdminTableTh className="text-right"> </AdminTableTh>
                   </AdminTableRow>
-                ))
-              )}
-            </AdminTableBody>
-          </AdminTable>
+                </AdminTableHead>
+                <AdminTableBody>
+                  {data.recentApplications.map((row) => (
+                    <AdminTableRow key={row.id}>
+                      <AdminTableTd className="whitespace-nowrap text-sm">
+                        {row.created_at ? formatAdminStamp(row.created_at) : "—"}
+                      </AdminTableTd>
+                      <AdminTableTd className="font-medium">{row.full_name}</AdminTableTd>
+                      <AdminTableTd>
+                        <a className="text-primary hover:underline" href={`mailto:${row.email}`}>
+                          {row.email}
+                        </a>
+                      </AdminTableTd>
+                      <AdminTableTd className="max-w-48 truncate text-sm">{row.job_title}</AdminTableTd>
+                      <AdminTableTd className="text-right">
+                        <Link href={`/admin/careers/applications/${row.id}`} className={cnDs(dsBtnGhost, "inline-flex min-h-9 px-3 text-xs")}>
+                          Open
+                        </Link>
+                      </AdminTableTd>
+                    </AdminTableRow>
+                  ))}
+                </AdminTableBody>
+              </AdminTable>
+            </div>
+          </>
+        )}
       </AdminSectionCard>
 
       <AdminSectionCard title="Shortcuts" description="Common admin destinations.">

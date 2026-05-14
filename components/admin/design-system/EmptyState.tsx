@@ -4,7 +4,7 @@ import { cnDs } from "./cn-ds"
 
 export type EmptyStateProps = {
   title: string
-  description?: string
+  description?: ReactNode
   icon?: ReactNode
   action?: ReactNode
   className?: string
@@ -23,7 +23,7 @@ export function EmptyState({ title, description, icon, action, className }: Empt
     >
       {icon ? <div className="mb-4 text-[var(--admin-text-muted)]">{icon}</div> : null}
       <p className="font-[family-name:var(--font-montserrat)] text-base font-semibold text-[var(--admin-text)]">{title}</p>
-      {description ? <p className="mt-2 max-w-md text-sm text-[var(--admin-text-muted)]">{description}</p> : null}
+      {description ? <div className="mt-2 max-w-md text-sm text-[var(--admin-text-muted)]">{description}</div> : null}
       {action ? <div className="mt-6">{action}</div> : null}
     </div>
   )

@@ -14,7 +14,7 @@ export type QuickActionCardProps = {
 }
 
 const baseClass =
-  "flex w-full items-start gap-4 rounded-[var(--admin-radius-card)] border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 text-left shadow-[var(--admin-shadow-card)] transition-shadow outline-none hover:shadow-[var(--admin-shadow-hover)] focus-visible:ring-2 focus-visible:ring-[var(--admin-focus-ring)] focus-visible:ring-offset-2"
+  "flex min-w-0 w-full items-start gap-4 rounded-[var(--admin-radius-card)] border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 text-left shadow-[var(--admin-shadow-card)] transition-shadow outline-none hover:shadow-[var(--admin-shadow-hover)] focus-visible:ring-2 focus-visible:ring-[var(--admin-focus-ring)] focus-visible:ring-offset-2"
 
 /**
  * Tappable row/card for dashboard shortcuts (link or button).

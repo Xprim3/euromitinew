@@ -93,6 +93,8 @@ export async function submitJobApplicationAction(
     }
 
     revalidatePath("/admin/careers/applications")
+    revalidatePath("/careers")
+    revalidatePath(`/careers/${v.job_slug}`)
 
     return { ok: true, message: "Aplikimi u dërgua. Do t’ju kontaktojmë nëse profili juaj përputhet me kërkesat." }
   } catch (e) {

@@ -40,7 +40,7 @@ export function AdminSectionCard({ title, description, headerActions, children, 
           {headerActions ? <div className="flex shrink-0 flex-wrap gap-2">{headerActions}</div> : null}
         </div>
       ) : null}
-      <div className="px-5 py-5 sm:px-6">{children}</div>
+      <div className="min-w-0 px-5 py-5 sm:px-6">{children}</div>
     </section>
   )
 }

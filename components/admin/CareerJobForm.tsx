@@ -88,10 +88,10 @@ export function CareerJobForm({ mode, submitAction, initial }: CareerJobFormProp
             <ToggleInput
               label="Job status"
               name="is_active"
-              defaultChecked={Boolean(initial?.is_active)}
+              defaultChecked={mode === "create" ? true : Boolean(initial?.is_active)}
               checkedLabel="Active"
               uncheckedLabel="Inactive"
-              helperText="Only active jobs are publicly readable by Supabase RLS."
+              helperText="Inactive jobs are hidden from /careers and cannot receive new applications. Turn on to list the opening on the public site."
             />
           </AdminContentGrid>
           <TextareaInput

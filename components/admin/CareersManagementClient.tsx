@@ -52,7 +52,7 @@ export function CareersManagementClient({ rows }: CareersManagementClientProps) 
   return (
     <AdminSectionCard
       title="Careers / jobs management"
-      description="Create, edit, filter, activate, and remove open positions."
+      description="Only Active jobs appear on the public /careers page (Supabase RLS). Inactive jobs stay in admin only."
       headerActions={
         <>
           <Link href="/admin/careers/applications" className={cnDs(dsBtnTertiary, "min-h-10 px-4 text-xs")}>
@@ -105,9 +105,14 @@ export function CareersManagementClient({ rows }: CareersManagementClientProps) 
                     <div className="mt-1 font-mono text-xs text-[var(--admin-text-muted)]">{job.slug}</div>
                   </AdminTableTd>
                   <AdminTableTd>
-                    <StatusBadge tone={job.is_active ? "success" : "neutral"}>
-                      {job.is_active ? "active" : "inactive"}
-                    </StatusBadge>
+                    <div className="flex flex-col gap-1">
+                      <StatusBadge tone={job.is_active ? "success" : "neutral"}>
+                        {job.is_active ? "Active" : "Inactive"}
+                      </StatusBadge>
+                      <span className="text-[0.65rem] leading-snug text-[var(--admin-text-muted)]">
+                        {job.is_active ? "Listed on public /careers" : "Hidden from website"}
+                      </span>
+                    </div>
                   </AdminTableTd>
                   <AdminTableTd>{job.location_city ?? "—"}</AdminTableTd>
                   <AdminTableTd>{job.posted_at ? formatNewsDate(job.posted_at) : "—"}</AdminTableTd>
