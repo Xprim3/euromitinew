@@ -637,8 +637,6 @@ export function HomepageContentForm({ initial, mediaPreviews, locationPreviews }
       </AdminSectionCard>
 
       <SaveBar
-        hasUnsavedChanges
-        unsavedLabel="Review changes before publishing"
         cancelLabel="Reset changes"
         onCancel={() => formRef.current?.reset()}
         submitLabel="Save changes"

@@ -3,7 +3,6 @@
 import { useFormStatus } from "react-dom"
 import type { ReactNode } from "react"
 import Link from "next/link"
-import { AlertCircle, CheckCircle2 } from "lucide-react"
 
 import { cnDs } from "./cn-ds"
 import { dsBtnGhost, dsBtnPrimary } from "./ds-button-classes"
@@ -18,16 +17,13 @@ function SaveBarSubmitButton({ label, pendingLabel }: { label: string; pendingLa
 }
 
 export type SaveBarProps = {
-  /** Left side: unsaved hint, last saved text, etc. */
+  /** Optional left column (e.g. short helper text). Omit for actions-only bar. */
   leading?: ReactNode
   /** Extra buttons before Cancel (e.g. “Preview”). */
   middle?: ReactNode
   onCancel?: () => void
   cancelHref?: string
   cancelLabel?: string
-  hasUnsavedChanges?: boolean
-  unsavedLabel?: string
-  savedLabel?: string
   /** When inside `<form action={serverAction}>`, omit and use default submit. */
   submitLabel?: string
   submitPendingLabel?: string
@@ -37,7 +33,7 @@ export type SaveBarProps = {
 }
 
 /**
- * Sticky bottom action bar for long forms — primary Save + optional Cancel (tertiary/ghost).
+ * Sticky bottom action bar for long forms — primary Save + optional Cancel (ghost).
  * Default submit uses `useFormStatus` for pending label when used inside a form.
  */
 export function SaveBar({
@@ -46,37 +42,25 @@ export function SaveBar({
   onCancel,
   cancelHref,
   cancelLabel = "Cancel",
-  hasUnsavedChanges = false,
-  unsavedLabel = "Unsaved changes",
-  savedLabel = "No unsaved changes",
   submitLabel = "Save changes",
   submitPendingLabel,
   showSubmit = true,
   className,
 }: SaveBarProps) {
-  const status = leading ?? (
-    <span
-      className={cnDs(
-        "inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-semibold",
-        hasUnsavedChanges
-          ? "bg-amber-100 text-amber-800"
-          : "bg-emerald-100 text-emerald-800"
-      )}
-    >
-      {hasUnsavedChanges ? <AlertCircle className="size-3.5" aria-hidden /> : <CheckCircle2 className="size-3.5" aria-hidden />}
-      {hasUnsavedChanges ? unsavedLabel : savedLabel}
-    </span>
-  )
-
   return (
     <div
       className={cnDs(
-        "sticky bottom-0 z-20 border-[var(--admin-border)] border-t bg-[var(--admin-surface)]/95 px-4 py-3 shadow-[0_-4px_12px_rgba(15,23,42,0.06)] backdrop-blur-sm sm:px-6",
+        "sticky bottom-0 z-20 border-[var(--admin-border)] border-t bg-[var(--admin-surface)]/95 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] pt-3 shadow-[0_-4px_12px_rgba(15,23,42,0.06)] backdrop-blur-sm",
         className
       )}
     >
-      <div className="mx-auto flex w-full max-w-[var(--admin-content-max)] flex-wrap items-center justify-between gap-3">
-        <div className="min-w-0 flex-1 text-sm text-[var(--admin-text-muted)]">{status}</div>
+      <div
+        className={cnDs(
+          "mx-auto flex w-full max-w-[var(--admin-content-max)] flex-wrap items-center gap-3 px-[max(1rem,env(safe-area-inset-left,0px))] py-3 pr-[max(1rem,env(safe-area-inset-right,0px))]",
+          leading ? "justify-between" : "justify-end"
+        )}
+      >
+        {leading ? <div className="min-w-0 flex-1 text-sm text-[var(--admin-text-muted)]">{leading}</div> : null}
         <div className="flex flex-wrap items-center justify-end gap-2">
           {middle}
           {cancelHref ? (

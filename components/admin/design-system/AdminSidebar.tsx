@@ -77,7 +77,7 @@ export function AdminSidebar({
             key={href}
             href={href}
             className={cnDs(
-              "relative flex items-center gap-3 rounded-lg py-2.5 pr-3 pl-4 text-sm font-medium transition-colors",
+              "relative flex min-h-11 items-center gap-3 rounded-lg py-2.5 pr-3 pl-4 text-sm font-medium transition-colors",
               active
                 ? "bg-[var(--admin-sidebar-active-bg)] text-white"
                 : "text-[var(--admin-sidebar-muted)] hover:bg-[var(--admin-sidebar-hover)] hover:text-white"
@@ -109,12 +109,12 @@ export function AdminSidebar({
         aria-modal={mobileOpen ? "true" : undefined}
         role={mobileOpen ? "dialog" : undefined}
         className={cnDs(
-          "fixed inset-y-0 left-0 z-50 flex w-[var(--admin-sidebar-width)] -translate-x-full flex-col border-[var(--admin-border)] border-r bg-[var(--admin-sidebar)] shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] lg:static lg:z-0 lg:translate-x-0 lg:shadow-none",
+          "fixed left-0 top-0 z-50 flex h-dvh max-h-dvh min-h-0 w-[min(100vw,280px)] max-w-[100vw] -translate-x-full flex-col border-[var(--admin-border)] border-r bg-[var(--admin-sidebar)] pt-[env(safe-area-inset-top,0px)] shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] lg:static lg:z-0 lg:h-full lg:max-h-none lg:w-[var(--admin-sidebar-width)] lg:max-w-none lg:translate-x-0 lg:pt-0 lg:shadow-none",
           mobileOpen && "translate-x-0",
           className
         )}
       >
-        <div className="flex items-center justify-between gap-3 border-white/10 border-b px-5 py-5">
+        <div className="flex items-center justify-between gap-3 border-white/10 border-b px-4 py-4 sm:px-5 sm:py-5">
           <Link
             href={brandHref}
             className="block font-[family-name:var(--font-montserrat)] text-lg font-extrabold tracking-tight text-[var(--admin-sidebar-foreground)]"
@@ -137,7 +137,11 @@ export function AdminSidebar({
           </button>
         </div>
         {nav}
-        {footer ? <div className="mt-auto border-white/10 border-t p-3">{footer}</div> : null}
+        {footer ? (
+          <div className="mt-auto border-white/10 border-t p-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]">
+            {footer}
+          </div>
+        ) : null}
       </aside>
     </>
   )

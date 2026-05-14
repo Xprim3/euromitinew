@@ -243,8 +243,6 @@ export function LocationEditorForm({
       </AdminSectionCard>
 
       <SaveBar
-        hasUnsavedChanges
-        unsavedLabel={mode === "create" ? "New location draft" : "Review location changes"}
         cancelLabel="Reset changes"
         onCancel={() => {
           formRef.current?.reset()

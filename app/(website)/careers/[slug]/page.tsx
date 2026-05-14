@@ -6,13 +6,11 @@ import { JobApplicationForm } from "@/components/careers/JobApplicationForm"
 import { Container } from "@/components/layout/Container"
 import { PageImageHero } from "@/components/layout/PageImageHero"
 import { SectionReveal } from "@/components/motion/SectionReveal"
-import { Button } from "@/components/ui/button"
 import { MaterialSymbol } from "@/components/ui/MaterialSymbol"
 import { SectionAccentRule } from "@/components/ui/SectionAccentRule"
 import { homeHeroDesign } from "@/data/mock/homepage-visual"
-import { applyHref, applyLabel, getActiveJobBySlugPublic, textArrayFromJson } from "@/lib/data/careers-public"
+import { getActiveJobBySlugPublic, textArrayFromJson } from "@/lib/data/careers-public"
 import { formatNewsDate } from "@/lib/format-news-date"
-import { telHrefFromDisplayPhone } from "@/lib/utils"
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -35,14 +33,6 @@ export default async function CareerDetailPage({ params }: Props) {
 
   const description = textArrayFromJson(job.description)
   const requirements = textArrayFromJson(job.requirements)
-  const href = applyHref(job)
-  const label = applyLabel(job)
-  const phoneHref = job.apply_phone ? telHrefFromDisplayPhone(job.apply_phone) : null
-  const hasAlternateApply =
-    Boolean(job.apply_instructions?.trim()) ||
-    Boolean(job.apply_email?.trim()) ||
-    Boolean(job.apply_phone?.trim()) ||
-    Boolean(href)
 
   return (
     <>
@@ -113,48 +103,10 @@ export default async function CareerDetailPage({ params }: Props) {
                     Dërgo aplikimin tënd
                   </h2>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-base">
-                    Plotësoni të dhënat dhe ngarkoni CV-në në PDF. Të dhënat përdoren vetëm për procesin e rekrutimit.
+                    Plotësoni të dhënat dhe ngarkoni CV-në ose dokumentin përkatës (PDF, Word, RTF ose ODT). Të dhënat
+                    përdoren vetëm për procesin e rekrutimit.
                   </p>
                   <SectionAccentRule className="mt-5 max-w-24 sm:mt-6" />
-
-                  {hasAlternateApply ? (
-                    <div className="mt-6 space-y-3 rounded-lg border border-border/60 bg-muted/30 p-4 text-sm text-muted-foreground">
-                      <p className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-foreground">
-                        Mundësi të tjera aplikimi
-                      </p>
-                      {job.apply_instructions ? (
-                        <p className="whitespace-pre-wrap leading-relaxed">{job.apply_instructions}</p>
-                      ) : null}
-                      {job.apply_email ? (
-                        <p>
-                          <span className="font-semibold text-foreground">Email: </span>
-                          <a
-                            className="break-all font-medium text-primary underline-offset-2 hover:underline"
-                            href={`mailto:${job.apply_email}`}
-                          >
-                            {job.apply_email}
-                          </a>
-                        </p>
-                      ) : null}
-                      {job.apply_phone ? (
-                        <p>
-                          <span className="font-semibold text-foreground">Telefoni: </span>
-                          {phoneHref ? (
-                            <a className="font-medium text-primary underline-offset-2 hover:underline" href={phoneHref}>
-                              {job.apply_phone}
-                            </a>
-                          ) : (
-                            job.apply_phone
-                          )}
-                        </p>
-                      ) : null}
-                      {href ? (
-                        <Button className="mt-1 w-full sm:w-auto" variant="outlinePrimary" size="sm" render={<a href={href} />}>
-                          {label}
-                        </Button>
-                      ) : null}
-                    </div>
-                  ) : null}
 
                   <div className="mt-6 sm:mt-8">
                     <JobApplicationForm jobSlug={job.slug} />

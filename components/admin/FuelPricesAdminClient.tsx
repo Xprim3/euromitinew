@@ -1,6 +1,6 @@
 "use client"
 
-import { useActionState, useMemo, useState } from "react"
+import { useActionState, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Plus } from "lucide-react"
 
@@ -80,7 +80,6 @@ export function FuelPricesAdminClient({ rows }: { rows: AdminFuelPriceRow[] }) {
   }, initialSaveState)
 
   const fieldErrors = state.ok === false && "fieldErrors" in state ? state.fieldErrors : undefined
-  const activeCount = useMemo(() => rows.filter((row) => row.is_active).length, [rows])
 
   function openCreate() {
     setEditing(null)
@@ -102,8 +101,6 @@ export function FuelPricesAdminClient({ rows }: { rows: AdminFuelPriceRow[] }) {
       ) : null}
 
       <AdminSectionCard
-        title="Fuel Price Management"
-        description="Manage the network fuel rows shown in the homepage fuel price widget. Active rows are visible publicly."
         headerActions={
           <button type="button" className={cn(dsBtnPrimary, "min-h-10 px-4 text-xs")} onClick={openCreate}>
             <Plus className="size-4" aria-hidden />
@@ -111,11 +108,6 @@ export function FuelPricesAdminClient({ rows }: { rows: AdminFuelPriceRow[] }) {
           </button>
         }
       >
-        <div className="mb-5 flex flex-wrap gap-2 text-sm text-[var(--admin-text-muted)]">
-          <span className="rounded-full bg-slate-100 px-3 py-1">{rows.length} total rows</span>
-          <span className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-800">{activeCount} active</span>
-        </div>
-
         <AdminTable>
           <AdminTableHead>
             <AdminTableRow>
@@ -180,22 +172,19 @@ export function FuelPricesAdminClient({ rows }: { rows: AdminFuelPriceRow[] }) {
           />
           <aside
             aria-label={editing ? "Edit fuel price" : "Add fuel type"}
-            className="absolute top-0 right-0 flex h-full w-[min(100%,32rem)] flex-col overflow-y-auto bg-[var(--admin-surface)] shadow-2xl"
+            className="absolute top-0 right-0 flex h-full max-h-dvh w-full max-w-full flex-col overflow-y-auto border-[var(--admin-border)] border-l bg-[var(--admin-surface)] pb-[env(safe-area-inset-bottom,0px)] shadow-2xl sm:max-w-lg"
           >
             <form action={formAction} className="flex min-h-full flex-col">
-              <div className="border-[var(--admin-border)] border-b px-5 py-5">
+              <div className="border-[var(--admin-border)] border-b px-4 py-4 sm:px-5 sm:py-5">
                 <p className="text-xs font-semibold tracking-wide text-[var(--admin-text-muted)] uppercase">
                   {editing ? "Edit fuel price" : "Add fuel type"}
                 </p>
                 <h2 className="mt-1 font-[family-name:var(--font-montserrat)] text-xl font-bold text-[var(--admin-text)]">
                   {editing ? editing.fuel_type : "New fuel price"}
                 </h2>
-                <p className="mt-2 text-sm text-[var(--admin-text-muted)]">
-                  Saving updates the <code className="rounded bg-slate-100 px-1 py-0.5 text-xs">fuel_prices</code> row and revalidates the homepage.
-                </p>
               </div>
 
-              <div className="flex-1 space-y-5 px-5 py-5">
+              <div className="flex-1 space-y-5 px-4 py-5 sm:px-5">
                 {editing ? <input type="hidden" name="id" value={editing.id} /> : null}
                 <AdminContentGrid columns={1}>
                   <SelectInput
@@ -203,7 +192,6 @@ export function FuelPricesAdminClient({ rows }: { rows: AdminFuelPriceRow[] }) {
                     name="fuel_type_key"
                     options={fuelTypeOptions}
                     defaultValue={fuelTypeKey(editing)}
-                    helperText="Petrol maps to the existing euro95 homepage product key."
                     required
                     error={fieldErrors?.fuel_type_key?.[0]}
                   />
@@ -230,7 +218,6 @@ export function FuelPricesAdminClient({ rows }: { rows: AdminFuelPriceRow[] }) {
                   <ToggleInput
                     label="Active on public homepage"
                     name="is_active"
-                    description="Inactive rows stay in admin but are hidden from the homepage fuel cards."
                     checkedLabel="Active"
                     uncheckedLabel="Inactive"
                     defaultChecked={editing ? editing.is_active : true}
@@ -239,8 +226,6 @@ export function FuelPricesAdminClient({ rows }: { rows: AdminFuelPriceRow[] }) {
               </div>
 
               <SaveBar
-                hasUnsavedChanges
-                unsavedLabel={editing ? "Editing fuel price" : "Creating fuel price"}
                 cancelLabel="Cancel"
                 onCancel={() => setPanelOpen(false)}
                 submitLabel="Save fuel price"

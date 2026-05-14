@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 
 import { ServicesContentForm, type ServicesMediaPreviews } from "@/components/admin/ServicesContentForm"
-import { AdminSectionCard, ErrorMessage, SuccessMessage } from "@/components/admin/design-system"
+import { ErrorMessage } from "@/components/admin/design-system"
 import { normalizeServicesRow } from "@/lib/data/services-content-public"
 import { formatNewsDate } from "@/lib/format-news-date"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
@@ -75,24 +75,13 @@ export default async function AdminServicesPage() {
 
   return (
     <div className="space-y-6">
-        {!result.ok ? (
-          <ErrorMessage title="Services content could not load">
-            {result.message}
-          </ErrorMessage>
-        ) : (
-          <>
-            <SuccessMessage title="Public revalidation">
-              Saves revalidate <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">/services</code>{" "}
-              automatically. Apply the latest services highlight migrations before saving bullets.
-            </SuccessMessage>
-            <AdminSectionCard>
-              <p className="text-sm text-[var(--admin-text-muted)]">
-                Last updated <span className="font-medium text-[var(--admin-text)]">{formatNewsDate(result.row.updated_at)}</span>
-              </p>
-            </AdminSectionCard>
-            <ServicesContentForm key={result.row.updated_at} initial={result.row} previews={result.previews} />
-          </>
-        )}
+      {!result.ok ? (
+        <ErrorMessage title="Services content could not load">
+          {result.message}
+        </ErrorMessage>
+      ) : (
+        <ServicesContentForm key={result.row.updated_at} initial={result.row} previews={result.previews} />
+      )}
     </div>
   )
 }

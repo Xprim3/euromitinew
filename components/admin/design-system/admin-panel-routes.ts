@@ -1,186 +1,31 @@
-import type { AdminHeaderBreadcrumb } from "./AdminHeader"
-
-/** Route-driven header copy (no icons — safe from server or client). */
+/** Route-driven header title (no icons — safe from server or client). */
 export type AdminRouteHeaderMeta = {
   title: string
-  subtitle?: string
-  breadcrumbs: readonly AdminHeaderBreadcrumb[]
 }
-
-const crumbAdmin: AdminHeaderBreadcrumb = { label: "Admin", href: "/admin/dashboard" }
 
 export function adminRouteHeaderMeta(pathname: string): AdminRouteHeaderMeta {
   const p = pathname.replace(/\/$/, "") || "/admin/dashboard"
 
-  if (p === "/admin" || p === "/admin/dashboard") {
-    return {
-      title: "Dashboard",
-      subtitle: "High-level overview and quick links.",
-      breadcrumbs: [crumbAdmin, { label: "Dashboard" }],
-    }
-  }
+  if (p === "/admin" || p === "/admin/dashboard") return { title: "Dashboard" }
+  if (p === "/admin/homepage") return { title: "Homepage" }
+  if (p === "/admin/fuel-prices") return { title: "Fuel prices" }
+  if (p === "/admin/locations/new") return { title: "New location" }
+  if (p.startsWith("/admin/locations/")) return { title: "Edit location" }
+  if (p === "/admin/locations") return { title: "Locations" }
+  if (p === "/admin/services") return { title: "Services" }
+  if (p === "/admin/restaurant") return { title: "Restaurant" }
+  if (p === "/admin/news/new") return { title: "New article" }
+  if (p.startsWith("/admin/news/")) return { title: "Edit article" }
+  if (p === "/admin/news") return { title: "News" }
+  if (p === "/admin/careers/new") return { title: "New job" }
+  if (p === "/admin/careers/applications" || p === "/admin/careers/applications/") return { title: "Job applications" }
+  if (p.startsWith("/admin/careers/applications/")) return { title: "Applicant" }
+  if (p.startsWith("/admin/careers/")) return { title: "Edit job" }
+  if (p === "/admin/careers") return { title: "Careers" }
+  if (p === "/admin/site") return { title: "Contact info" }
+  if (p === "/admin/media") return { title: "Media library" }
+  if (p === "/admin/settings") return { title: "Settings" }
+  if (p === "/admin/about") return { title: "About Page" }
 
-  if (p === "/admin/homepage") {
-    return {
-      title: "Homepage",
-      subtitle: "Marketing homepage singleton — hero, sections, and media.",
-      breadcrumbs: [crumbAdmin, { label: "Homepage" }],
-    }
-  }
-
-  if (p === "/admin/fuel-prices") {
-    return {
-      title: "Fuel prices",
-      subtitle: "Retail pump prices on the marketing homepage.",
-      breadcrumbs: [crumbAdmin, { label: "Fuel prices" }],
-    }
-  }
-
-  if (p === "/admin/locations/new") {
-    return {
-      title: "New location",
-      subtitle: "Create a forecourt record.",
-      breadcrumbs: [crumbAdmin, { label: "Locations", href: "/admin/locations" }, { label: "New" }],
-    }
-  }
-
-  if (p.startsWith("/admin/locations/")) {
-    return {
-      title: "Edit location",
-      subtitle: "Update address, services, main image, and visibility.",
-      breadcrumbs: [crumbAdmin, { label: "Locations", href: "/admin/locations" }, { label: "Edit" }],
-    }
-  }
-
-  if (p === "/admin/locations") {
-    return {
-      title: "Locations",
-      subtitle: "Forecourt records for the public `/locations` page.",
-      breadcrumbs: [crumbAdmin, { label: "Locations" }],
-    }
-  }
-
-  if (p === "/admin/services") {
-    return {
-      title: "Services",
-      subtitle: "Services page copy and section media.",
-      breadcrumbs: [crumbAdmin, { label: "Services" }],
-    }
-  }
-
-  if (p === "/admin/restaurant") {
-    return {
-      title: "Restaurant",
-      subtitle: "Restaurant marketing page content.",
-      breadcrumbs: [crumbAdmin, { label: "Restaurant" }],
-    }
-  }
-
-  if (p === "/admin/news/new") {
-    return {
-      title: "New article",
-      subtitle: "Create a news post.",
-      breadcrumbs: [crumbAdmin, { label: "News", href: "/admin/news" }, { label: "New" }],
-    }
-  }
-
-  if (p.startsWith("/admin/news/")) {
-    return {
-      title: "Edit article",
-      subtitle: "Update slug, body, hero image, and publish state.",
-      breadcrumbs: [crumbAdmin, { label: "News", href: "/admin/news" }, { label: "Edit" }],
-    }
-  }
-
-  if (p === "/admin/news") {
-    return {
-      title: "News",
-      subtitle: "Posts for `/news` and article pages.",
-      breadcrumbs: [crumbAdmin, { label: "News" }],
-    }
-  }
-
-  if (p === "/admin/careers/new") {
-    return {
-      title: "New job",
-      subtitle: "Create a careers opening.",
-      breadcrumbs: [crumbAdmin, { label: "Careers", href: "/admin/careers" }, { label: "New" }],
-    }
-  }
-
-  if (p === "/admin/careers/applications" || p === "/admin/careers/applications/") {
-    return {
-      title: "Job applications",
-      subtitle: "Applicants who submitted the public careers form.",
-      breadcrumbs: [crumbAdmin, { label: "Careers", href: "/admin/careers" }, { label: "Applications" }],
-    }
-  }
-
-  if (p.startsWith("/admin/careers/applications/")) {
-    return {
-      title: "Applicant",
-      subtitle: "Review contact details and download the CV.",
-      breadcrumbs: [
-        crumbAdmin,
-        { label: "Careers", href: "/admin/careers" },
-        { label: "Applications", href: "/admin/careers/applications" },
-        { label: "Detail" },
-      ],
-    }
-  }
-
-  if (p.startsWith("/admin/careers/")) {
-    return {
-      title: "Edit job",
-      subtitle: "Update job details and visibility.",
-      breadcrumbs: [crumbAdmin, { label: "Careers", href: "/admin/careers" }, { label: "Edit" }],
-    }
-  }
-
-  if (p === "/admin/careers") {
-    return {
-      title: "Careers",
-      subtitle: "Manage job openings.",
-      breadcrumbs: [crumbAdmin, { label: "Careers" }],
-    }
-  }
-
-  if (p === "/admin/site") {
-    return {
-      title: "Contact info",
-      subtitle: "Footer, branding, and headquarters contact fields.",
-      breadcrumbs: [crumbAdmin, { label: "Contact info" }],
-    }
-  }
-
-  if (p === "/admin/media") {
-    return {
-      title: "Media library",
-      subtitle: "Uploaded images and files.",
-      breadcrumbs: [crumbAdmin, { label: "Media library" }],
-    }
-  }
-
-  if (p === "/admin/settings") {
-    return {
-      title: "Settings",
-      subtitle: "Admin profile, account, and logout.",
-      breadcrumbs: [crumbAdmin, { label: "Settings" }],
-    }
-  }
-
-  if (p === "/admin/about") {
-    return {
-      title: "About Page",
-      subtitle:
-        "Public `/about` singleton: hero, story, owner, mission & vision, offer cards, the dark “Pse të na zgjidhni” (why choose) band, core values, and gallery images.",
-      breadcrumbs: [crumbAdmin, { label: "About" }],
-    }
-  }
-
-  return {
-    title: "Admin",
-    subtitle: undefined,
-    breadcrumbs: [crumbAdmin],
-  }
+  return { title: "Admin" }
 }

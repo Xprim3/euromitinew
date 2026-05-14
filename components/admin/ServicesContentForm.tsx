@@ -359,8 +359,6 @@ export function ServicesContentForm({ initial, previews }: ServicesContentFormPr
       </AdminSectionCard>
 
       <SaveBar
-        hasUnsavedChanges
-        unsavedLabel="Review services changes"
         cancelLabel="Reset changes"
         onCancel={() => formRef.current?.reset()}
         submitLabel="Save services page"

@@ -34,22 +34,6 @@ export function textArrayFromJson(raw: unknown): string[] {
   return raw.map((item) => (typeof item === "string" ? item.trim() : "")).filter(Boolean)
 }
 
-export function applyLabel(job: JobRow) {
-  if (job.apply_channel === "email" && job.apply_email) return "Apliko me email"
-  if (job.apply_channel === "phone" && job.apply_phone) return "Apliko me telefon"
-  if (job.apply_channel === "url" && job.apply_url) return "Apliko në platformë"
-  return "Udhëzime aplikimi"
-}
-
-export function applyHref(job: JobRow): string | null {
-  if (job.apply_channel === "email" && job.apply_email) {
-    return `mailto:${job.apply_email}?subject=${encodeURIComponent(`Application for ${job.title}`)}`
-  }
-  if (job.apply_channel === "phone" && job.apply_phone) return `tel:${job.apply_phone.replace(/\s+/g, "")}`
-  if (job.apply_channel === "url" && job.apply_url) return job.apply_url
-  return null
-}
-
 export const getActiveJobsPublic = cache(async (): Promise<JobRow[]> => {
   unstable_noStore()
   const supabase = createPublicSupabaseServerClient()

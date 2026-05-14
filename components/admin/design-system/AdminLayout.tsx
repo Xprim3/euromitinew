@@ -18,9 +18,11 @@ export type AdminLayoutProps = {
 export function AdminLayout({ sidebar, children, className }: AdminLayoutProps) {
   return (
     <AdminSidebarStateProvider>
-      <div className={cnDs("euromiti-admin-ds flex min-h-svh w-full flex-col lg:flex-row", className)}>
+      <div className={cnDs("euromiti-admin-ds flex h-full min-h-0 w-full max-w-full flex-col overflow-hidden lg:flex-row", className)}>
         {sidebar}
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-[var(--admin-canvas)]">{children}</div>
+        <div className="flex min-h-0 min-w-0 w-full max-w-full flex-1 flex-col overflow-hidden bg-[var(--admin-canvas)]">
+          {children}
+        </div>
       </div>
     </AdminSidebarStateProvider>
   )

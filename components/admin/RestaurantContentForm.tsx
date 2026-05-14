@@ -435,8 +435,6 @@ export function RestaurantContentForm({
       </AdminSectionCard>
 
       <SaveBar
-        hasUnsavedChanges
-        unsavedLabel="Review restaurant changes"
         cancelLabel="Reset changes"
         onCancel={() => {
           formRef.current?.reset()

@@ -2,10 +2,9 @@ import type { Metadata } from "next"
 
 import { saveRestaurantContent } from "@/app/admin/(panel)/restaurant/actions"
 import { RestaurantContentForm } from "@/components/admin/RestaurantContentForm"
-import { AdminSectionCard, ErrorMessage, SuccessMessage } from "@/components/admin/design-system"
+import { ErrorMessage } from "@/components/admin/design-system"
 import { galleryDraftsFromRow, menuDraftsFromRow, pillarDraftsFromRow } from "@/lib/data/restaurant-admin-slots"
 import { normalizeRestaurantContentRow } from "@/lib/data/restaurant-content-public"
-import { formatNewsDate } from "@/lib/format-news-date"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 import type { RestaurantContentRow } from "@/types/supabase-cms"
 
@@ -125,32 +124,21 @@ export default async function AdminRestaurantPage() {
       {!result.ok ? (
         <ErrorMessage title="Restaurant content could not load">{result.message}</ErrorMessage>
       ) : (
-        <>
-          <SuccessMessage title="Public revalidation">
-            Saves revalidate <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">/restaurant</code> automatically.
-            Accordion order matches the page top to bottom. Per-city reservation details are edited under Locations, not here.
-          </SuccessMessage>
-          <AdminSectionCard>
-            <p className="text-sm text-[var(--admin-text-muted)]">
-              Last updated <span className="font-medium text-[var(--admin-text)]">{formatNewsDate(result.row.updated_at)}</span>
-            </p>
-          </AdminSectionCard>
-          <RestaurantContentForm
-            key={result.row.updated_at}
-            submitAction={saveRestaurantContent}
-            initial={result.row}
-            heroPreviewUrl={result.heroPreviewUrl}
-            editorialPreviewUrl={result.editorialPreviewUrl}
-            editorialImageAltFromMedia={result.editorialImageAltFromMedia}
-            introPreviewUrl={result.introPreviewUrl}
-            introImageAltFromMedia={result.introImageAltFromMedia}
-            skanomPreviewUrl={result.skanomPreviewUrl}
-            skanomImageAltFromMedia={result.skanomImageAltFromMedia}
-            menuDrafts={result.menuDrafts}
-            pillarDrafts={result.pillarDrafts}
-            galleryDrafts={result.galleryDrafts}
-          />
-        </>
+        <RestaurantContentForm
+          key={result.row.updated_at}
+          submitAction={saveRestaurantContent}
+          initial={result.row}
+          heroPreviewUrl={result.heroPreviewUrl}
+          editorialPreviewUrl={result.editorialPreviewUrl}
+          editorialImageAltFromMedia={result.editorialImageAltFromMedia}
+          introPreviewUrl={result.introPreviewUrl}
+          introImageAltFromMedia={result.introImageAltFromMedia}
+          skanomPreviewUrl={result.skanomPreviewUrl}
+          skanomImageAltFromMedia={result.skanomImageAltFromMedia}
+          menuDrafts={result.menuDrafts}
+          pillarDrafts={result.pillarDrafts}
+          galleryDrafts={result.galleryDrafts}
+        />
       )}
     </div>
   )

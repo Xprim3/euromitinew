@@ -38,13 +38,13 @@ export default async function AdminJobApplicationDetailPage({ params }: Props) {
         description={`Submitted ${submitted}`}
         headerActions={
           <>
-            <Link href={cvHref} className={cnDs(dsBtnPrimary, "min-h-10 px-4 text-xs")} target="_blank" rel="noopener noreferrer">
-              Download CV (PDF)
+            <Link href={cvHref} className={cnDs(dsBtnPrimary, "min-h-10 min-w-0 max-w-full px-4 text-xs")} target="_blank" rel="noopener noreferrer">
+              Download document
             </Link>
-            <Link href="/admin/careers/applications" className={cnDs(dsBtnTertiary, "min-h-10 px-4 text-xs")}>
+            <Link href="/admin/careers/applications" className={cnDs(dsBtnTertiary, "min-h-10 min-w-0 max-w-full px-4 text-xs")}>
               All applications
             </Link>
-            <Link href="/admin/careers" className={cnDs(dsBtnTertiary, "min-h-10 px-4 text-xs")}>
+            <Link href="/admin/careers" className={cnDs(dsBtnTertiary, "min-h-10 min-w-0 max-w-full px-4 text-xs")}>
               Jobs
             </Link>
             <DeleteJobApplicationForm
@@ -56,42 +56,49 @@ export default async function AdminJobApplicationDetailPage({ params }: Props) {
           </>
         }
       >
-        <dl className="grid gap-4 text-sm sm:grid-cols-2">
-          <div>
+        <dl className="grid min-w-0 gap-4 text-sm sm:grid-cols-2">
+          <div className="min-w-0">
             <dt className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-[var(--admin-text-muted)]">Full name</dt>
-            <dd className="mt-1 font-medium text-[var(--admin-text)]">{row.full_name}</dd>
+            <dd className="mt-1 min-w-0 break-words font-medium text-[var(--admin-text)]">{row.full_name}</dd>
           </div>
-          <div>
+          <div className="min-w-0">
             <dt className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-[var(--admin-text-muted)]">Email</dt>
-            <dd className="mt-1">
-              <a className="font-medium text-primary hover:underline" href={`mailto:${row.email}`}>
+            <dd className="mt-1 min-w-0">
+              <a className="break-all font-medium text-primary hover:underline" href={`mailto:${row.email}`}>
                 {row.email}
               </a>
             </dd>
           </div>
-          <div>
+          <div className="min-w-0">
             <dt className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-[var(--admin-text-muted)]">Phone</dt>
-            <dd className="mt-1 text-[var(--admin-text)]">{row.phone.trim() ? row.phone : "—"}</dd>
+            <dd className="mt-1 min-w-0 break-words text-[var(--admin-text)]">{row.phone.trim() ? row.phone : "—"}</dd>
           </div>
-          <div>
+          <div className="min-w-0">
             <dt className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-[var(--admin-text-muted)]">Job</dt>
-            <dd className="mt-1 text-[var(--admin-text)]">
+            <dd className="mt-1 min-w-0 break-words text-[var(--admin-text)]">
               <span className="font-medium">{row.job_title}</span>
               {row.job_slug ? (
                 <>
                   {" "}
                   <span className="text-[var(--admin-text-muted)]">·</span>{" "}
-                  <Link className="text-primary hover:underline" href={`/careers/${row.job_slug}`} target="_blank" rel="noopener noreferrer">
+                  <Link
+                    className="inline-block max-w-full break-all text-primary hover:underline"
+                    href={`/careers/${row.job_slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     Public posting
                   </Link>
                 </>
               ) : null}
             </dd>
           </div>
-          <div className="sm:col-span-2">
+          <div className="min-w-0 sm:col-span-2">
             <dt className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-[var(--admin-text-muted)]">CV file</dt>
-            <dd className="mt-1 text-[var(--admin-text)]">
-              {row.cv_original_filename ?? "cv.pdf"} · {formatFileSize(row.cv_byte_size)}
+            <dd className="mt-1 min-w-0 break-all text-[var(--admin-text)] sm:break-words">
+              {row.cv_original_filename ?? "cv.pdf"}
+              <span className="text-[var(--admin-text-muted)]"> · </span>
+              <span className="whitespace-nowrap">{formatFileSize(row.cv_byte_size)}</span>
             </dd>
           </div>
         </dl>
@@ -99,7 +106,9 @@ export default async function AdminJobApplicationDetailPage({ params }: Props) {
 
       <AdminSectionCard title="Cover letter" description="Optional message from the applicant.">
         {row.cover_letter.trim() ? (
-          <p className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--admin-text)]">{row.cover_letter}</p>
+          <p className="min-w-0 break-words whitespace-pre-wrap text-sm leading-relaxed text-[var(--admin-text)]">
+            {row.cover_letter}
+          </p>
         ) : (
           <p className="text-sm text-[var(--admin-text-muted)]">No cover letter provided.</p>
         )}

@@ -528,7 +528,6 @@ export function AboutContentForm({ initial, previews, valueSlots, whyReasonSlots
       </AdminSectionCard>
 
       <SaveBar
-        savedLabel="Ready to save About page"
         submitLabel="Save about page"
         submitPendingLabel="Saving about page..."
         onCancel={() => formRef.current?.reset()}

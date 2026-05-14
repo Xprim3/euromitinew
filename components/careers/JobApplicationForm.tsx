@@ -16,7 +16,7 @@ function SubmitRow() {
       <Button type="submit" variant="default" disabled={pending} className="min-w-40">
         {pending ? "Duke dërguar…" : "Dërgo aplikimin"}
       </Button>
-      <p className="text-muted-foreground text-xs">PDF deri në 5 MB.</p>
+      <p className="text-muted-foreground text-xs">PDF, Word (.doc, .docx), RTF ose ODT — deri në 5 MB.</p>
     </div>
   )
 }
@@ -123,13 +123,13 @@ export function JobApplicationForm({ jobSlug }: JobApplicationFormProps) {
         </div>
         <div className="space-y-1.5 sm:col-span-2">
           <label htmlFor="ja-cv" className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
-            CV (PDF) <span className="text-brand-red-vivid">*</span>
+            CV / dokumenti <span className="text-brand-red-vivid">*</span>
           </label>
           <input
             id="ja-cv"
             name="cv"
             type="file"
-            accept="application/pdf,.pdf"
+            accept=".pdf,.doc,.docx,.rtf,.odt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/rtf,text/rtf,application/vnd.oasis.opendocument.text"
             required
             aria-invalid={Boolean(fieldErrors?.cv?.length)}
             className="block w-full max-w-md text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-2 file:font-semibold file:text-primary-foreground"

@@ -151,8 +151,6 @@ export function SiteContactForm({ contact, submitAction }: SiteContactFormProps)
       </AdminSectionCard>
 
       <SaveBar
-        hasUnsavedChanges
-        unsavedLabel="Review contact changes"
         cancelLabel="Reset changes"
         onCancel={() => formRef.current?.reset()}
         submitLabel="Save contact & social"

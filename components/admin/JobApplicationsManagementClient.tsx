@@ -80,19 +80,21 @@ export function JobApplicationsManagementClient({ rows }: JobApplicationsManagem
                   <AdminTableTd className="whitespace-nowrap text-sm">
                     {r.created_at ? formatNewsDate(r.created_at) : "—"}
                   </AdminTableTd>
-                  <AdminTableTd>
-                    <div className="font-medium">{r.full_name}</div>
-                    {r.phone ? <div className="mt-1 text-xs text-[var(--admin-text-muted)]">{r.phone}</div> : null}
+                  <AdminTableTd className="min-w-0 max-w-[11rem] sm:max-w-none">
+                    <div className="break-words font-medium">{r.full_name}</div>
+                    {r.phone ? (
+                      <div className="mt-1 break-all text-xs text-[var(--admin-text-muted)]">{r.phone}</div>
+                    ) : null}
                   </AdminTableTd>
-                  <AdminTableTd>
-                    <a className="text-primary hover:underline" href={`mailto:${r.email}`}>
+                  <AdminTableTd className="min-w-0 max-w-[14rem] sm:max-w-[18rem]">
+                    <a className="break-all text-primary hover:underline" href={`mailto:${r.email}`}>
                       {r.email}
                     </a>
                   </AdminTableTd>
-                  <AdminTableTd>
-                    <div>{r.job_title}</div>
+                  <AdminTableTd className="min-w-0 max-w-[12rem] sm:max-w-none">
+                    <div className="break-words">{r.job_title}</div>
                     {r.job_slug ? (
-                      <div className="mt-1 font-mono text-xs text-[var(--admin-text-muted)]">{r.job_slug}</div>
+                      <div className="mt-1 break-all font-mono text-xs text-[var(--admin-text-muted)]">{r.job_slug}</div>
                     ) : null}
                   </AdminTableTd>
                   <AdminTableTd className="text-right">

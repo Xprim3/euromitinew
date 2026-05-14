@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 
 import { DeleteLocationForm } from "@/components/admin/DeleteLocationForm"
-import { AdminSectionCard, ErrorMessage, StatusBadge, SuccessMessage } from "@/components/admin/design-system"
+import { AdminSectionCard, ErrorMessage, StatusBadge } from "@/components/admin/design-system"
 import { dsBtnPrimary, dsBtnTertiary } from "@/components/admin/design-system/ds-button-classes"
 import { normalizeLocationRow } from "@/lib/data/locations-admin-shared"
 import { formatNewsDate } from "@/lib/format-news-date"
@@ -46,12 +46,6 @@ export default async function AdminLocationsPage() {
           Each card opens a full editor with services, map link, main image, and active/inactive visibility.
         </p>
       </AdminSectionCard>
-
-      <SuccessMessage title="Public revalidation">
-          Saving or deleting revalidates the public{" "}
-          <code className="rounded bg-emerald-100 px-1 py-0.5 text-xs">/locations</code> route and homepage
-          preview.
-      </SuccessMessage>
 
       {message ? (
         <ErrorMessage title="Locations could not load">

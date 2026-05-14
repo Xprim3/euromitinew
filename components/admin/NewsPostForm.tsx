@@ -185,8 +185,6 @@ export function NewsPostForm({ mode, submitAction, initial, heroPreviewUrl }: Ne
       </AdminSectionCard>
 
       <SaveBar
-        hasUnsavedChanges
-        unsavedLabel={mode === "create" ? "New post draft" : "Review post changes"}
         cancelLabel="Reset changes"
         onCancel={() => {
           formRef.current?.reset()

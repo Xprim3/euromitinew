@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 
 import type { HomepageLocationPreviewAdmin, HomepageMediaPreviews } from "@/components/admin/HomepageContentForm"
 import { HomepageContentForm } from "@/components/admin/HomepageContentForm"
-import { AdminSectionCard, ErrorMessage, SuccessMessage } from "@/components/admin/design-system"
+import { ErrorMessage } from "@/components/admin/design-system"
 import { homepageContentRowFromUnknown, heroSlidesFromCMS } from "@/lib/data/homepage-singleton-public"
 import { normalizeLocationRow } from "@/lib/data/locations-admin-shared"
 import { formatNewsDate } from "@/lib/format-news-date"
@@ -132,32 +132,18 @@ export default async function AdminHomepagePage() {
 
   return (
     <div className="space-y-6">
-        <SuccessMessage title="CMS connection">
-          The public homepage reads from <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">homepage_content</code>,{" "}
-          <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">fuel_prices</code>, and{" "}
-          <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">locations</code> (preview cards). Saving here
-          revalidates the home route.
-        </SuccessMessage>
-
-        {!result.ok ? (
-          <ErrorMessage title="Homepage content could not load">
-            {result.message}
-          </ErrorMessage>
-        ) : (
-          <>
-            <AdminSectionCard>
-              <p className="text-sm text-[var(--admin-text-muted)]">
-                Last updated in CMS <span className="font-medium text-[var(--admin-text)]">{formatNewsDate(result.row.updated_at)}</span>
-              </p>
-            </AdminSectionCard>
-            <HomepageContentForm
-              key={result.row.updated_at}
-              initial={result.row}
-              mediaPreviews={result.previews}
-              locationPreviews={result.locationPreviews}
-            />
-          </>
-        )}
+      {!result.ok ? (
+        <ErrorMessage title="Homepage content could not load">
+          {result.message}
+        </ErrorMessage>
+      ) : (
+        <HomepageContentForm
+          key={result.row.updated_at}
+          initial={result.row}
+          mediaPreviews={result.previews}
+          locationPreviews={result.locationPreviews}
+        />
+      )}
     </div>
   )
 }

@@ -48,8 +48,6 @@ function AdminHeaderAuto() {
   return (
     <AdminHeader
       title={meta.title}
-      subtitle={meta.subtitle}
-      breadcrumbs={meta.breadcrumbs}
       showMobileNavTrigger
     />
   )
@@ -66,7 +64,7 @@ export function AdminPanelChrome({ children }: { children: ReactNode }) {
             <>
               <Link
                 href="/"
-                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--admin-sidebar-muted)] transition-colors hover:bg-[var(--admin-sidebar-hover)] hover:text-white"
+                className="flex min-h-11 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--admin-sidebar-muted)] transition-colors hover:bg-[var(--admin-sidebar-hover)] hover:text-white"
               >
                 <Home className="size-[1.125rem] shrink-0 opacity-90" aria-hidden />
                 View website

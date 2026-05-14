@@ -16,7 +16,7 @@ import {
   ToggleInput,
 } from "@/components/admin/design-system"
 import { adminTextFromJsonArray } from "@/lib/data/careers-format"
-import { JOB_APPLY_CHANNEL_OPTIONS, JOB_LOCATION_OPTIONS } from "@/lib/validations/careers-admin"
+import { JOB_LOCATION_OPTIONS } from "@/lib/validations/careers-admin"
 import type { JobRow } from "@/types/supabase-cms"
 
 const initialState: JobSaveState = { ok: null }
@@ -28,18 +28,6 @@ type CareerJobFormProps = {
 }
 
 const locationOptions = JOB_LOCATION_OPTIONS.map((location) => ({ value: location, label: location }))
-
-const applyChannelOptions = JOB_APPLY_CHANNEL_OPTIONS.map((channel) => ({
-  value: channel,
-  label:
-    channel === "email"
-      ? "Email"
-      : channel === "phone"
-        ? "Phone"
-        : channel === "url"
-          ? "External URL"
-          : "Instructions",
-}))
 
 export function CareerJobForm({ mode, submitAction, initial }: CareerJobFormProps) {
   const router = useRouter()
@@ -131,41 +119,7 @@ export function CareerJobForm({ mode, submitAction, initial }: CareerJobFormProp
         </div>
       </AdminSectionCard>
 
-      <AdminSectionCard title="Apply/contact info" description="Tell candidates how to apply or who to contact.">
-        <div className="space-y-5">
-          <SelectInput
-            label="Apply channel"
-            name="apply_channel"
-            required
-            options={applyChannelOptions}
-            defaultValue={initial?.apply_channel ?? "email"}
-            error={fieldErrors?.apply_channel?.[0]}
-          />
-          <AdminContentGrid columns={3}>
-            <TextInput
-              label="Apply email"
-              name="apply_email"
-              type="email"
-              defaultValue={initial?.apply_email ?? ""}
-              error={fieldErrors?.apply_email?.[0]}
-            />
-            <TextInput label="Apply phone" name="apply_phone" defaultValue={initial?.apply_phone ?? ""} />
-            <TextInput label="Apply URL" name="apply_url" type="url" defaultValue={initial?.apply_url ?? ""} />
-          </AdminContentGrid>
-          <TextareaInput
-            label="Apply instructions"
-            name="apply_instructions"
-            rows={4}
-            defaultValue={initial?.apply_instructions ?? ""}
-            maxLength={2400}
-            showCharacterCount
-          />
-        </div>
-      </AdminSectionCard>
-
       <SaveBar
-        hasUnsavedChanges
-        unsavedLabel={mode === "create" ? "New job draft" : "Review job changes"}
         cancelLabel="Reset changes"
         onCancel={() => formRef.current?.reset()}
         submitLabel={saveLabel}

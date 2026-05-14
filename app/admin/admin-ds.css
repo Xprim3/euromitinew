@@ -77,3 +77,13 @@ html:has([data-admin-design-system]) {
     animation: none;
   }
 }
+
+/* Mobile: faster taps, no double-tap zoom delay on primary controls */
+[data-admin-design-system] :where(button, [type="button"], [type="submit"], [role="tab"], a[href]) {
+  touch-action: manipulation;
+}
+
+/* Smooth momentum scrolling inside admin scroll regions (iOS) */
+[data-admin-design-system] .admin-scroll-touch {
+  -webkit-overflow-scrolling: touch;
+}

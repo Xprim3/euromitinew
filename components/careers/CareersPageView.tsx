@@ -33,7 +33,7 @@ export function CareersPageView({ jobs }: { jobs: JobRow[] }) {
                 align="center"
                 label="Pozicionet e hapura"
                 title="Bëhu pjesë e ekipit Euromiti"
-                description="Pozicionet aktive shfaqen këtu automatikisht. Hapni një rol për detajet dhe për të aplikuar online me CV (PDF)."
+                description="Pozicionet aktive shfaqen këtu automatikisht. Hapni një rol për detajet dhe për të aplikuar online me dokument CV (PDF, Word, RTF ose ODT)."
               />
               <SectionAccentRule className="mt-6 w-28 md:mt-8" />
             </div>

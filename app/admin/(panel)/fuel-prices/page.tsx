@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 
 import { FuelPricesAdminClient, type AdminFuelPriceRow } from "@/components/admin/FuelPricesAdminClient"
-import { AdminSectionCard, ErrorMessage } from "@/components/admin/design-system"
+import { ErrorMessage } from "@/components/admin/design-system"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
@@ -51,15 +51,6 @@ export default async function AdminFuelPricesPage() {
 
   return (
     <div className="space-y-6">
-      <AdminSectionCard
-        title="Fuel prices"
-        description="Update fuel prices shown on the public homepage. Active rows are read by the existing homepage widget."
-      >
-        <p className="text-sm text-[var(--admin-text-muted)]">
-          This page writes to <code className="rounded bg-slate-100 px-1 py-0.5 text-xs">fuel_prices</code> and keeps the public fuel price widgets unchanged.
-        </p>
-      </AdminSectionCard>
-
       {!result.ok ? (
         <ErrorMessage title="Fuel prices could not load">{result.message}</ErrorMessage>
       ) : (

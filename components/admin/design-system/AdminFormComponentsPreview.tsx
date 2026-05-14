@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useState } from "react"
 
 import {
   ADMIN_SERVICE_OPTIONS,
@@ -40,11 +40,6 @@ export function AdminFormComponentsPreview() {
       altText: "Euromiti dining detail",
     },
   ])
-
-  const unsavedText = useMemo(
-    () => `Preview state only · ${services.length} services selected · ${gallerySlots.length} gallery images`,
-    [gallerySlots.length, services.length]
-  )
 
   return (
     <form
@@ -139,8 +134,6 @@ export function AdminFormComponentsPreview() {
       </FormSection>
 
       <SaveBar
-        hasUnsavedChanges
-        unsavedLabel={unsavedText}
         cancelLabel="Cancel preview"
         onCancel={() => {
           setServices(["petrol", "restaurant"])

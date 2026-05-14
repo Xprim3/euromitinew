@@ -100,7 +100,7 @@ export function AdminDialog({
   return createPortal(
     <div
       className={cnDs(
-        "euromiti-admin-portal-root fixed inset-0 z-[500] flex min-h-dvh w-full items-center justify-center overflow-x-hidden overflow-y-auto p-4"
+        "euromiti-admin-portal-root fixed inset-0 z-[500] flex min-h-dvh w-full items-center justify-center overflow-x-hidden overflow-y-auto px-[max(1rem,env(safe-area-inset-left,0px))] py-[max(1rem,env(safe-area-inset-top,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] pb-[max(1rem,env(safe-area-inset-bottom,0px))]"
       )}
       role="presentation"
     >

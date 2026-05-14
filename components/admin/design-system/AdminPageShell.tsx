@@ -17,8 +17,10 @@ export function AdminPageShell({ children, flush = false, className }: AdminPage
   return (
     <div
       className={cnDs(
-        "mx-auto min-w-0 w-full max-w-[var(--admin-content-max)] flex-1",
-        flush ? "py-6" : "px-4 py-6 sm:px-6 lg:px-8 lg:py-8",
+        "mx-auto min-h-0 min-w-0 w-full max-w-[var(--admin-content-max)] flex-1 overflow-y-auto overscroll-contain admin-scroll-touch",
+        flush
+          ? "px-[max(0.75rem,env(safe-area-inset-left,0px))] py-6 pr-[max(0.75rem,env(safe-area-inset-right,0px))] sm:px-6 lg:px-8"
+          : "px-[max(0.75rem,env(safe-area-inset-left,0px))] py-5 pr-[max(0.75rem,env(safe-area-inset-right,0px))] sm:px-6 lg:px-8 lg:py-8",
         className
       )}
     >

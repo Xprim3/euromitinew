@@ -16,7 +16,7 @@ export function AdminTable({ children, className, ...rest }: AdminTableProps) {
       )}
       {...rest}
     >
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto overscroll-x-contain touch-pan-x">
         <table className="w-full min-w-[32rem] border-collapse text-left text-sm">{children}</table>
       </div>
     </div>
@@ -57,7 +57,7 @@ export function AdminTableTh({ children, className, ...rest }: ThHTMLAttributes<
   return (
     <th
       className={cnDs(
-        "px-4 py-3.5 text-xs font-semibold tracking-wide text-[var(--admin-text-muted)] uppercase whitespace-nowrap",
+        "px-3 py-3 text-xs font-semibold tracking-wide text-[var(--admin-text-muted)] uppercase whitespace-normal sm:whitespace-nowrap sm:px-4 sm:py-3.5",
         className
       )}
       {...rest}
@@ -69,7 +69,7 @@ export function AdminTableTh({ children, className, ...rest }: ThHTMLAttributes<
 
 export function AdminTableTd({ children, className, ...rest }: TdHTMLAttributes<HTMLTableCellElement>) {
   return (
-    <td className={cnDs("px-4 py-3.5 text-[var(--admin-text)]", className)} {...rest}>
+    <td className={cnDs("px-3 py-3 text-[var(--admin-text)] sm:px-4 sm:py-3.5", className)} {...rest}>
       {children}
     </td>
   )

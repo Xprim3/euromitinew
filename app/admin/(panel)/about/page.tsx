@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 
 import { AboutContentForm, type AboutMediaPreviews } from "@/components/admin/AboutContentForm"
-import { AdminSectionCard, ErrorMessage, SuccessMessage } from "@/components/admin/design-system"
+import { ErrorMessage } from "@/components/admin/design-system"
 import {
   effectiveAboutGalleryMediaIds,
   normalizeAboutRow,
@@ -10,7 +10,6 @@ import {
   whyReasonsFromDb,
   whyReasonSlotsForAdmin,
 } from "@/lib/data/about-content-public"
-import { formatNewsDate } from "@/lib/format-news-date"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 import type { AboutContentRow } from "@/types/supabase-cms"
 
@@ -135,32 +134,13 @@ export default async function AdminAboutPage() {
           {result.message}
         </ErrorMessage>
       ) : (
-        <>
-          <SuccessMessage title="CMS connection">
-            Saves revalidate <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">/about</code> automatically.
-          </SuccessMessage>
-          <AdminSectionCard>
-            <p className="text-sm text-[var(--admin-text-muted)]">
-              Last updated in CMS{" "}
-              <span className="font-medium text-[var(--admin-text)]">{formatNewsDate(result.row.updated_at)}</span>
-            </p>
-            <p className="mt-3 text-sm leading-relaxed text-[var(--admin-text-muted)]">
-              The navy band titled <span className="font-medium text-[var(--admin-text)]">Pse të na zgjidhni</span> with
-              the icon reasons and right-hand image is edited in the{" "}
-              <a className="font-medium text-[var(--admin-accent-active)] underline-offset-2 hover:underline" href="#admin-about-pse-te-na-zgjidhni">
-                Why choose / Pse të na zgjidhni
-              </a>{" "}
-              block below (same order as on the public About page).
-            </p>
-          </AdminSectionCard>
-          <AboutContentForm
-            key={result.row.updated_at}
-            initial={result.row}
-            previews={result.previews}
-            valueSlots={result.valueSlots}
-            whyReasonSlots={result.whyReasonSlots}
-          />
-        </>
+        <AboutContentForm
+          key={result.row.updated_at}
+          initial={result.row}
+          previews={result.previews}
+          valueSlots={result.valueSlots}
+          whyReasonSlots={result.whyReasonSlots}
+        />
       )}
     </div>
   )

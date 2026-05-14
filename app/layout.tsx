@@ -36,6 +36,8 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: "#0f172a",
+  /** Lets `env(safe-area-inset-*)` work on notched phones (admin + mobile chrome). */
+  viewportFit: "cover",
 }
 
 export const metadata: Metadata = {

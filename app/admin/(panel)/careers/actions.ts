@@ -86,6 +86,15 @@ function todayIsoDate() {
   return new Date().toISOString().slice(0, 10)
 }
 
+/** Jobs use the public site application form only; legacy DB columns stay defaulted. */
+const JOB_APPLY_DEFAULTS = {
+  apply_channel: "instructions" as const,
+  apply_email: null as string | null,
+  apply_phone: null as string | null,
+  apply_url: null as string | null,
+  apply_instructions: null as string | null,
+}
+
 export async function createJobAction(_prev: JobSaveState, formData: FormData): Promise<JobSaveState> {
   const supabase = await createSupabaseServerClient()
   const {
@@ -131,11 +140,11 @@ export async function createJobAction(_prev: JobSaveState, formData: FormData): 
       description,
       requirements,
       is_active: isActive,
-      apply_channel: v.apply_channel,
-      apply_email: v.apply_email?.trim() || null,
-      apply_phone: v.apply_phone?.trim() || null,
-      apply_url: v.apply_url?.trim() || null,
-      apply_instructions: v.apply_instructions?.trim() || null,
+      apply_channel: JOB_APPLY_DEFAULTS.apply_channel,
+      apply_email: JOB_APPLY_DEFAULTS.apply_email,
+      apply_phone: JOB_APPLY_DEFAULTS.apply_phone,
+      apply_url: JOB_APPLY_DEFAULTS.apply_url,
+      apply_instructions: JOB_APPLY_DEFAULTS.apply_instructions,
       posted_at: isActive ? todayIsoDate() : null,
     })
     .select("id")
@@ -168,11 +177,6 @@ export async function updateJobAction(_prev: JobSaveState, formData: FormData): 
       summary: formData.get("summary") ?? "",
       description: formData.get("description"),
       requirements: formData.get("requirements"),
-      apply_channel: formData.get("apply_channel"),
-      apply_email: formData.get("apply_email") ?? "",
-      apply_phone: formData.get("apply_phone") ?? "",
-      apply_url: formData.get("apply_url") ?? "",
-      apply_instructions: formData.get("apply_instructions") ?? "",
     })
 
     if (!parsed.success) return { ok: false, fieldErrors: parsed.error.flatten().fieldErrors }
@@ -202,11 +206,11 @@ export async function updateJobAction(_prev: JobSaveState, formData: FormData): 
         description,
         requirements,
         is_active: isActive,
-        apply_channel: v.apply_channel,
-        apply_email: v.apply_email?.trim() || null,
-        apply_phone: v.apply_phone?.trim() || null,
-        apply_url: v.apply_url?.trim() || null,
-        apply_instructions: v.apply_instructions?.trim() || null,
+        apply_channel: JOB_APPLY_DEFAULTS.apply_channel,
+        apply_email: JOB_APPLY_DEFAULTS.apply_email,
+        apply_phone: JOB_APPLY_DEFAULTS.apply_phone,
+        apply_url: JOB_APPLY_DEFAULTS.apply_url,
+        apply_instructions: JOB_APPLY_DEFAULTS.apply_instructions,
         posted_at: isActive ? existingPostedAt ?? todayIsoDate() : null,
       })
       .eq("id", id)

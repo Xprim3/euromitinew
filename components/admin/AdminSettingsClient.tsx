@@ -73,13 +73,11 @@ export function AdminSettingsClient({ userEmail, userId, displayName, lastUpdate
         </AdminSectionCard>
 
         <SaveBar
-          hasUnsavedChanges
-          unsavedLabel="Review profile changes"
           cancelLabel="Reset profile"
           onCancel={() => profileFormRef.current?.reset()}
           submitLabel="Save profile"
           submitPendingLabel="Saving..."
-        className="static rounded-[var(--admin-radius-card)] border"
+          className="static rounded-[var(--admin-radius-card)] border"
         />
       </form>
 
@@ -109,13 +107,11 @@ export function AdminSettingsClient({ userEmail, userId, displayName, lastUpdate
         </AdminSectionCard>
 
         <SaveBar
-          hasUnsavedChanges
-          unsavedLabel="Password fields are private"
           cancelLabel="Clear password fields"
           onCancel={() => passwordFormRef.current?.reset()}
           submitLabel="Update password"
           submitPendingLabel="Updating..."
-        className="static rounded-[var(--admin-radius-card)] border"
+          className="static rounded-[var(--admin-radius-card)] border"
         />
       </form>
 
