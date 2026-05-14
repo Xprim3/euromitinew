@@ -206,14 +206,14 @@ export function LocationsPageView({ locations }: LocationsPageViewProps) {
         <Container className="euromiti-section-loose">
           <Reveal variant="fade-up" once>
             <div className="mx-auto max-w-3xl text-center">
-              <p className="font-playfair text-lg text-brand-accent-gold md:text-xl">The network</p>
+              <p className="font-playfair text-lg text-brand-accent-gold md:text-xl">Rrjeti Euromiti</p>
               <div className="mx-auto mt-5 h-px w-12 bg-linear-to-r from-transparent via-brand-accent-gold/80 to-transparent" aria-hidden />
               <h2 className="mt-6 font-heading text-[clamp(1.6rem,2.6vw,2.1rem)] font-semibold tracking-tight text-foreground">
-                Three destinations, one standard of hospitality
+                Një rrjet shërbimesh i ndërtuar mbi cilësi dhe besim.
               </h2>
               <p className="mt-4 text-sm leading-relaxed text-muted-foreground md:text-base">
-                Prishtina, Ferizaj, and Gjilan — refined forecourts where fuel, dining, car care, and retail sit under one
-                roof. Choose a station for directions, hours, and on-site services.
+                Në Prishtinë, Ferizaj dhe Gjilan, Euromiti ofron më shumë se një ndalesë karburanti një hapësirë të
+                kompletuar për furnizim, ushqim, kujdes për veturën dhe komoditet gjatë rrugës.
               </p>
             </div>
           </Reveal>

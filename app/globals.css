@@ -256,15 +256,23 @@
     text-shadow: 0 3px 18px rgb(10 17 32 / 0.5), 0 1px 2px rgb(10 17 32 / 0.64);
   }
 
-  .euromiti-mobile-menu-overlay {
-    animation: euromiti-mobile-menu-overlay 240ms var(--euromiti-ease-smooth) both;
+  .euromiti-mobile-menu-overlay--enter {
+    animation: euromiti-mobile-menu-overlay-enter 320ms var(--euromiti-ease-smooth) both;
   }
 
-  .euromiti-mobile-menu-panel {
-    animation: euromiti-mobile-menu-panel 320ms var(--euromiti-ease-smooth) both;
+  .euromiti-mobile-menu-overlay--exit {
+    animation: euromiti-mobile-menu-overlay-exit 320ms var(--euromiti-ease-smooth) both;
   }
 
-  @keyframes euromiti-mobile-menu-overlay {
+  .euromiti-mobile-menu-panel--enter {
+    animation: euromiti-mobile-menu-panel-enter 320ms var(--euromiti-ease-smooth) both;
+  }
+
+  .euromiti-mobile-menu-panel--exit {
+    animation: euromiti-mobile-menu-panel-exit 320ms var(--euromiti-ease-smooth) both;
+  }
+
+  @keyframes euromiti-mobile-menu-overlay-enter {
     from {
       opacity: 0;
     }
@@ -273,7 +281,16 @@
     }
   }
 
-  @keyframes euromiti-mobile-menu-panel {
+  @keyframes euromiti-mobile-menu-overlay-exit {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes euromiti-mobile-menu-panel-enter {
     from {
       opacity: 0;
       transform: translateX(100%);
@@ -281,6 +298,17 @@
     to {
       opacity: 1;
       transform: translateX(0);
+    }
+  }
+
+  @keyframes euromiti-mobile-menu-panel-exit {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(100%);
     }
   }
 

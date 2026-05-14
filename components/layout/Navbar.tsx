@@ -55,7 +55,7 @@ export function Navbar({ brand }: NavbarProps) {
           </Link>
         </div>
 
-        <nav aria-label="Main" className="hidden items-center gap-5 lg:flex xl:gap-8">
+        <nav aria-label="Main" className="hidden items-center gap-6 lg:flex xl:gap-10 2xl:gap-12">
           {TOPBAR_NAV_LINKS.map(({ href, label }) => (
             <Link
               key={href}

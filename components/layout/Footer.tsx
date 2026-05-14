@@ -18,7 +18,7 @@ const legalLinks = [
 const FOOTER_BRAND_MARK_SVG = "/logo-white.svg"
 
 const footerLinkClass =
-  "text-[0.7rem] font-bold uppercase tracking-[0.16em] text-white/68 transition-colors duration-200 hover:text-brand-accent-soft"
+  "group text-[0.7rem] font-bold uppercase tracking-[0.16em] text-white/68 transition-colors duration-200 hover:text-brand-accent-soft"
 
 const socialClass =
   "text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-white/55 transition-colors hover:text-brand-accent-soft"
