@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { AboutContentForm, type AboutMediaPreviews } from "@/components/admin/AboutContentForm"
 import { AdminSectionCard, ErrorMessage, SuccessMessage } from "@/components/admin/design-system"
 import {
+  effectiveAboutGalleryMediaIds,
   normalizeAboutRow,
   valueCardsFromDb,
   valueSlotsForAdmin,
@@ -24,6 +25,16 @@ function urlFromRows(
   if (!id || !mediaRows?.length) return null
   const hit = mediaRows.find((r) => r.id === id)
   return hit?.public_url ?? null
+}
+
+function altFromRows(
+  mediaRows: { id: string; alt_text: string | null }[] | null | undefined,
+  id: string | null | undefined
+): string | null {
+  if (!id || !mediaRows?.length) return null
+  const hit = mediaRows.find((r) => r.id === id)
+  const t = hit?.alt_text?.trim()
+  return t && t.length > 0 ? t : null
 }
 
 async function loadAbout(): Promise<
@@ -52,6 +63,7 @@ async function loadAbout(): Promise<
   if (!raw) return { ok: false, message: "No about_content row — run Phase 10 migrations." }
 
   const row = normalizeAboutRow(raw as Record<string, unknown>)
+  const gallery = effectiveAboutGalleryMediaIds(row)
 
   const mediaIds = [
     row.hero_media_id,
@@ -61,9 +73,9 @@ async function loadAbout(): Promise<
     row.offer_playground_media_id,
     row.offer_carwash_media_id,
     row.offer_mini_market_media_id,
-    row.gallery_strip_media_id,
-    row.gallery_why_us_media_id,
-    row.gallery_partnerships_media_id,
+    gallery.stripId,
+    gallery.whyUsId,
+    gallery.partnerId,
     row.owner_media_id,
   ].filter((x): x is string => typeof x === "string" && x.length > 0)
 
@@ -79,11 +91,17 @@ async function loadAbout(): Promise<
     galleryWhy: null,
     galleryPartner: null,
     owner: null,
+    galleryStripAltFromMedia: null,
+    galleryWhyAltFromMedia: null,
+    galleryPartnerAltFromMedia: null,
   }
 
-  let mediaRows: { id: string; public_url: string | null }[] | null = null
+  let mediaRows: { id: string; public_url: string | null; alt_text: string | null }[] | null = null
   if (mediaIds.length > 0) {
-    const { data: uploads } = await supabase.from("media_uploads").select("id, public_url").in("id", [...new Set(mediaIds)])
+    const { data: uploads } = await supabase
+      .from("media_uploads")
+      .select("id, public_url, alt_text")
+      .in("id", [...new Set(mediaIds)])
     mediaRows = uploads ?? null
     previews.hero = urlFromRows(mediaRows, row.hero_media_id)
     previews.story = urlFromRows(mediaRows, row.story_media_id)
@@ -92,10 +110,13 @@ async function loadAbout(): Promise<
     previews.offerPlayground = urlFromRows(mediaRows, row.offer_playground_media_id)
     previews.offerCarwash = urlFromRows(mediaRows, row.offer_carwash_media_id)
     previews.offerMiniMarket = urlFromRows(mediaRows, row.offer_mini_market_media_id)
-    previews.galleryStrip = urlFromRows(mediaRows, row.gallery_strip_media_id)
-    previews.galleryWhy = urlFromRows(mediaRows, row.gallery_why_us_media_id)
-    previews.galleryPartner = urlFromRows(mediaRows, row.gallery_partnerships_media_id)
+    previews.galleryStrip = urlFromRows(mediaRows, gallery.stripId)
+    previews.galleryWhy = urlFromRows(mediaRows, gallery.whyUsId)
+    previews.galleryPartner = urlFromRows(mediaRows, gallery.partnerId)
     previews.owner = urlFromRows(mediaRows, row.owner_media_id)
+    previews.galleryStripAltFromMedia = altFromRows(mediaRows, gallery.stripId)
+    previews.galleryWhyAltFromMedia = altFromRows(mediaRows, gallery.whyUsId)
+    previews.galleryPartnerAltFromMedia = altFromRows(mediaRows, gallery.partnerId)
   }
 
   const valueSlots = valueSlotsForAdmin(valueCardsFromDb(row.values_json))
@@ -122,6 +143,14 @@ export default async function AdminAboutPage() {
             <p className="text-sm text-[var(--admin-text-muted)]">
               Last updated in CMS{" "}
               <span className="font-medium text-[var(--admin-text)]">{formatNewsDate(result.row.updated_at)}</span>
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-[var(--admin-text-muted)]">
+              The navy band titled <span className="font-medium text-[var(--admin-text)]">Pse të na zgjidhni</span> with
+              the icon reasons and right-hand image is edited in the{" "}
+              <a className="font-medium text-[var(--admin-accent-active)] underline-offset-2 hover:underline" href="#admin-about-pse-te-na-zgjidhni">
+                Why choose / Pse të na zgjidhni
+              </a>{" "}
+              block below (same order as on the public About page).
             </p>
           </AdminSectionCard>
           <AboutContentForm

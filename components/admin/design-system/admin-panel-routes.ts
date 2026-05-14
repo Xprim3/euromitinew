@@ -151,7 +151,8 @@ export function adminRouteHeaderMeta(pathname: string): AdminRouteHeaderMeta {
   if (p === "/admin/about") {
     return {
       title: "About Page",
-      subtitle: "Edit the public About page hero, story, mission, values, and images.",
+      subtitle:
+        "Public `/about` singleton: hero, story, owner, mission & vision, offer cards, the dark “Pse të na zgjidhni” (why choose) band, core values, and gallery images.",
       breadcrumbs: [crumbAdmin, { label: "About" }],
     }
   }

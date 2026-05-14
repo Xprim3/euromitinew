@@ -18,6 +18,8 @@ async function loadRestaurantContent(): Promise<
       ok: true
       row: RestaurantContentRow
       heroPreviewUrl: string | null
+      skanomPreviewUrl: string | null
+      skanomImageAltFromMedia: string | null
       menuDrafts: ReturnType<typeof menuDraftsFromRow>
       galleryDrafts: ReturnType<typeof galleryDraftsFromRow>
     }
@@ -37,6 +39,7 @@ async function loadRestaurantContent(): Promise<
 
     const ids: string[] = []
     if (row.hero_image_media_id) ids.push(row.hero_image_media_id)
+    if (row.skanom_image_media_id) ids.push(row.skanom_image_media_id)
 
     const menuHl = Array.isArray(row.menu_highlights_json) ? row.menu_highlights_json : []
     for (const it of menuHl) {
@@ -49,22 +52,34 @@ async function loadRestaurantContent(): Promise<
 
     const uniq = [...new Set(ids)]
     const urlMap: Record<string, string | undefined> = {}
+    const altById: Record<string, string | undefined> = {}
 
     if (uniq.length > 0) {
-      const { data: uploads } = await supabase.from("media_uploads").select("id, public_url").in("id", uniq)
+      const { data: uploads } = await supabase.from("media_uploads").select("id, public_url, alt_text").in("id", uniq)
       for (const u of uploads ?? []) {
-        const r = u as { id: string; public_url: string | null }
-        if (r.public_url?.trim()) urlMap[r.id] = r.public_url.trim()
+        const r = u as { id: string; public_url: string | null; alt_text: string | null }
+        const url = r.public_url?.trim()
+        if (url) urlMap[r.id] = url
+        const alt = r.alt_text?.trim()
+        if (alt) altById[r.id] = alt
       }
     }
 
     const heroPreviewUrl =
       row.hero_image_media_id && urlMap[row.hero_image_media_id] ? urlMap[row.hero_image_media_id]! : null
 
+    const skanomPreviewUrl =
+      row.skanom_image_media_id && urlMap[row.skanom_image_media_id] ? urlMap[row.skanom_image_media_id]! : null
+    const skanomImageAltFromMedia = row.skanom_image_media_id
+      ? altById[row.skanom_image_media_id] ?? null
+      : null
+
     return {
       ok: true,
       row,
       heroPreviewUrl,
+      skanomPreviewUrl,
+      skanomImageAltFromMedia,
       menuDrafts: menuDraftsFromRow(row, urlMap),
       galleryDrafts: galleryDraftsFromRow(row, urlMap),
     }
@@ -86,9 +101,9 @@ export default async function AdminRestaurantPage() {
       ) : (
         <>
           <SuccessMessage title="Public revalidation">
-            Saves revalidate <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">/restaurant</code>. Digital menu
-            (Skanom), experience pillars, and per-city cards stay static; the Restaurant desk band uses hours, phone,
-            email, and notes below.
+            Saves revalidate <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">/restaurant</code> automatically.
+            Experience pillars and reservation cards stay static; hero, Skanom digital menu, menu cards, gallery, hours, and
+            contact use the fields below.
           </SuccessMessage>
           <AdminSectionCard>
             <p className="text-sm text-[var(--admin-text-muted)]">
@@ -100,6 +115,8 @@ export default async function AdminRestaurantPage() {
             submitAction={saveRestaurantContent}
             initial={result.row}
             heroPreviewUrl={result.heroPreviewUrl}
+            skanomPreviewUrl={result.skanomPreviewUrl}
+            skanomImageAltFromMedia={result.skanomImageAltFromMedia}
             menuDrafts={result.menuDrafts}
             galleryDrafts={result.galleryDrafts}
           />

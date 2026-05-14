@@ -156,6 +156,12 @@ export type RestaurantContentRow = {
   contact_notes: string | null
   menu_highlights_json: unknown
   gallery_media_ids: string[] | null
+  skanom_eyebrow: string
+  skanom_title: string
+  skanom_description: string
+  skanom_image_media_id: string | null
+  skanom_cta_label: string
+  skanom_cta_href: string
   updated_at: string
   updated_by: string | null
 }

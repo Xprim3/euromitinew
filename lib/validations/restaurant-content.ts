@@ -18,6 +18,12 @@ export const restaurantContentFormSchema = z.object({
     .refine((s) => s.length === 0 || z.string().email().safeParse(s).success, "Invalid email"),
   contact_notes: text.max(2400),
   hero_image_alt: text.max(500).optional(),
+  skanom_eyebrow: text.max(120),
+  skanom_title: text.max(240),
+  skanom_description: text.max(2400),
+  skanom_cta_label: text.max(120),
+  skanom_cta_href: text.max(500),
+  skanom_image_alt: text.max(500).optional(),
 })
 
 export type RestaurantContentFormParsed = z.infer<typeof restaurantContentFormSchema>

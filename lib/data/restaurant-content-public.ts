@@ -5,6 +5,7 @@ import {
   restaurantEditorialHeroMock,
   restaurantEditorialIntroMock,
   restaurantSeasonalFoodGalleryMock,
+  restaurantSkanomSectionMock,
   type RestaurantAtmosphereGalleryMock,
   type RestaurantEditorialHeroMock,
   type RestaurantEditorialIntroMock,
@@ -17,6 +18,24 @@ import type { RestaurantContentRow } from "@/types/supabase-cms"
 
 type MediaMap = Record<string, { public_url: string; alt_text: string | null }>
 
+export type ResolvedRestaurantSkanomSection = {
+  sectionId: string
+  headingId: string
+  eyebrow: string
+  title: string
+  description: string
+  imageSrc: string
+  imageAlt: string
+  ctaLabel: string
+  ctaHref: string
+  partner: {
+    headline: string
+    body: string
+    href: string
+    hint: string
+  }
+}
+
 export type ResolvedRestaurantPage = {
   pageHeroTitle: string
   pageHeroSubtitle: string
@@ -25,6 +44,7 @@ export type ResolvedRestaurantPage = {
   editorialHero: RestaurantEditorialHeroMock
   editorialIntro: RestaurantEditorialIntroMock
   seasonalGallery: RestaurantSeasonalFoodGalleryMock
+  skanom: ResolvedRestaurantSkanomSection
   atmosphereGallery: RestaurantAtmosphereGalleryMock
   deskInfo: RestaurantDeskInfo | null
 }
@@ -51,6 +71,12 @@ export function normalizeRestaurantContentRow(raw: Record<string, unknown>): Res
     contact_notes: raw.contact_notes == null ? null : typeof raw.contact_notes === "string" ? raw.contact_notes : null,
     menu_highlights_json: raw.menu_highlights_json ?? [],
     gallery_media_ids,
+    skanom_eyebrow: typeof raw.skanom_eyebrow === "string" ? raw.skanom_eyebrow : "",
+    skanom_title: typeof raw.skanom_title === "string" ? raw.skanom_title : "",
+    skanom_description: typeof raw.skanom_description === "string" ? raw.skanom_description : "",
+    skanom_image_media_id: fk("skanom_image_media_id"),
+    skanom_cta_label: typeof raw.skanom_cta_label === "string" ? raw.skanom_cta_label : "",
+    skanom_cta_href: typeof raw.skanom_cta_href === "string" ? raw.skanom_cta_href : "",
     updated_at: typeof raw.updated_at === "string" ? raw.updated_at : new Date().toISOString(),
     updated_by: fk("updated_by"),
   }
@@ -143,7 +169,7 @@ export const getRestaurantContentPublic = cache(async (): Promise<{ row: Restaur
 
   const galleryIds = row.gallery_media_ids ?? []
 
-  const allIds = [...new Set([row.hero_image_media_id, ...menuIds, ...galleryIds].filter((x): x is string => Boolean(x)))]
+  const allIds = [...new Set([row.hero_image_media_id, row.skanom_image_media_id, ...menuIds, ...galleryIds].filter((x): x is string => Boolean(x)))]
 
   let media: MediaMap = {}
   if (allIds.length) {
@@ -164,6 +190,40 @@ export const getRestaurantContentPublic = cache(async (): Promise<{ row: Restaur
   return { row, media }
 })
 
+function resolveSkanomSection(row: RestaurantContentRow | null, media: MediaMap): ResolvedRestaurantSkanomSection {
+  const mock0 = restaurantSkanomSectionMock.collageImages[0]
+  const partner = { ...restaurantSkanomSectionMock.partner }
+  if (!row) {
+    return {
+      sectionId: restaurantSkanomSectionMock.sectionId,
+      headingId: restaurantSkanomSectionMock.headingId,
+      eyebrow: restaurantSkanomSectionMock.eyebrow,
+      title: restaurantSkanomSectionMock.title,
+      description: restaurantSkanomSectionMock.description,
+      imageSrc: mock0.src,
+      imageAlt: mock0.alt,
+      ctaLabel: restaurantSkanomSectionMock.ctaLabel,
+      ctaHref: restaurantSkanomSectionMock.ctaHref,
+      partner,
+    }
+  }
+  const sid = row.skanom_image_media_id
+  const sm = sid ? media[sid] : undefined
+  const url = sm?.public_url?.trim()
+  return {
+    sectionId: restaurantSkanomSectionMock.sectionId,
+    headingId: restaurantSkanomSectionMock.headingId,
+    eyebrow: row.skanom_eyebrow.trim() || restaurantSkanomSectionMock.eyebrow,
+    title: row.skanom_title.trim() || restaurantSkanomSectionMock.title,
+    description: row.skanom_description.trim() || restaurantSkanomSectionMock.description,
+    imageSrc: url && url.length > 0 ? url : mock0.src,
+    imageAlt: sm?.alt_text?.trim() || mock0.alt,
+    ctaLabel: row.skanom_cta_label.trim() || restaurantSkanomSectionMock.ctaLabel,
+    ctaHref: row.skanom_cta_href.trim() || restaurantSkanomSectionMock.ctaHref,
+    partner,
+  }
+}
+
 export function resolveRestaurantPage(row: RestaurantContentRow | null, media: MediaMap): ResolvedRestaurantPage {
   const defaultHeroSrc = homeBeyondDesign.restaurant.mainImage
   const defaultHeroAlt = homeBeyondDesign.restaurant.mainImageAlt
@@ -178,6 +238,7 @@ export function resolveRestaurantPage(row: RestaurantContentRow | null, media: M
       editorialHero: restaurantEditorialHeroMock,
       editorialIntro: restaurantEditorialIntroMock,
       seasonalGallery: restaurantSeasonalFoodGalleryMock,
+      skanom: resolveSkanomSection(null, media),
       atmosphereGallery: restaurantAtmosphereGalleryMock,
       deskInfo: null,
     }
@@ -244,6 +305,7 @@ export function resolveRestaurantPage(row: RestaurantContentRow | null, media: M
     editorialHero,
     editorialIntro,
     seasonalGallery,
+    skanom: resolveSkanomSection(row, media),
     atmosphereGallery,
     deskInfo,
   }

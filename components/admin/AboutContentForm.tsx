@@ -30,6 +30,10 @@ export type AboutMediaPreviews = {
   galleryWhy: string | null
   galleryPartner: string | null
   owner: string | null
+  /** `media_uploads.alt_text` for resolved strip id (explicit column or legacy gallery index 0). */
+  galleryStripAltFromMedia: string | null
+  galleryWhyAltFromMedia: string | null
+  galleryPartnerAltFromMedia: string | null
 }
 
 type AboutContentFormProps = {
@@ -270,6 +274,45 @@ export function AboutContentForm({ initial, previews, valueSlots, whyReasonSlots
         </div>
       </AdminSectionCard>
 
+      <AdminSectionCard title="Mission & Vision" description="Public About page mission and vision cards.">
+        <div className="space-y-5">
+          <AdminContentGrid columns={2}>
+            <TextInput
+              label="Mission label"
+              name="mission_title"
+              defaultValue={initial.mission_title}
+              maxLength={160}
+              error={fieldErrors?.mission_title?.[0]}
+            />
+            <TextInput
+              label="Vision label"
+              name="vision_title"
+              defaultValue={initial.vision_title}
+              maxLength={160}
+              error={fieldErrors?.vision_title?.[0]}
+            />
+          </AdminContentGrid>
+          <TextareaInput
+            label="Mission body"
+            name="mission_body"
+            defaultValue={initial.mission_body}
+            rows={5}
+            maxLength={8000}
+            showCharacterCount
+            error={fieldErrors?.mission_body?.[0]}
+          />
+          <TextareaInput
+            label="Vision body"
+            name="vision_body"
+            defaultValue={initial.vision_body}
+            rows={5}
+            maxLength={8000}
+            showCharacterCount
+            error={fieldErrors?.vision_body?.[0]}
+          />
+        </div>
+      </AdminSectionCard>
+
       <AdminSectionCard
         title="What we offer"
         description="Edit only the offer card titles, text, and images shown on the public About page."
@@ -322,12 +365,13 @@ export function AboutContentForm({ initial, previews, valueSlots, whyReasonSlots
       </AdminSectionCard>
 
       <AdminSectionCard
-        title="Why Choose Us"
-        description="Edit the public About page reasons list and the image beside it."
+        id="admin-about-pse-te-na-zgjidhni"
+        title="Pse të na zgjidhni (Why choose Euromiti)"
+        description="Dark section on `/about` — main heading, right column image, and the six reason rows (icons + title + text). Scroll here from the note above."
       >
         <div className="space-y-5">
           <TextInput
-            label="Section title"
+            label="Main heading (shown as H2 on the page)"
             name="why_choose_heading"
             defaultValue={initial.why_choose_heading}
             maxLength={180}
@@ -340,13 +384,16 @@ export function AboutContentForm({ initial, previews, valueSlots, whyReasonSlots
             previewAlt="About why choose us image"
             removeInputName="clear_gallery_why"
             layout="auto"
-            helperText="Shown beside the Why Choose Us list on the public About page."
+            replaceLabel="Replace image"
+            acceptedFileTypesLabel="JPG, PNG, WebP, or GIF"
+            helperText="Shown beside the reasons list. Uses the dedicated Why column when set, otherwise the second legacy gallery image (strip → why → partner order)."
           />
           <TextInput
             label="Image alt text"
             name="gallery_why_alt"
             placeholder="Describe the why section image"
             maxLength={500}
+            defaultValue={previews.galleryWhyAltFromMedia ?? ""}
             error={fieldErrors?.gallery_why_alt?.[0]}
           />
 
@@ -390,87 +437,6 @@ export function AboutContentForm({ initial, previews, valueSlots, whyReasonSlots
         </div>
       </AdminSectionCard>
 
-      <AdminSectionCard title="Mission & Vision" description="Public About page mission and vision cards.">
-        <div className="space-y-5">
-          <AdminContentGrid columns={2}>
-            <TextInput
-              label="Mission label"
-              name="mission_title"
-              defaultValue={initial.mission_title}
-              maxLength={160}
-              error={fieldErrors?.mission_title?.[0]}
-            />
-            <TextInput
-              label="Vision label"
-              name="vision_title"
-              defaultValue={initial.vision_title}
-              maxLength={160}
-              error={fieldErrors?.vision_title?.[0]}
-            />
-          </AdminContentGrid>
-          <TextareaInput
-            label="Mission body"
-            name="mission_body"
-            defaultValue={initial.mission_body}
-            rows={5}
-            maxLength={8000}
-            showCharacterCount
-            error={fieldErrors?.mission_body?.[0]}
-          />
-          <TextareaInput
-            label="Vision body"
-            name="vision_body"
-            defaultValue={initial.vision_body}
-            rows={5}
-            maxLength={8000}
-            showCharacterCount
-            error={fieldErrors?.vision_body?.[0]}
-          />
-        </div>
-      </AdminSectionCard>
-
-      <AdminSectionCard
-        title="Section images"
-        description="Images used in the mission strip and partnerships/contact block."
-      >
-        <AdminContentGrid columns={2}>
-          <div className="space-y-4">
-            <FileUploadInput
-              label="Mission footer strip"
-              name="gallery_strip_image"
-              previewUrl={previews.galleryStrip}
-              previewAlt="About mission footer strip"
-              removeInputName="clear_gallery_strip"
-              layout="stacked"
-            />
-            <TextInput
-              label="Strip image alt text"
-              name="gallery_strip_alt"
-              placeholder="Describe the strip image"
-              maxLength={500}
-              error={fieldErrors?.gallery_strip_alt?.[0]}
-            />
-          </div>
-          <div className="space-y-4">
-            <FileUploadInput
-              label="Partnerships / contact block"
-              name="gallery_partner_image"
-              previewUrl={previews.galleryPartner}
-              previewAlt="About partnerships image"
-              removeInputName="clear_gallery_partner"
-              layout="stacked"
-            />
-            <TextInput
-              label="Partnerships image alt text"
-              name="gallery_partner_alt"
-              placeholder="Describe the partnerships image"
-              maxLength={500}
-              error={fieldErrors?.gallery_partner_alt?.[0]}
-            />
-          </div>
-        </AdminContentGrid>
-      </AdminSectionCard>
-
       <AdminSectionCard
         title="Core values"
         description="Icons use Material Symbols names, for example verified, favorite, trending_up. Leave title/body blank to skip a slot."
@@ -511,6 +477,54 @@ export function AboutContentForm({ initial, previews, valueSlots, whyReasonSlots
             </div>
           ))}
         </div>
+      </AdminSectionCard>
+
+      <AdminSectionCard
+        title="Section images"
+        description="Mission strip and partnerships/contact block images (same order as the lower sections on the public About page)."
+      >
+        <AdminContentGrid columns={2}>
+          <div className="space-y-4">
+            <FileUploadInput
+              label="Mission footer strip"
+              name="gallery_strip_image"
+              previewUrl={previews.galleryStrip}
+              previewAlt="About mission footer strip"
+              removeInputName="clear_gallery_strip"
+              layout="stacked"
+              replaceLabel="Replace image"
+              acceptedFileTypesLabel="JPG, PNG, WebP, or GIF"
+            />
+            <TextInput
+              label="Strip image alt text"
+              name="gallery_strip_alt"
+              placeholder="Describe the strip image"
+              maxLength={500}
+              defaultValue={previews.galleryStripAltFromMedia ?? ""}
+              error={fieldErrors?.gallery_strip_alt?.[0]}
+            />
+          </div>
+          <div className="space-y-4">
+            <FileUploadInput
+              label="Partnerships / contact block"
+              name="gallery_partner_image"
+              previewUrl={previews.galleryPartner}
+              previewAlt="About partnerships image"
+              removeInputName="clear_gallery_partner"
+              layout="stacked"
+              replaceLabel="Replace image"
+              acceptedFileTypesLabel="JPG, PNG, WebP, or GIF"
+            />
+            <TextInput
+              label="Partnerships image alt text"
+              name="gallery_partner_alt"
+              placeholder="Describe the partnerships image"
+              maxLength={500}
+              defaultValue={previews.galleryPartnerAltFromMedia ?? ""}
+              error={fieldErrors?.gallery_partner_alt?.[0]}
+            />
+          </div>
+        </AdminContentGrid>
       </AdminSectionCard>
 
       <SaveBar

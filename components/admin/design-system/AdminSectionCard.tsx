@@ -9,16 +9,19 @@ export type AdminSectionCardProps = {
   headerActions?: ReactNode
   children: ReactNode
   className?: string
+  /** Optional anchor for in-page links / deep links from docs. */
+  id?: string
 }
 
 /**
  * White card with optional titled header — use to group related fields or content blocks.
  */
-export function AdminSectionCard({ title, description, headerActions, children, className }: AdminSectionCardProps) {
+export function AdminSectionCard({ title, description, headerActions, children, className, id }: AdminSectionCardProps) {
   const hasHeader = Boolean(title || description || headerActions)
 
   return (
     <section
+      id={id}
       className={cnDs(
         "rounded-[var(--admin-radius-card)] border border-[var(--admin-border)] bg-[var(--admin-surface)] shadow-[var(--admin-shadow-card)]",
         className

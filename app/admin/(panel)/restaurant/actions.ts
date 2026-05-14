@@ -150,6 +150,28 @@ async function collectGalleryIds(
   return { ok: true, ids: dedupeIds(ordered).slice(0, ADMIN_RESTAURANT_GALLERY_SLOTS) }
 }
 
+async function resolveSkanomMedia(opts: {
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>
+  editorId: string
+  formData: FormData
+}): Promise<{ next: OptionalUuid } | { error: string }> {
+  if (truthyCheckbox(opts.formData.get("clear_skanom_image"))) {
+    return { next: null }
+  }
+  const file = opts.formData.get("skanom_image")
+  const alt = String(opts.formData.get("skanom_image_alt") ?? "").trim()
+  if (file instanceof File && file.size > 0) {
+    const up = await uploadHomepageAssetRow(opts.supabase, opts.editorId, file, {
+      altText: alt,
+      usageSection: "restaurant-skanom",
+      category: "restaurant",
+    })
+    if ("message" in up) return { error: up.message }
+    return { next: up.id }
+  }
+  return { next: undefined }
+}
+
 export async function saveRestaurantContent(
   _prev: RestaurantSaveState,
   formData: FormData
@@ -177,6 +199,12 @@ export async function saveRestaurantContent(
       contact_email: formData.get("contact_email") ?? "",
       contact_notes: formData.get("contact_notes") ?? "",
       hero_image_alt: formData.get("hero_image_alt") ?? "",
+      skanom_eyebrow: formData.get("skanom_eyebrow"),
+      skanom_title: formData.get("skanom_title"),
+      skanom_description: formData.get("skanom_description"),
+      skanom_cta_label: formData.get("skanom_cta_label"),
+      skanom_cta_href: formData.get("skanom_cta_href"),
+      skanom_image_alt: formData.get("skanom_image_alt") ?? "",
     })
 
     if (!parsed.success) {
@@ -187,6 +215,9 @@ export async function saveRestaurantContent(
 
     const heroR = await resolveHeroMedia({ supabase, editorId, formData })
     if ("error" in heroR) return { ok: false, message: heroR.error }
+
+    const skanomR = await resolveSkanomMedia({ supabase, editorId, formData })
+    if ("error" in skanomR) return { ok: false, message: skanomR.error }
 
     const menuR = await collectMenuHighlights(supabase, editorId, formData)
     if (!menuR.ok) return { ok: false, message: menuR.message }
@@ -209,10 +240,16 @@ export async function saveRestaurantContent(
       contact_notes: notesTrim.length ? notesTrim : null,
       menu_highlights_json: menuR.value,
       gallery_media_ids: galR.ids,
+      skanom_eyebrow: v.skanom_eyebrow,
+      skanom_title: v.skanom_title,
+      skanom_description: v.skanom_description,
+      skanom_cta_label: v.skanom_cta_label,
+      skanom_cta_href: v.skanom_cta_href,
       updated_by: editorId,
     }
 
     if (heroR.next !== undefined) patch.hero_image_media_id = heroR.next
+    if (skanomR.next !== undefined) patch.skanom_image_media_id = skanomR.next
 
     const { error: upErr } = await supabase.from("restaurant_content").upsert(patch, { onConflict: "id" })
     if (upErr) return { ok: false, message: upErr.message }

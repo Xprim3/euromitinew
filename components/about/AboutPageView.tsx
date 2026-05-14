@@ -89,17 +89,20 @@ export function AboutPageView({ data }: { data: ResolvedAboutPage }) {
               </div>
 
               <div className="relative lg:col-span-5">
-                <div className="relative min-h-[22rem] overflow-hidden rounded-[1.25rem] bg-muted shadow-[0_24px_70px_rgba(15,23,42,0.12)] sm:min-h-[28rem] lg:min-h-[34rem]">
+                <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[1.25rem] bg-muted shadow-[0_24px_70px_rgba(15,23,42,0.12)] sm:aspect-4/5">
                   <ImageHoverZoom className="absolute inset-0 h-full w-full">
                     <Image
                       src={data.ownerImageSrc}
                       alt={data.ownerImageAlt}
                       fill
                       sizes="(max-width: 1024px) 100vw, 40vw"
-                      className="object-cover object-center"
+                      className="object-contain object-center"
                     />
                   </ImageHoverZoom>
-                  <div className="absolute inset-0 bg-linear-to-t from-brand-shell-deep/32 via-transparent to-transparent" aria-hidden />
+                  <div
+                    className="pointer-events-none absolute inset-0 bg-linear-to-t from-brand-shell-deep/18 via-transparent to-transparent"
+                    aria-hidden
+                  />
                 </div>
               </div>
             </div>

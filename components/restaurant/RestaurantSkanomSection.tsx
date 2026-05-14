@@ -2,23 +2,19 @@ import Image from "next/image"
 import Link from "next/link"
 
 import { Container } from "@/components/layout/Container"
-import { EuromitiMotionClasses, ImageHoverZoom, Reveal, Stagger } from "@/components/motion"
+import { EuromitiMotionClasses, ImageHoverZoom, Reveal } from "@/components/motion"
 import { Button } from "@/components/ui/button"
+import type { ResolvedRestaurantSkanomSection } from "@/lib/data/restaurant-content-public"
 import { cn } from "@/lib/utils"
 
-import type { RestaurantSkanomSectionMock } from "@/data/mock/restaurant-page"
-
 type RestaurantSkanomSectionProps = {
-  data: RestaurantSkanomSectionMock
+  data: ResolvedRestaurantSkanomSection
   className?: string
 }
 
-/** Split digital menu promo — mosaic of dishes left, typography + Skanom block right. */
+/** Digital menu (Skanom) — CMS-backed image, copy, and CTA; partner callout stays from design defaults. */
 export function RestaurantSkanomSection({ data, className }: RestaurantSkanomSectionProps) {
-  const { sectionId, headingId, eyebrow, title, description, collageImages, ctaLabel, ctaHref, partner } =
-    data
-
-  const staggerPattern = ["", "motion-safe:md:translate-y-7", "", "motion-safe:md:-translate-y-6"] as const
+  const { sectionId, headingId, eyebrow, title, description, imageSrc, imageAlt, ctaLabel, ctaHref, partner } = data
 
   return (
     <section
@@ -28,21 +24,19 @@ export function RestaurantSkanomSection({ data, className }: RestaurantSkanomSec
     >
       <Container size="wide">
         <div className="grid grid-cols-1 items-center gap-9 lg:grid-cols-12 lg:gap-10 xl:gap-12">
-          <Stagger once className="relative grid grid-cols-2 gap-3 sm:gap-4 lg:col-span-5 lg:gap-5">
-            {collageImages.map((img, index) => (
-              <div
-                key={img.src}
-                className={cn(
-                  "relative aspect-4/5 overflow-hidden bg-background shadow-(--shadow-euromiti-sm)",
-                  staggerPattern[index]
-                )}
-              >
-                <ImageHoverZoom className="absolute inset-0 h-full w-full">
-                  <Image src={img.src} alt={img.alt} fill sizes="(max-width: 1024px) 45vw, 22vw" className="object-cover" />
-                </ImageHoverZoom>
-              </div>
-            ))}
-          </Stagger>
+          <Reveal variant="fade-up" once className="relative lg:col-span-5">
+            <div className="relative aspect-4/5 min-h-[16rem] overflow-hidden bg-background shadow-(--shadow-euromiti-sm) sm:min-h-[18rem] lg:min-h-0">
+              <ImageHoverZoom className="absolute inset-0 h-full w-full">
+                <Image
+                  src={imageSrc}
+                  alt={imageAlt}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 40vw"
+                  className="object-cover"
+                />
+              </ImageHoverZoom>
+            </div>
+          </Reveal>
 
           <Reveal variant="fade-up" once className="flex flex-col lg:col-span-7 lg:py-4">
             <p className="mb-5 font-heading text-[0.65rem] font-semibold uppercase tracking-[0.38em] text-secondary">

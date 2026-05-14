@@ -182,6 +182,21 @@ export function normalizeAboutRow(raw: Record<string, unknown>): AboutContentRow
   }
 }
 
+/** Same gallery slot resolution as the public About page (`gallery_*_media_id` or legacy `gallery_media_ids` order). */
+export function effectiveAboutGalleryMediaIds(row: AboutContentRow): {
+  stripId: string | null
+  whyUsId: string | null
+  partnerId: string | null
+} {
+  const ids = row.gallery_media_ids
+  const at = (i: number) => (ids && ids[i]) || null
+  return {
+    stripId: row.gallery_strip_media_id ?? at(0),
+    whyUsId: row.gallery_why_us_media_id ?? at(1),
+    partnerId: row.gallery_partnerships_media_id ?? at(2),
+  }
+}
+
 export const getAboutContentPublic = cache(async (): Promise<{
   row: AboutContentRow | null
   media: AboutMediaLookup
@@ -384,13 +399,7 @@ export function resolveAboutPage(row: AboutContentRow | null, media: AboutMediaL
     }
   }
 
-  const fallbackStrip = row?.gallery_media_ids?.[0] ?? null
-  const fallbackWhy = row?.gallery_media_ids?.[1] ?? null
-  const fallbackPartner = row?.gallery_media_ids?.[2] ?? null
-
-  const g0 = row?.gallery_strip_media_id ?? fallbackStrip
-  const g1 = row?.gallery_why_us_media_id ?? fallbackWhy
-  const g2 = row?.gallery_partnerships_media_id ?? fallbackPartner
+  const { stripId: g0, whyUsId: g1, partnerId: g2 } = effectiveAboutGalleryMediaIds(row)
   const whyReasons = whyReasonsFromDb(row.why_choose_reasons_json)
 
   return {

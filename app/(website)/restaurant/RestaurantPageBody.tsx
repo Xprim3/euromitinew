@@ -9,7 +9,6 @@ import { RestaurantSkanomSection } from "@/components/restaurant/RestaurantSkano
 import {
   restaurantExperiencePillarsMock,
   restaurantReservationStationsSectionMock,
-  restaurantSkanomSectionMock,
 } from "@/data/mock/restaurant-page"
 import {
   getRestaurantContentPublic,
@@ -34,7 +33,7 @@ export async function RestaurantPageBody() {
       <RestaurantEditorialHero data={data.editorialHero} />
       <RestaurantEditorialIntroSection data={data.editorialIntro} />
       <RestaurantSeasonalFoodGallery data={data.seasonalGallery} />
-      <RestaurantSkanomSection data={restaurantSkanomSectionMock} />
+      <RestaurantSkanomSection data={data.skanom} />
       <RestaurantExperiencePillars data={restaurantExperiencePillarsMock} />
       <RestaurantAtmosphereGallery data={data.atmosphereGallery} />
       <RestaurantReservationStations section={restaurantReservationStationsSectionMock} deskInfo={data.deskInfo} />

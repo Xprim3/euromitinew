@@ -27,6 +27,8 @@ type RestaurantContentFormProps = {
   submitAction: (prev: RestaurantSaveState, fd: FormData) => Promise<RestaurantSaveState>
   initial: RestaurantContentRow
   heroPreviewUrl: string | null
+  skanomPreviewUrl: string | null
+  skanomImageAltFromMedia: string | null
   menuDrafts: MenuSlotDraft[]
   galleryDrafts: GallerySlotDraft[]
 }
@@ -86,6 +88,8 @@ export function RestaurantContentForm({
   submitAction,
   initial,
   heroPreviewUrl,
+  skanomPreviewUrl,
+  skanomImageAltFromMedia,
   menuDrafts,
   galleryDrafts,
 }: RestaurantContentFormProps) {
@@ -184,6 +188,70 @@ export function RestaurantContentForm({
                   <TextInput label="Image alt text" name={`menu_image_alt_${i}`} placeholder="Describe this food image" />
                 </div>
               ))}
+            </div>
+          </EditorAccordion>
+
+          <EditorAccordion
+            title="Digital menu (Skanom)"
+            description="The band with the large image and headline before Experience pillars — same order as the public Restaurant page."
+          >
+            <div className="space-y-5">
+              <TextInput
+                label="Eyebrow / kicker"
+                name="skanom_eyebrow"
+                defaultValue={initial.skanom_eyebrow}
+                maxLength={120}
+                error={fieldErrors?.skanom_eyebrow?.[0]}
+              />
+              <TextInput
+                label="Title"
+                name="skanom_title"
+                defaultValue={initial.skanom_title}
+                maxLength={240}
+                error={fieldErrors?.skanom_title?.[0]}
+              />
+              <TextareaInput
+                label="Description"
+                name="skanom_description"
+                rows={6}
+                defaultValue={initial.skanom_description}
+                maxLength={2400}
+                showCharacterCount
+                error={fieldErrors?.skanom_description?.[0]}
+              />
+              <FileUploadInput
+                label="Section image"
+                name="skanom_image"
+                previewUrl={skanomPreviewUrl}
+                previewAlt="Skanom digital menu section image"
+                removeInputName="clear_skanom_image"
+                replaceLabel="Replace image"
+                acceptedFileTypesLabel="JPG, PNG, WebP, or GIF"
+                helperText="Shown on the left of this section on the public page."
+              />
+              <TextInput
+                label="Image alt text"
+                name="skanom_image_alt"
+                placeholder="Describe the section image"
+                maxLength={500}
+                defaultValue={skanomImageAltFromMedia ?? ""}
+              />
+              <AdminContentGrid columns={2}>
+                <TextInput
+                  label="CTA button label"
+                  name="skanom_cta_label"
+                  defaultValue={initial.skanom_cta_label}
+                  maxLength={120}
+                  error={fieldErrors?.skanom_cta_label?.[0]}
+                />
+                <TextInput
+                  label="CTA link (URL)"
+                  name="skanom_cta_href"
+                  defaultValue={initial.skanom_cta_href}
+                  maxLength={500}
+                  error={fieldErrors?.skanom_cta_href?.[0]}
+                />
+              </AdminContentGrid>
             </div>
           </EditorAccordion>
 
