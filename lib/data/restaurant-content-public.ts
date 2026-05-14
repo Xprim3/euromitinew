@@ -4,15 +4,21 @@ import {
   restaurantAtmosphereGalleryMock,
   restaurantEditorialHeroMock,
   restaurantEditorialIntroMock,
+  restaurantExperiencePillarsMock,
   restaurantSeasonalFoodGalleryMock,
   restaurantSkanomSectionMock,
   type RestaurantAtmosphereGalleryMock,
   type RestaurantEditorialHeroMock,
   type RestaurantEditorialIntroMock,
+  type RestaurantExperiencePillarsMock,
   type RestaurantSeasonalFoodGalleryMock,
 } from "@/data/mock/restaurant-page"
 import { homeBeyondDesign } from "@/data/mock/homepage-visual"
-import { ADMIN_RESTAURANT_MENU_SLOTS, ADMIN_RESTAURANT_GALLERY_SLOTS } from "@/lib/validations/restaurant-content"
+import {
+  ADMIN_RESTAURANT_GALLERY_SLOTS,
+  ADMIN_RESTAURANT_MENU_SLOTS,
+  ADMIN_RESTAURANT_PILLAR_SLOTS,
+} from "@/lib/validations/restaurant-content"
 import { createPublicSupabaseServerClient } from "@/lib/supabase/public-server-client"
 import type { RestaurantDeskInfo } from "@/types/public"
 import type { RestaurantContentRow } from "@/types/supabase-cms"
@@ -47,6 +53,7 @@ export type ResolvedRestaurantPage = {
   editorialIntro: RestaurantEditorialIntroMock
   seasonalGallery: RestaurantSeasonalFoodGalleryMock
   skanom: ResolvedRestaurantSkanomSection
+  experiencePillars: RestaurantExperiencePillarsMock
   atmosphereGallery: RestaurantAtmosphereGalleryMock
   deskInfo: RestaurantDeskInfo | null
 }
@@ -77,6 +84,7 @@ export function normalizeRestaurantContentRow(raw: Record<string, unknown>): Res
     contact_email: fk("contact_email"),
     contact_notes: raw.contact_notes == null ? null : typeof raw.contact_notes === "string" ? raw.contact_notes : null,
     menu_highlights_json: raw.menu_highlights_json ?? [],
+    experience_pillars_json: raw.experience_pillars_json ?? [],
     gallery_media_ids,
     skanom_eyebrow: typeof raw.skanom_eyebrow === "string" ? raw.skanom_eyebrow : "",
     skanom_title: typeof raw.skanom_title === "string" ? raw.skanom_title : "",
@@ -215,6 +223,30 @@ export const getRestaurantContentPublic = cache(async (): Promise<{ row: Restaur
   return { row, media }
 })
 
+type ExperiencePillarDb = { title?: unknown; body?: unknown }
+
+function resolveExperiencePillars(json: unknown): RestaurantExperiencePillarsMock {
+  const arr = Array.isArray(json) ? json : []
+  const pillars = Array.from({ length: ADMIN_RESTAURANT_PILLAR_SLOTS }, (_, i) => {
+    const mockP = restaurantExperiencePillarsMock.pillars[i]!
+    const raw = arr[i]
+    if (!raw || typeof raw !== "object") {
+      return { title: mockP.title, body: mockP.body }
+    }
+    const o = raw as ExperiencePillarDb
+    const title = typeof o.title === "string" ? o.title.trim() : ""
+    const body = typeof o.body === "string" ? o.body.trim() : ""
+    return {
+      title: title || mockP.title,
+      body: body || mockP.body,
+    }
+  })
+  return {
+    ...restaurantExperiencePillarsMock,
+    pillars: pillars as unknown as typeof restaurantExperiencePillarsMock.pillars,
+  }
+}
+
 function resolveSkanomSection(row: RestaurantContentRow | null, media: MediaMap): ResolvedRestaurantSkanomSection {
   const mock0 = restaurantSkanomSectionMock.collageImages[0]
   const partner = { ...restaurantSkanomSectionMock.partner }
@@ -264,6 +296,7 @@ export function resolveRestaurantPage(row: RestaurantContentRow | null, media: M
       editorialIntro: restaurantEditorialIntroMock,
       seasonalGallery: restaurantSeasonalFoodGalleryMock,
       skanom: resolveSkanomSection(null, media),
+      experiencePillars: restaurantExperiencePillarsMock,
       atmosphereGallery: restaurantAtmosphereGalleryMock,
       deskInfo: null,
     }
@@ -360,6 +393,7 @@ export function resolveRestaurantPage(row: RestaurantContentRow | null, media: M
     editorialIntro,
     seasonalGallery,
     skanom: resolveSkanomSection(row, media),
+    experiencePillars: resolveExperiencePillars(row.experience_pillars_json),
     atmosphereGallery,
     deskInfo,
   }

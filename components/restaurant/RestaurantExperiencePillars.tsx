@@ -26,9 +26,9 @@ export function RestaurantExperiencePillars({ data, className }: RestaurantExper
           What defines the restaurant experience
         </h2>
         <Stagger once className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4 lg:gap-10">
-          {pillars.map((pillar) => (
+          {pillars.map((pillar, index) => (
             <article
-              key={pillar.title}
+              key={`restaurant-pillar-${index}`}
               className="border-l border-border px-5 py-1 md:px-4 lg:border-border/80 lg:px-6"
             >
               <h3 className="font-playfair mb-4 text-[1.1rem] font-normal tracking-tight text-primary md:text-xl">

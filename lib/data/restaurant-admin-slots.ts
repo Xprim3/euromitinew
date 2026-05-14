@@ -1,6 +1,7 @@
 import {
   ADMIN_RESTAURANT_GALLERY_SLOTS,
   ADMIN_RESTAURANT_MENU_SLOTS,
+  ADMIN_RESTAURANT_PILLAR_SLOTS,
 } from "@/lib/validations/restaurant-content"
 import type { RestaurantContentRow } from "@/types/supabase-cms"
 
@@ -16,6 +17,11 @@ export type GallerySlotDraft = {
   previewUrl: string
 }
 
+export type PillarSlotDraft = {
+  title: string
+  body: string
+}
+
 export function emptyMenuDrafts(): MenuSlotDraft[] {
   return Array.from({ length: ADMIN_RESTAURANT_MENU_SLOTS }, () => ({
     title: "",
@@ -29,6 +35,13 @@ export function emptyGalleryDrafts(): GallerySlotDraft[] {
   return Array.from({ length: ADMIN_RESTAURANT_GALLERY_SLOTS }, () => ({
     mediaId: "",
     previewUrl: "",
+  }))
+}
+
+export function emptyPillarDrafts(): PillarSlotDraft[] {
+  return Array.from({ length: ADMIN_RESTAURANT_PILLAR_SLOTS }, () => ({
+    title: "",
+    body: "",
   }))
 }
 
@@ -54,6 +67,22 @@ export function menuDraftsFromRow(
       mediaId,
       previewUrl: mediaId ? urlById[mediaId] ?? "" : "",
     }
+  }
+  return slots
+}
+
+type PillarHl = { title?: unknown; body?: unknown }
+
+export function pillarDraftsFromRow(row: RestaurantContentRow): PillarSlotDraft[] {
+  const slots = emptyPillarDrafts()
+  const arr = Array.isArray(row.experience_pillars_json) ? row.experience_pillars_json : []
+  for (let i = 0; i < ADMIN_RESTAURANT_PILLAR_SLOTS; i++) {
+    const raw = arr[i]
+    if (!raw || typeof raw !== "object") continue
+    const m = raw as PillarHl
+    const title = typeof m.title === "string" ? m.title : ""
+    const body = typeof m.body === "string" ? m.body : ""
+    slots[i] = { title, body }
   }
   return slots
 }

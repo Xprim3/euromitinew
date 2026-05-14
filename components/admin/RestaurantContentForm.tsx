@@ -16,10 +16,11 @@ import {
   TextareaInput,
   TextInput,
 } from "@/components/admin/design-system"
-import type { MenuSlotDraft, GallerySlotDraft } from "@/lib/data/restaurant-admin-slots"
+import type { MenuSlotDraft, GallerySlotDraft, PillarSlotDraft } from "@/lib/data/restaurant-admin-slots"
 import {
   ADMIN_RESTAURANT_GALLERY_SLOTS,
   ADMIN_RESTAURANT_MENU_SLOTS,
+  ADMIN_RESTAURANT_PILLAR_SLOTS,
 } from "@/lib/validations/restaurant-content"
 import type { RestaurantContentRow } from "@/types/supabase-cms"
 
@@ -34,6 +35,7 @@ type RestaurantContentFormProps = {
   skanomPreviewUrl: string | null
   skanomImageAltFromMedia: string | null
   menuDrafts: MenuSlotDraft[]
+  pillarDrafts: PillarSlotDraft[]
   galleryDrafts: GallerySlotDraft[]
 }
 
@@ -107,6 +109,7 @@ export function RestaurantContentForm({
   skanomPreviewUrl,
   skanomImageAltFromMedia,
   menuDrafts,
+  pillarDrafts,
   galleryDrafts,
 }: RestaurantContentFormProps) {
   const router = useRouter()
@@ -142,7 +145,7 @@ export function RestaurantContentForm({
 
       <AdminSectionCard
         title="Restaurant content"
-        description="Sections follow the public /restaurant page top to bottom: page hero, Playfair band, dining-room intro (headlines + copy + image), food gallery, Skanom, atmosphere gallery, then desk details. Experience pillars stay code-only."
+        description="Sections follow the public /restaurant page top to bottom: page hero, Playfair band, dining-room intro, food gallery, Skanom, four experience pillars, atmosphere mosaic, then desk details. Reservation city cards stay mock-only for now."
       >
         <div className="space-y-3">
           <EditorAccordion
@@ -334,7 +337,7 @@ export function RestaurantContentForm({
 
           <EditorAccordion
             title="5 · Digital menu (Skanom)"
-            description="Section before Experience pillars — large image, headline, CTA. Static pillars are not editable here."
+            description="Large image, headline, body, and CTA — section immediately before the four-column experience pillars."
           >
             <div className="space-y-5">
               <TextInput
@@ -397,7 +400,22 @@ export function RestaurantContentForm({
           </EditorAccordion>
 
           <EditorAccordion
-            title="6 · Atmosphere gallery"
+            title="6 · Experience pillars"
+            description={`${ADMIN_RESTAURANT_PILLAR_SLOTS} columns on /restaurant between Skanom and the dark atmosphere band. Empty title or body falls back to the default line for that slot.`}
+          >
+            <div className="grid gap-5 lg:grid-cols-2">
+              {pillarDrafts.map((slot, i) => (
+                <div key={i} className="space-y-4 rounded-[var(--admin-radius-card)] border border-[var(--admin-border)] bg-slate-50 p-4">
+                  <p className="font-medium text-sm text-[var(--admin-text)]">Pillar {i + 1}</p>
+                  <TextInput label="Title" name={`pillar_title_${i}`} defaultValue={slot.title} maxLength={200} />
+                  <TextareaInput label="Body" name={`pillar_body_${i}`} rows={6} defaultValue={slot.body} maxLength={2000} showCharacterCount />
+                </div>
+              ))}
+            </div>
+          </EditorAccordion>
+
+          <EditorAccordion
+            title="7 · Atmosphere gallery"
             description={`Same dark mosaic as on /restaurant after Experience pillars: ${ADMIN_RESTAURANT_GALLERY_SLOTS} images in fixed order (hero left, two stacked right, then bottom narrow + wide).`}
           >
             <ImageGalleryManager
@@ -415,7 +433,7 @@ export function RestaurantContentForm({
           </EditorAccordion>
 
           <EditorAccordion
-            title="7 · Reservations / desk (hours & contact)"
+            title="8 · Reservations / desk (hours & contact)"
             description="Shown in the reservation band at the bottom of the restaurant page."
           >
             <div className="space-y-5">

@@ -6,6 +6,7 @@ import { uploadHomepageAssetRow } from "@/lib/server/upload-homepage-asset"
 import {
   ADMIN_RESTAURANT_GALLERY_SLOTS,
   ADMIN_RESTAURANT_MENU_SLOTS,
+  ADMIN_RESTAURANT_PILLAR_SLOTS,
   restaurantContentFormSchema,
 } from "@/lib/validations/restaurant-content"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
@@ -150,6 +151,16 @@ async function collectGalleryIds(
   return { ok: true, ids: dedupeIds(ordered).slice(0, ADMIN_RESTAURANT_GALLERY_SLOTS) }
 }
 
+function collectExperiencePillars(formData: FormData): { title: string; body: string }[] {
+  const out: { title: string; body: string }[] = []
+  for (let i = 0; i < ADMIN_RESTAURANT_PILLAR_SLOTS; i++) {
+    const title = String(formData.get(`pillar_title_${i}`) ?? "").trim()
+    const body = String(formData.get(`pillar_body_${i}`) ?? "").trim()
+    out.push({ title, body })
+  }
+  return out
+}
+
 async function resolveSkanomMedia(opts: {
   supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>
   editorId: string
@@ -286,6 +297,8 @@ export async function saveRestaurantContent(
     const galR = await collectGalleryIds(supabase, editorId, formData)
     if (!galR.ok) return { ok: false, message: galR.message }
 
+    const experiencePillarsJson = collectExperiencePillars(formData)
+
     const phoneTrim = v.contact_phone?.trim() ?? ""
     const emailTrim = v.contact_email?.trim() ?? ""
     const notesTrim = v.contact_notes?.trim() ?? ""
@@ -304,6 +317,7 @@ export async function saveRestaurantContent(
       contact_email: emailTrim.length ? emailTrim : null,
       contact_notes: notesTrim.length ? notesTrim : null,
       menu_highlights_json: menuR.value,
+      experience_pillars_json: experiencePillarsJson,
       gallery_media_ids: galR.ids,
       skanom_eyebrow: v.skanom_eyebrow,
       skanom_title: v.skanom_title,

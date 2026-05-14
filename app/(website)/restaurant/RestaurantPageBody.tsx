@@ -6,10 +6,7 @@ import { RestaurantExperiencePillars } from "@/components/restaurant/RestaurantE
 import { RestaurantReservationStations } from "@/components/restaurant/RestaurantReservationStations"
 import { RestaurantSeasonalFoodGallery } from "@/components/restaurant/RestaurantSeasonalFoodGallery"
 import { RestaurantSkanomSection } from "@/components/restaurant/RestaurantSkanomSection"
-import {
-  restaurantExperiencePillarsMock,
-  restaurantReservationStationsSectionMock,
-} from "@/data/mock/restaurant-page"
+import { restaurantReservationStationsSectionMock } from "@/data/mock/restaurant-page"
 import {
   getRestaurantContentPublic,
   resolveRestaurantPage,
@@ -33,7 +30,7 @@ export async function RestaurantPageBody() {
       <RestaurantEditorialIntroSection data={data.editorialIntro} />
       <RestaurantSeasonalFoodGallery data={data.seasonalGallery} />
       <RestaurantSkanomSection data={data.skanom} />
-      <RestaurantExperiencePillars data={restaurantExperiencePillarsMock} />
+      <RestaurantExperiencePillars data={data.experiencePillars} />
       <RestaurantAtmosphereGallery data={data.atmosphereGallery} />
       <RestaurantReservationStations section={restaurantReservationStationsSectionMock} deskInfo={data.deskInfo} />
     </>

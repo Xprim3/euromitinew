@@ -4,6 +4,8 @@ const text = z.string().trim()
 
 export const ADMIN_RESTAURANT_MENU_SLOTS = 6
 export const ADMIN_RESTAURANT_GALLERY_SLOTS = 5
+/** Four-column promise band between Skanom and atmosphere gallery. */
+export const ADMIN_RESTAURANT_PILLAR_SLOTS = 4
 
 export const restaurantContentFormSchema = z.object({
   hero_title: text.max(240),

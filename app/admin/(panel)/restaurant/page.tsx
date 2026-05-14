@@ -3,7 +3,7 @@ import type { Metadata } from "next"
 import { saveRestaurantContent } from "@/app/admin/(panel)/restaurant/actions"
 import { RestaurantContentForm } from "@/components/admin/RestaurantContentForm"
 import { AdminSectionCard, ErrorMessage, SuccessMessage } from "@/components/admin/design-system"
-import { galleryDraftsFromRow, menuDraftsFromRow } from "@/lib/data/restaurant-admin-slots"
+import { galleryDraftsFromRow, menuDraftsFromRow, pillarDraftsFromRow } from "@/lib/data/restaurant-admin-slots"
 import { normalizeRestaurantContentRow } from "@/lib/data/restaurant-content-public"
 import { formatNewsDate } from "@/lib/format-news-date"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
@@ -25,6 +25,7 @@ async function loadRestaurantContent(): Promise<
       skanomPreviewUrl: string | null
       skanomImageAltFromMedia: string | null
       menuDrafts: ReturnType<typeof menuDraftsFromRow>
+      pillarDrafts: ReturnType<typeof pillarDraftsFromRow>
       galleryDrafts: ReturnType<typeof galleryDraftsFromRow>
     }
   | { ok: false; message: string }
@@ -105,6 +106,7 @@ async function loadRestaurantContent(): Promise<
       skanomPreviewUrl,
       skanomImageAltFromMedia,
       menuDrafts: menuDraftsFromRow(row, urlMap),
+      pillarDrafts: pillarDraftsFromRow(row),
       galleryDrafts: galleryDraftsFromRow(row, urlMap),
     }
   } catch {
@@ -126,8 +128,7 @@ export default async function AdminRestaurantPage() {
         <>
           <SuccessMessage title="Public revalidation">
             Saves revalidate <code className="rounded bg-zinc-900/80 px-1 py-0.5 text-xs">/restaurant</code> automatically.
-            Accordion order matches the page top to bottom. Experience pillars and reservation city cards stay static; hero,
-            Playfair band, dining-room intro, food cards, Skanom, atmosphere gallery, and desk details are editable below.
+            Accordion order matches the page top to bottom. Reservation city cards stay mock-only; hero through experience pillars, atmosphere gallery, and desk details are editable below.
           </SuccessMessage>
           <AdminSectionCard>
             <p className="text-sm text-[var(--admin-text-muted)]">
@@ -146,6 +147,7 @@ export default async function AdminRestaurantPage() {
             skanomPreviewUrl={result.skanomPreviewUrl}
             skanomImageAltFromMedia={result.skanomImageAltFromMedia}
             menuDrafts={result.menuDrafts}
+            pillarDrafts={result.pillarDrafts}
             galleryDrafts={result.galleryDrafts}
           />
         </>

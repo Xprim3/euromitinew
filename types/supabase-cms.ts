@@ -160,6 +160,7 @@ export type RestaurantContentRow = {
   contact_email: string | null
   contact_notes: string | null
   menu_highlights_json: unknown
+  experience_pillars_json: unknown
   gallery_media_ids: string[] | null
   skanom_eyebrow: string
   skanom_title: string
