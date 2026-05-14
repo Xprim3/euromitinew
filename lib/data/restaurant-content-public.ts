@@ -12,6 +12,7 @@ import {
   type RestaurantSeasonalFoodGalleryMock,
 } from "@/data/mock/restaurant-page"
 import { homeBeyondDesign } from "@/data/mock/homepage-visual"
+import { ADMIN_RESTAURANT_MENU_SLOTS, ADMIN_RESTAURANT_GALLERY_SLOTS } from "@/lib/validations/restaurant-content"
 import { createPublicSupabaseServerClient } from "@/lib/supabase/public-server-client"
 import type { RestaurantDeskInfo } from "@/types/public"
 import type { RestaurantContentRow } from "@/types/supabase-cms"
@@ -29,6 +30,7 @@ export type ResolvedRestaurantSkanomSection = {
   ctaLabel: string
   ctaHref: string
   partner: {
+    advertisementLabel: string
     headline: string
     body: string
     href: string
@@ -123,7 +125,7 @@ function menuCardsFromDb(json: unknown, media: MediaMap): { title: string; descr
       src: url && url.length > 0 ? url : fallback.src,
       alt: m?.alt_text?.trim() || fallback.alt,
     })
-    if (out.length >= 12) break
+    if (out.length >= ADMIN_RESTAURANT_MENU_SLOTS) break
   }
   return out
 }
@@ -144,7 +146,7 @@ function atmosphereSlotsFromGallery(ids: string[] | null | undefined, media: Med
     }
   }
   const merged: { src: string; alt: string }[] = []
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < ADMIN_RESTAURANT_GALLERY_SLOTS; i++) {
     merged.push(fromDb[i] ?? mockSlots[i]!)
   }
   return merged as [

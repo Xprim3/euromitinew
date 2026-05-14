@@ -117,10 +117,12 @@ export const restaurantSkanomSectionMock = {
     },
   ] as const,
   partner: {
+    advertisementLabel: "Partneri i menusë digjitale",
     headline: "Skanom.com",
-    body: "The guest-facing menu canvas we rely on—instant edits, multilingual paths, and a viewing experience calibrated for luminous screens.",
+    body:
+      "Platforma që përdorim për menunë online të Restaurant Euromiti e shpejtë, moderne dhe e lehtë për t'u përditësuar. Përmes Skanom, mysafirët mund ta shfletojnë menunë në mënyrë të qartë, nga telefoni apo çdo pajisje tjetër, me përvojë të përshtatur për përdorim të thjeshtë dhe profesional.",
     href: "https://skanom.com/",
-    hint: "Learn more about Skanom",
+    hint: "Mësoni më shumë për Skanom",
   },
 } as const
 

@@ -74,12 +74,20 @@ function EditorAccordion({
   )
 }
 
+const RESTAURANT_ATMOSPHERE_GALLERY_SLOT_LABELS = [
+  "1 · Hero — tall left panel",
+  "2 · Upper — right column stack",
+  "3 · Lower — right column stack",
+  "4 · Bottom — narrow strip (4 cols)",
+  "5 · Bottom — wide strip (8 cols)",
+] as const
+
 function restaurantGalleryDraftToSlots(galleryDrafts: GallerySlotDraft[]): GallerySlot[] {
   return Array.from({ length: ADMIN_RESTAURANT_GALLERY_SLOTS }, (_, i) => {
     const slot = galleryDrafts[i]
     return {
       id: `restaurant-gallery-${i}`,
-      label: `Gallery tile ${i + 1}`,
+      label: RESTAURANT_ATMOSPHERE_GALLERY_SLOT_LABELS[i] ?? `Gallery slot ${i + 1}`,
       previewUrl: slot?.previewUrl || null,
       existingMediaId: slot?.mediaId ?? "",
       altText: "",
@@ -390,7 +398,7 @@ export function RestaurantContentForm({
 
           <EditorAccordion
             title="6 · Atmosphere gallery"
-            description={`After Experience pillars on the public page. ${ADMIN_RESTAURANT_GALLERY_SLOTS} ordered tiles.`}
+            description={`Same dark mosaic as on /restaurant after Experience pillars: ${ADMIN_RESTAURANT_GALLERY_SLOTS} images in fixed order (hero left, two stacked right, then bottom narrow + wide).`}
           >
             <ImageGalleryManager
               label="Atmosphere gallery"

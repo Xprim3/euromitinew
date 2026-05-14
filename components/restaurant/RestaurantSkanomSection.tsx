@@ -64,12 +64,12 @@ export function RestaurantSkanomSection({ data, className }: RestaurantSkanomSec
             </Button>
 
             <aside
-              aria-label={`${partner.headline}: partner`}
+              aria-label={`${partner.headline} — ${partner.advertisementLabel}`}
               className="mt-12 border border-primary/15 bg-linear-to-br from-background to-muted/65 px-6 py-6 shadow-(--shadow-euromiti-soft) sm:px-8 sm:py-7"
             >
               <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                <span className="font-heading text-[0.6rem] font-semibold uppercase tracking-[0.28em] text-muted-foreground">
-                  Advertisement
+                <span className="font-heading text-[0.6rem] font-semibold tracking-wide text-muted-foreground">
+                  {partner.advertisementLabel}
                 </span>
               </div>
               <Link
@@ -87,7 +87,7 @@ export function RestaurantSkanomSection({ data, className }: RestaurantSkanomSec
                 href={partner.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-heading mt-5 inline-flex text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-secondary underline-offset-[0.35em] transition-colors hover:text-primary hover:underline"
+                className="font-heading mt-5 inline-flex text-[0.65rem] font-semibold tracking-wide text-secondary underline-offset-[0.35em] transition-colors hover:text-primary hover:underline"
               >
                 {partner.hint}
               </Link>
