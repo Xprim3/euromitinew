@@ -32,7 +32,7 @@ export async function RestaurantPageBody() {
       <RestaurantSkanomSection data={data.skanom} />
       <RestaurantExperiencePillars data={data.experiencePillars} />
       <RestaurantAtmosphereGallery data={data.atmosphereGallery} />
-      <RestaurantReservationStations section={restaurantReservationStationsSectionMock} deskInfo={data.deskInfo} />
+      <RestaurantReservationStations section={restaurantReservationStationsSectionMock} />
     </>
   )
 }

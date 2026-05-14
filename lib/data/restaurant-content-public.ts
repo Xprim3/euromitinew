@@ -20,7 +20,6 @@ import {
   ADMIN_RESTAURANT_PILLAR_SLOTS,
 } from "@/lib/validations/restaurant-content"
 import { createPublicSupabaseServerClient } from "@/lib/supabase/public-server-client"
-import type { RestaurantDeskInfo } from "@/types/public"
 import type { RestaurantContentRow } from "@/types/supabase-cms"
 
 type MediaMap = Record<string, { public_url: string; alt_text: string | null }>
@@ -55,7 +54,6 @@ export type ResolvedRestaurantPage = {
   skanom: ResolvedRestaurantSkanomSection
   experiencePillars: RestaurantExperiencePillarsMock
   atmosphereGallery: RestaurantAtmosphereGalleryMock
-  deskInfo: RestaurantDeskInfo | null
 }
 
 export function normalizeRestaurantContentRow(raw: Record<string, unknown>): RestaurantContentRow {
@@ -298,7 +296,6 @@ export function resolveRestaurantPage(row: RestaurantContentRow | null, media: M
       skanom: resolveSkanomSection(null, media),
       experiencePillars: restaurantExperiencePillarsMock,
       atmosphereGallery: restaurantAtmosphereGalleryMock,
-      deskInfo: null,
     }
   }
 
@@ -369,21 +366,6 @@ export function resolveRestaurantPage(row: RestaurantContentRow | null, media: M
     slots,
   } as unknown as RestaurantAtmosphereGalleryMock
 
-  const phone = row.contact_phone?.trim() ?? ""
-  const email = row.contact_email?.trim() ?? ""
-  const notes = row.contact_notes?.trim() ?? ""
-  const hours = row.opening_hours.trim()
-
-  const deskInfo: RestaurantDeskInfo | null =
-    hours || phone || email || notes
-      ? {
-          openingHours: hours || "—",
-          phone: phone || "—",
-          email: email || "—",
-          notes: notes || "",
-        }
-      : null
-
   return {
     pageHeroTitle,
     pageHeroSubtitle,
@@ -395,6 +377,5 @@ export function resolveRestaurantPage(row: RestaurantContentRow | null, media: M
     skanom: resolveSkanomSection(row, media),
     experiencePillars: resolveExperiencePillars(row.experience_pillars_json),
     atmosphereGallery,
-    deskInfo,
   }
 }

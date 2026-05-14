@@ -28,14 +28,6 @@ export interface LocationSummary {
   googleMapsUrl: string
 }
 
-/** Network-level desk details from CMS (`restaurant_content`), shown on `/restaurant`. */
-export type RestaurantDeskInfo = {
-  openingHours: string
-  phone: string
-  email: string
-  notes: string
-}
-
 export interface ServiceHighlight {
   id: string
   name: string

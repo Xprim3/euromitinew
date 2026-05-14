@@ -145,7 +145,7 @@ export function RestaurantContentForm({
 
       <AdminSectionCard
         title="Restaurant content"
-        description="Sections follow the public /restaurant page top to bottom: page hero, Playfair band, dining-room intro, food gallery, Skanom, four experience pillars, atmosphere mosaic, then desk details. Reservation city cards stay mock-only for now."
+        description="Sections follow the public /restaurant page top to bottom: page hero, Playfair band, dining-room intro, food gallery, Skanom, four experience pillars, atmosphere mosaic, then reservation city cards. Desk fields below are saved to CMS but not rendered as a network summary on this page. Reservation city cards stay mock-only for now."
       >
         <div className="space-y-3">
           <EditorAccordion
@@ -434,7 +434,7 @@ export function RestaurantContentForm({
 
           <EditorAccordion
             title="8 · Reservations / desk (hours & contact)"
-            description="Shown in the reservation band at the bottom of the restaurant page."
+            description="Stored on the restaurant content record. Not shown as a summary card on /restaurant — city station cards use each location’s details."
           >
             <div className="space-y-5">
               <TextareaInput
