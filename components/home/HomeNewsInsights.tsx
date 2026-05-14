@@ -5,7 +5,7 @@ import { Stagger } from "@/components/motion"
 import { SectionAccentRule } from "@/components/ui/SectionAccentRule"
 import { MaterialSymbol } from "@/components/ui/MaterialSymbol"
 import { homeNewsInsightsDesign } from "@/data/mock/homepage-visual"
-import { getLatestNewsForHomePublic } from "@/lib/data/news-public"
+import { getPublishedNewsSummariesPublic } from "@/lib/data/news-public"
 import type { NewsSummary } from "@/types/public"
 import { cn } from "@/lib/utils"
 
@@ -26,10 +26,10 @@ function badgeForHomeNews(item: NewsSummary): { label: string; className: string
 }
 
 export async function HomeNewsInsights() {
-  const previewItems = await getLatestNewsForHomePublic(2)
+  const summaries = await getPublishedNewsSummariesPublic()
   const n = homeNewsInsightsDesign
 
-  if (!previewItems.length) {
+  if (summaries.length === 0) {
     return (
       <section
         className="overflow-hidden bg-brand-shell px-4 py-11 sm:px-6 md:py-14 lg:px-12"
@@ -47,32 +47,23 @@ export async function HomeNewsInsights() {
             {n.subtitle ? <p className="mx-auto mt-3 max-w-2xl text-base font-medium text-white/75">{n.subtitle}</p> : null}
             <SectionAccentRule className="mx-auto mt-5 md:mt-6" />
           </div>
-          <div className="flex justify-center">
-            <Link
-              href="/news"
-              className="group relative flex max-w-lg min-h-[min(52vw,14rem)] w-full flex-col justify-end overflow-hidden rounded-2xl border border-white/15 bg-linear-to-br from-brand-shell-elevated via-brand-shell-mid to-brand-shell p-8 transition duration-300 hover:-translate-y-0.5 hover:border-brand-accent-soft/40 sm:min-h-[14rem]"
-            >
-              <div
-                className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,180,171,0.24),transparent_40%),radial-gradient(circle_at_20%_85%,rgba(217,53,47,0.20),transparent_42%)]"
-                aria-hidden
-              />
-              <div className="relative space-y-3">
-                <p className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-brand-accent-soft">
-                  Lajme dhe informacione
-                </p>
-                <h3 className="font-[family-name:var(--font-montserrat)] text-xl font-extrabold tracking-tight text-white md:text-2xl">
-                  Shiko lajmet
-                </h3>
-                <p className="text-sm leading-relaxed text-white/75">
-                  Përditësimet do të shfaqen këtu sapo të publikohen lajme të reja.
-                </p>
-              </div>
-            </Link>
+          <div className="mx-auto max-w-lg rounded-2xl border border-white/10 bg-white/4 px-6 py-10 text-center sm:px-8 sm:py-12">
+            <p className="font-[family-name:var(--font-montserrat)] text-lg font-semibold leading-snug text-white sm:text-xl">
+              Për momentin nuk ka lajme të publikuara.
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-white/72 sm:text-base">
+              Përditësimet nga Euromiti do të shfaqen këtu sapo të publikohen lajme të reja.
+            </p>
           </div>
         </div>
       </section>
     )
   }
+
+  /** Fewer than three posts: keep section hidden (no sparse grid / placeholder CTA). */
+  if (summaries.length <= 2) return null
+
+  const previewItems = summaries.slice(0, 2)
 
   return (
     <section

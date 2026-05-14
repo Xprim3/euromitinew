@@ -73,7 +73,7 @@ export function AboutPageView({ data }: { data: ResolvedAboutPage }) {
         <Container className="py-10 sm:py-12 md:py-16 lg:py-20">
           <SectionReveal variant="fade-up" once>
             <div className="grid items-center gap-8 lg:grid-cols-12 lg:gap-12 xl:gap-16">
-              <div className="space-y-5 lg:col-span-7">
+              <div className="order-2 space-y-5 lg:order-1 lg:col-span-7">
                 <h2 className="font-heading text-[clamp(1.75rem,6vw,2.6rem)] font-extrabold leading-[1.08] tracking-[-0.04em] text-foreground md:text-[clamp(2.15rem,4vw,3.25rem)]">
                   {data.ownerTitle}
                 </h2>
@@ -87,7 +87,7 @@ export function AboutPageView({ data }: { data: ResolvedAboutPage }) {
                 </div>
               </div>
 
-              <div className="relative lg:col-span-5">
+              <div className="relative order-1 lg:order-2 lg:col-span-5">
                 <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[1.25rem] bg-muted shadow-[0_24px_70px_rgba(15,23,42,0.12)] sm:aspect-4/5">
                   <ImageHoverZoom className="absolute inset-0 h-full w-full">
                     <Image

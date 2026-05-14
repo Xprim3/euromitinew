@@ -49,10 +49,10 @@ function FooterView({ data }: { data: SiteFooterPublic }) {
                 <img
                   src={FOOTER_BRAND_MARK_SVG}
                   alt={data.logoAlt?.trim() || `${data.companyName} logo`}
-                  width={480}
-                  height={300}
+                  width={360}
+                  height={120}
                   decoding="async"
-                  className="block h-16 w-auto max-w-[min(96vw,20rem)] object-contain object-left sm:h-18 md:h-20 md:max-w-104 lg:h-24 lg:max-w-[min(100%,32rem)]"
+                  className="block h-10 w-auto max-w-[min(72vw,11rem)] object-contain object-left sm:h-11 sm:max-w-52 md:h-12 md:max-w-60"
                 />
               )}
               <span className="sr-only">{data.companyName}</span>
