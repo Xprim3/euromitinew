@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect, useId, useRef, useState } from "react"
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import { usePathname } from "next/navigation"
 
@@ -26,6 +26,10 @@ const navIcons: Record<string, string> = {
 export function MobileMenu({ className }: MobileMenuProps) {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
+  const pathnameRef = useRef(pathname)
+  useLayoutEffect(() => {
+    pathnameRef.current = pathname
+  }, [pathname])
   const panelId = useId()
   const firstLinkRef = useRef<HTMLAnchorElement>(null)
 
@@ -35,6 +39,7 @@ export function MobileMenu({ className }: MobileMenuProps) {
     }
     if (!open) return undefined
     const scrollY = window.scrollY
+    const pathWhenOpened = pathnameRef.current
     const previousBodyStyles = {
       position: document.body.style.position,
       top: document.body.style.top,
@@ -59,7 +64,9 @@ export function MobileMenu({ className }: MobileMenuProps) {
       document.body.style.right = previousBodyStyles.right
       document.body.style.width = previousBodyStyles.width
       document.body.style.overflow = previousBodyStyles.overflow
-      window.scrollTo(0, scrollY)
+      if (pathnameRef.current === pathWhenOpened) {
+        window.scrollTo(0, scrollY)
+      }
       window.removeEventListener("keydown", onKey)
     }
   }, [open])
@@ -86,7 +93,6 @@ export function MobileMenu({ className }: MobileMenuProps) {
                 className="euromiti-mobile-menu-overlay fixed inset-0 z-[100] bg-brand-shell-deep/76 backdrop-blur-sm"
                 onClick={() => setOpen(false)}
               />
-
               <aside
                 id={panelId}
                 aria-modal="true"
