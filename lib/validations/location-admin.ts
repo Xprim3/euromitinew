@@ -4,8 +4,6 @@ import type { LocationAmenity } from "@/types/public"
 
 export const LOCATION_AMENITY_KEYS = ["petrol", "restaurant", "carwash", "mini_market", "ev"] as const satisfies readonly LocationAmenity[]
 
-export const ADMIN_LOCATION_GALLERY_SLOTS = 8
-
 export const locationSlugSchema = z
   .string()
   .trim()

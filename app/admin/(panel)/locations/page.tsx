@@ -43,7 +43,7 @@ export default async function AdminLocationsPage() {
         }
       >
         <p className="text-sm text-[var(--admin-text-muted)]">
-          Each card opens a full editor with services, map link, main image, gallery, and active/inactive visibility.
+          Each card opens a full editor with services, map link, main image, and active/inactive visibility.
         </p>
       </AdminSectionCard>
 

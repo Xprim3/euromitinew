@@ -5,7 +5,6 @@ import { createLocationAction } from "@/app/admin/(panel)/locations/actions"
 import { LocationEditorForm } from "@/components/admin/LocationEditorForm"
 import { AdminSectionCard } from "@/components/admin/design-system"
 import { dsBtnTertiary } from "@/components/admin/design-system/ds-button-classes"
-import { emptyGalleryDraft } from "@/lib/data/locations-admin-shared"
 
 export const metadata: Metadata = {
   title: "New location",
@@ -23,7 +22,6 @@ export default function AdminNewLocationPage() {
         mode="create"
         submitAction={createLocationAction}
         initial={null}
-        gallerySlots={emptyGalleryDraft()}
         mainPreviewUrl={null}
         mainImageAlt=""
       />

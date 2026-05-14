@@ -1,6 +1,5 @@
 import { cache } from "react"
 
-import { homeBeyondDesign } from "@/data/mock/homepage-visual"
 import { fallbackMainVisualForSlug } from "@/lib/data/location-visual-fallback"
 import { createPublicSupabaseServerClient } from "@/lib/supabase/public-server-client"
 import type { LocationAmenity } from "@/types/public"
@@ -29,8 +28,6 @@ export type ResolvedPublicLocation = {
   openingHours: string
   googleMapsUrl: string
   services: LocationAmenity[]
-  /** Ordered gallery tiles (subset of CMS gallery). */
-  gallery: { src: string; alt: string }[]
   mainImageSrc: string
   mainImageAlt: string
 }
@@ -44,45 +41,6 @@ function normalizeServices(raw: unknown): LocationAmenity[] {
     if (typeof item !== "string") continue
     const k = item as LocationAmenity
     if (AMENITIES.has(k)) out.push(k)
-  }
-  return out
-}
-
-/** Extra gallery placeholders when DB has fewer than two tiles (matches original grid). */
-function galleryFallbackForIndex(sectionIndex: number, tileIndex: number): { src: string; alt: string } {
-  const imgs: { src: string; alt: string }[] = [
-    {
-      src: homeBeyondDesign.secondaryServices[2].imageSrc,
-      alt: homeBeyondDesign.secondaryServices[2].imageAlt,
-    },
-    {
-      src: homeBeyondDesign.restaurant.mainImage,
-      alt: homeBeyondDesign.restaurant.mainImageAlt,
-    },
-    {
-      src: homeBeyondDesign.secondaryServices[0].imageSrc,
-      alt: homeBeyondDesign.secondaryServices[0].imageAlt,
-    },
-    {
-      src: homeBeyondDesign.secondaryServices[1].imageSrc,
-      alt: homeBeyondDesign.secondaryServices[1].imageAlt,
-    },
-  ]
-  const pick = imgs[(sectionIndex * 2 + tileIndex + imgs.length) % imgs.length]
-  return {
-    src: pick.src,
-    alt: `${pick.alt}${tileIndex === 0 ? "" : " — gallery view"}`.slice(0, 180),
-  }
-}
-
-function padGalleryToDesign(
-  sectionIndex: number,
-  urls: { src: string; alt: string }[]
-): { src: string; alt: string }[] {
-  const out = [...urls]
-  while (out.length < 2) {
-    const i = out.length
-    out.push(galleryFallbackForIndex(sectionIndex, i))
   }
   return out
 }
@@ -117,8 +75,6 @@ export async function fetchLocationsPublicPageRows(): Promise<
     ),
   ]
 
-  const locIds = (locs ?? []).map((l) => String((l as Record<string, unknown>).id ?? ""))
-
   let mediaLookup: Record<string, { public_url: string; alt_text: string | null }> = {}
   if (mainIds.length) {
     const { data: uploads, error: uErr } = await supabase
@@ -134,39 +90,6 @@ export async function fetchLocationsPublicPageRows(): Promise<
       )
     }
   }
-
-  const { data: galleryRows } = await supabase
-    .from("location_images")
-    .select("location_id, sort_order, media_id")
-    .in("location_id", locIds)
-    .order("sort_order", { ascending: true })
-
-  const galMediaIds =
-    galleryRows?.map((r: { media_id: string }) => r.media_id).filter(Boolean) ??
-    ([] as string[])
-
-  let galleryLookup: Record<string, { public_url: string; alt_text: string | null }> = {}
-  const uniqGalIds = [...new Set(galMediaIds)]
-  if (uniqGalIds.length) {
-    const { data: gUploads } = await supabase.from("media_uploads").select("id, public_url, alt_text").in("id", uniqGalIds)
-    if (gUploads?.length) {
-      galleryLookup = Object.fromEntries(
-        gUploads.map((u: { id: string; public_url: string | null; alt_text: string | null }) => [
-          u.id,
-          { public_url: u.public_url ?? "", alt_text: u.alt_text },
-        ])
-      )
-    }
-  }
-
-  const groupedGallery = new Map<string, { sort_order: number; media_id: string }[]>()
-  for (const row of galleryRows ?? []) {
-    const r = row as { location_id: string; sort_order: number; media_id: string }
-    const bucket = groupedGallery.get(r.location_id) ?? []
-    bucket.push({ sort_order: r.sort_order, media_id: r.media_id })
-    groupedGallery.set(r.location_id, bucket)
-  }
-  for (const [, rows] of groupedGallery) rows.sort((a, b) => a.sort_order - b.sort_order)
 
   const resolved: ResolvedPublicLocation[] = (locs ?? []).map((raw, idx) => {
     const loc = raw as Record<string, unknown>
@@ -188,25 +111,6 @@ export async function fetchLocationsPublicPageRows(): Promise<
     const heading = pageHeadingVal.trim() || `${cityTrim} station`.trim()
     const summary = pageSummaryVal.trim() || FALLBACK_SUMMARY
 
-    const rawGal = groupedGallery.get(locId) ?? []
-    const tiles: { src: string; alt: string }[] = []
-    for (const gr of rawGal) {
-      const g = galleryLookup[gr.media_id]
-      const u = g?.public_url?.trim()
-      if (!u) continue
-      tiles.push({
-        src: u,
-        alt: g?.alt_text?.trim() || `${cityTrim} gallery image`,
-      })
-    }
-
-    let gallery = tiles
-    if (!gallery.length) {
-      gallery = padGalleryToDesign(idx, [])
-    } else if (gallery.length === 1) {
-      gallery = padGalleryToDesign(idx, [gallery[0]])
-    }
-
     const address = typeof loc.address === "string" ? loc.address : ""
     const phone = typeof loc.phone === "string" ? loc.phone : ""
     const opening_hours = typeof loc.opening_hours === "string" ? loc.opening_hours : ""
@@ -225,7 +129,6 @@ export async function fetchLocationsPublicPageRows(): Promise<
       openingHours: opening_hours.trim(),
       googleMapsUrl: google_maps_url.trim(),
       services: normalizeServices(loc.services),
-      gallery,
       mainImageSrc,
       mainImageAlt,
     }

@@ -1,4 +1,3 @@
-import { ADMIN_LOCATION_GALLERY_SLOTS } from "@/lib/validations/location-admin"
 import type { LocationRow } from "@/types/supabase-cms"
 
 /** Coerce `/admin/locations/*` payloads from loosely typed selects. */
@@ -25,14 +24,4 @@ export function normalizeLocationRow(raw: Record<string, unknown>): LocationRow 
     created_at: typeof raw.created_at === "string" ? raw.created_at : "",
     updated_at: typeof raw.updated_at === "string" ? raw.updated_at : "",
   }
-}
-
-export type GallerySlotDraft = { mediaId: string; publicUrl: string; alt: string }
-
-export function emptyGalleryDraft(): GallerySlotDraft[] {
-  return Array.from({ length: ADMIN_LOCATION_GALLERY_SLOTS }, () => ({
-    mediaId: "",
-    publicUrl: "",
-    alt: "",
-  }))
 }

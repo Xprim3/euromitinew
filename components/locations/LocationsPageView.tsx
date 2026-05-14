@@ -1,10 +1,8 @@
 import Image from "next/image"
-import Link from "next/link"
 
 import { Container } from "@/components/layout/Container"
 import { PageImageHero } from "@/components/layout/PageImageHero"
-import { EuromitiMotionClasses, Reveal, Stagger } from "@/components/motion"
-import { Button } from "@/components/ui/button"
+import { Reveal, Stagger } from "@/components/motion"
 import { MaterialSymbol } from "@/components/ui/MaterialSymbol"
 import { homeHeroDesign } from "@/data/mock/homepage-visual"
 import { LOCATION_PAGE_SERVICE_LABELS, type ResolvedPublicLocation } from "@/lib/data/locations-public"
@@ -25,16 +23,6 @@ function mailHref(display: string) {
   if (t.length < 5 || t.includes("—")) return undefined
   if (!t.includes("@")) return undefined
   return `mailto:${t}`
-}
-
-/** Primary split uses the hero image; secondary split prefers a different gallery frame when available. */
-function splitVisual(entry: ResolvedPublicLocation, imageLeft: boolean): { src: string; alt: string } {
-  if (imageLeft) {
-    return { src: entry.mainImageSrc, alt: entry.mainImageAlt }
-  }
-  const distinct = entry.gallery.find((g) => g.src !== entry.mainImageSrc)
-  if (distinct) return distinct
-  return entry.gallery[1] ?? entry.gallery[0] ?? { src: entry.mainImageSrc, alt: entry.mainImageAlt }
 }
 
 type LocationInfoPanelProps = {
@@ -91,7 +79,22 @@ function LocationInfoPanel({ entry, index, phoneHref, emailHref, variant }: Loca
         <ul className={cn("space-y-4 border-t pt-8 text-sm leading-snug md:text-[0.95rem]", line, heading)}>
           <li className="flex gap-3.5">
             <MaterialSymbol name="location_on" className={cn("mt-0.5 shrink-0 text-[1.25rem]", icon)} />
-            <span className={dark ? "text-white/90" : undefined}>{entry.address}</span>
+            {entry.googleMapsUrl.trim() ? (
+              <a
+                href={entry.googleMapsUrl.trim()}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Open directions for ${entry.address}`}
+                className={cn(
+                  "font-medium leading-snug underline-offset-4 transition-colors hover:underline",
+                  dark ? "text-white/90 hover:text-brand-accent-gold" : "text-foreground hover:text-secondary"
+                )}
+              >
+                {entry.address}
+              </a>
+            ) : (
+              <span className={dark ? "text-white/90" : undefined}>{entry.address}</span>
+            )}
           </li>
           <li className="flex gap-3.5">
             <MaterialSymbol name="call" className={cn("mt-0.5 shrink-0 text-[1.25rem]", icon)} />
@@ -144,23 +147,6 @@ function LocationInfoPanel({ entry, index, phoneHref, emailHref, variant }: Loca
             </span>
           ))}
         </div>
-
-        <div className="mt-10">
-          <Button
-            variant={dark ? "outline" : "outlinePrimary"}
-            render={<Link href={entry.googleMapsUrl} />}
-            className={cn(
-              "min-h-12 w-full max-w-sm border-foreground/25 sm:w-auto",
-              dark &&
-                "border-white/35 bg-transparent text-white shadow-none hover:bg-white/10 hover:text-white [&_svg]:text-brand-accent-gold",
-              !dark && EuromitiMotionClasses.buttonHover
-            )}
-            size="lg"
-          >
-            <MaterialSymbol name="map" className="mr-2 text-[1.15rem]" />
-            Directions
-          </Button>
-        </div>
       </div>
     </div>
   )
@@ -200,7 +186,6 @@ function LocationImagePanel({ entry, visual, priority, tone = "light" }: Locatio
         <p className="font-playfair text-[clamp(1.85rem,4vw,3rem)] font-normal leading-tight tracking-tight text-white drop-shadow-md">
           {entry.city}
         </p>
-        <p className="mt-2 max-w-sm text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-white/75">Kosovo</p>
       </div>
     </div>
   )
@@ -240,7 +225,7 @@ export function LocationsPageView({ locations }: LocationsPageViewProps) {
           const imageLeft = index % 2 === 0
           const phoneHref = telHref(entry.phone)
           const emailHref = mailHref(entry.contactEmailDisplay)
-          const visual = splitVisual(entry, imageLeft)
+          const visual = { src: entry.mainImageSrc, alt: entry.mainImageAlt }
           const editorialDark = index % 2 === 1
           const infoVariant = editorialDark ? "dark" : "light"
 

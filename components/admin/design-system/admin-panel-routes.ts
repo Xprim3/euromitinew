@@ -47,7 +47,7 @@ export function adminRouteHeaderMeta(pathname: string): AdminRouteHeaderMeta {
   if (p.startsWith("/admin/locations/")) {
     return {
       title: "Edit location",
-      subtitle: "Update address, services, gallery, and visibility.",
+      subtitle: "Update address, services, main image, and visibility.",
       breadcrumbs: [crumbAdmin, { label: "Locations", href: "/admin/locations" }, { label: "Edit" }],
     }
   }

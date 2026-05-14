@@ -1,6 +1,5 @@
 "use client"
 
-import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -38,30 +37,12 @@ export function Navbar({ brand }: NavbarProps) {
         <div className="flex items-center gap-4 md:gap-5">
           <Link
             href="/"
-            className="group inline-flex min-w-0 items-center gap-3"
+            className="group inline-flex min-w-0 items-center gap-3 md:gap-4"
           >
-            {brand?.logoUrl ? (
-              <span className="relative grid size-11 shrink-0 place-items-center overflow-hidden rounded-[0.9rem] border border-white/14 bg-white/8 shadow-[0_12px_32px_rgba(15,23,42,0.28)]">
-                <Image
-                  src={brand.logoUrl}
-                  alt={brand.logoAlt}
-                  fill
-                  sizes="2.75rem"
-                  className="object-contain p-1.5"
-                />
-              </span>
-            ) : (
-              <span className="relative grid size-11 shrink-0 place-items-center overflow-hidden rounded-[0.9rem] border border-white/14 bg-white/8 shadow-[0_12px_32px_rgba(15,23,42,0.28)]">
-                <span
-                  className="absolute inset-0 bg-[radial-gradient(circle_at_28%_24%,rgba(255,180,171,0.34),transparent_32%),linear-gradient(135deg,var(--brand-shell-elevated)_0%,var(--brand-shell)_100%)]"
-                  aria-hidden
-                />
-                <span className="absolute right-2 top-2 size-1.5 rounded-full bg-brand-accent-soft" aria-hidden />
-                <span className="relative font-(family-name:--font-montserrat) text-lg font-black tracking-[-0.08em] text-white">
-                  E
-                </span>
-              </span>
-            )}
+            <span
+              aria-hidden
+              className="h-11 w-px shrink-0 bg-linear-to-b from-transparent via-brand-accent-gold/50 to-transparent sm:h-12"
+            />
             <span className="min-w-0 leading-none">
               <span className="block truncate font-(family-name:--font-montserrat) text-[1.05rem] font-black uppercase tracking-[0.16em] text-white transition-colors group-hover:text-brand-accent-soft sm:text-lg">
                 {companyName}

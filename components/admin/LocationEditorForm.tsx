@@ -9,8 +9,6 @@ import {
   AdminSectionCard,
   ErrorMessage,
   FileUploadInput,
-  type GallerySlot,
-  ImageGalleryManager,
   MultiSelectInput,
   SaveBar,
   SelectInput,
@@ -19,8 +17,6 @@ import {
   TextInput,
   ToggleInput,
 } from "@/components/admin/design-system"
-import type { GallerySlotDraft } from "@/lib/data/locations-admin-shared"
-import { ADMIN_LOCATION_GALLERY_SLOTS } from "@/lib/validations/location-admin"
 import type { LocationRow } from "@/types/supabase-cms"
 
 const initialState: LocationSaveState = { ok: null }
@@ -42,30 +38,14 @@ type LocationEditorFormProps = {
   mode: "create" | "edit"
   submitAction: (prev: LocationSaveState, formData: FormData) => Promise<LocationSaveState>
   initial: LocationRow | null
-  gallerySlots: GallerySlotDraft[]
   mainPreviewUrl?: string | null
   mainImageAlt?: string
-}
-
-function galleryDraftToSlots(gallerySlots: GallerySlotDraft[]): GallerySlot[] {
-  return Array.from({ length: ADMIN_LOCATION_GALLERY_SLOTS }, (_, i) => {
-    const slot = gallerySlots[i]
-    return {
-      id: `location-gallery-${i}`,
-      label: `Gallery image ${i + 1}`,
-      previewUrl: slot?.publicUrl || null,
-      altText: slot?.alt ?? "",
-      existingMediaId: slot?.mediaId ?? "",
-      clear: false,
-    }
-  })
 }
 
 export function LocationEditorForm({
   mode,
   submitAction,
   initial,
-  gallerySlots,
   mainPreviewUrl = null,
   mainImageAlt = "",
 }: LocationEditorFormProps) {
@@ -79,9 +59,7 @@ export function LocationEditorForm({
       ),
     [initial?.services]
   )
-  const initialGallerySlots = useMemo(() => galleryDraftToSlots(gallerySlots), [gallerySlots])
   const [selectedServices, setSelectedServices] = useState<string[]>(initialSelectedServices)
-  const [managedGallerySlots, setManagedGallerySlots] = useState<GallerySlot[]>(initialGallerySlots)
 
   const fieldErrors = state.ok === false && "fieldErrors" in state ? state.fieldErrors : undefined
   const hasFieldErrors = Boolean(fieldErrors && Object.values(fieldErrors).some((v) => v?.length))
@@ -120,7 +98,7 @@ export function LocationEditorForm({
 
       <AdminSectionCard
         title={mode === "create" ? "Create location" : `Edit ${initial?.city || "location"}`}
-        description="Manage public location content, services, map link, visibility, and media."
+        description="Manage public location content, services, map link, visibility, and main image."
       >
         <div className="space-y-8">
           <AdminContentGrid columns={2}>
@@ -242,7 +220,10 @@ export function LocationEditorForm({
         />
       </AdminSectionCard>
 
-      <AdminSectionCard title="Main image" description="Primary image for this location.">
+      <AdminSectionCard
+        title="Main image"
+        description="Single image for this location — used on `/locations` and the homepage location previews."
+      >
         <div className="space-y-4">
           <FileUploadInput
             label="Main image upload"
@@ -250,7 +231,7 @@ export function LocationEditorForm({
             previewUrl={mainPreviewUrl}
             previewAlt={`${initial?.city || "Location"} main image`}
             removeInputName={mode === "edit" ? "clear_main_media" : undefined}
-            helperText="Upload a new image to replace the current location hero image."
+            helperText="Upload a new image to replace the current location photo."
           />
           <TextInput
             label="Main image alt text"
@@ -261,24 +242,6 @@ export function LocationEditorForm({
         </div>
       </AdminSectionCard>
 
-      <AdminSectionCard
-        title={`Gallery (${ADMIN_LOCATION_GALLERY_SLOTS} slots)`}
-        description="Manage ordered gallery images. Removing a slot clears it on save; replacing uploads a new image."
-      >
-        <ImageGalleryManager
-          label="Location gallery"
-          name="location_gallery"
-          slots={managedGallerySlots}
-          onSlotsChange={setManagedGallerySlots}
-          maxSlots={ADMIN_LOCATION_GALLERY_SLOTS}
-          fixedSlots
-          fileInputName={(_slot, index) => `gallery_file_${index}`}
-          altInputName={(_slot, index) => `gallery_image_alt_${index}`}
-          existingMediaIdInputName={(_slot, index) => `gallery_media_id_${index}`}
-          clearInputName={(_slot, index) => `gallery_clear_${index}`}
-        />
-      </AdminSectionCard>
-
       <SaveBar
         hasUnsavedChanges
         unsavedLabel={mode === "create" ? "New location draft" : "Review location changes"}
@@ -286,7 +249,6 @@ export function LocationEditorForm({
         onCancel={() => {
           formRef.current?.reset()
           setSelectedServices(initialSelectedServices)
-          setManagedGallerySlots(initialGallerySlots)
         }}
         submitLabel={saveLabel}
         submitPendingLabel={mode === "create" ? "Creating…" : "Saving…"}

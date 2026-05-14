@@ -47,7 +47,6 @@ export function LocationsPageSkeleton() {
               <div className={cn("h-8 w-20 animate-pulse", dark ? "bg-white/10" : "bg-muted-foreground/12")} />
               <div className={cn("h-8 w-16 animate-pulse", dark ? "bg-white/10" : "bg-muted-foreground/12")} />
             </div>
-            <div className={cn("h-12 max-w-sm animate-pulse rounded-md", dark ? "bg-white/15" : "bg-muted-foreground/15")} />
           </div>
         )
         return (

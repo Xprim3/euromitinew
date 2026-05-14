@@ -4,11 +4,7 @@ import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 
 import { uploadHomepageAssetRow } from "@/lib/server/upload-homepage-asset"
-import {
-  ADMIN_LOCATION_GALLERY_SLOTS,
-  LOCATION_AMENITY_KEYS,
-  locationCoreFieldsSchema,
-} from "@/lib/validations/location-admin"
+import { LOCATION_AMENITY_KEYS, locationCoreFieldsSchema } from "@/lib/validations/location-admin"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 import type { LocationAmenity } from "@/types/public"
 
@@ -67,51 +63,6 @@ function revalidateLocationSurfaces(locationId?: string) {
 }
 
 type OptionalUuid = string | null | undefined
-
-function dedupeIds(ids: string[]) {
-  const seen = new Set<string>()
-  return ids.filter((id) => {
-    if (!id || seen.has(id)) return false
-    seen.add(id)
-    return true
-  })
-}
-
-async function collectGalleryMediaIds(
-  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
-  editorId: string,
-  formData: FormData
-): Promise<{ ok: true; ids: string[] } | { ok: false; message: string }> {
-  const ordered: string[] = []
-
-  for (let i = 0; i < ADMIN_LOCATION_GALLERY_SLOTS; i++) {
-    const clearSlot = truthyCheckbox(formData.get(`gallery_clear_${i}`))
-    const file = formData.get(`gallery_file_${i}`)
-    const keptRaw = String(formData.get(`gallery_media_id_${i}`) ?? "").trim()
-
-    if (clearSlot) {
-      continue
-    }
-
-    if (file instanceof File && file.size > 0) {
-      const alt = String(formData.get(`gallery_image_alt_${i}`) ?? "").trim()
-      const up = await uploadHomepageAssetRow(supabase, editorId, file, {
-        altText: alt,
-        usageSection: `location-gallery-slot-${i}`,
-        category: "locations",
-      })
-      if ("message" in up) return { ok: false, message: up.message }
-      ordered.push(up.id)
-      continue
-    }
-
-    if (keptRaw.length > 0) {
-      ordered.push(keptRaw)
-    }
-  }
-
-  return { ok: true, ids: dedupeIds(ordered) }
-}
 
 async function resolveMainMediaId(opts: {
   supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>
@@ -272,10 +223,7 @@ export async function createLocationAction(_prev: LocationSaveState, formData: F
     if (uMain) return { ok: false, message: uMain.message }
   }
 
-  const gal = await collectGalleryMediaIds(supabase, editorId, formData)
-  if (!gal.ok) return { ok: false, message: gal.message }
-
-  const gErr = await replaceLocationGallery(supabase, locationId, gal.ids)
+  const gErr = await replaceLocationGallery(supabase, locationId, [])
   if (gErr) {
     await supabase.from("locations").delete().eq("id", locationId)
     return { ok: false, message: gErr.error }
@@ -350,10 +298,7 @@ export async function updateLocationAction(_prev: LocationSaveState, formData: F
     const { error: upErr } = await supabase.from("locations").update(patch).eq("id", locationId)
     if (upErr) return { ok: false, message: pgUniqueMessage(upErr.message) }
 
-    const gal = await collectGalleryMediaIds(supabase, editorId, formData)
-    if (!gal.ok) return { ok: false, message: gal.message }
-
-    const gErr = await replaceLocationGallery(supabase, locationId, gal.ids)
+    const gErr = await replaceLocationGallery(supabase, locationId, [])
     if (gErr) return { ok: false, message: gErr.error }
 
     revalidateLocationSurfaces(locationId)
