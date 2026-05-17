@@ -1,7 +1,7 @@
 export const PRIMARY_NAV_LINKS = [
   { href: "/", label: "Ballina" },
   { href: "/about", label: "Rreth Nesh" },
-  { href: "/locations", label: "Lokacionet" },
+  { href: "/locations", label: "Pikat e Shitjes" },
   { href: "/restaurant", label: "Restaurant" },
   { href: "/news", label: "Lajme" },
 ] as const
@@ -11,10 +11,10 @@ export const TOPBAR_NAV_LINKS = [
   { href: "/", label: "Ballina" },
   { href: "/about", label: "Rreth Nesh" },
   { href: "/services", label: "Shërbimet" },
-  { href: "/locations", label: "Lokacionet" },
+  { href: "/locations", label: "Pikat e Shitjes" },
   { href: "/restaurant", label: "Restaurant" },
   { href: "/news", label: "Lajme" },
-  { href: "/careers", label: "Karriera" },
+  { href: "/careers", label: "Mundësi punësimi" },
   { href: "/contact", label: "Kontakti" },
 ] as const
 

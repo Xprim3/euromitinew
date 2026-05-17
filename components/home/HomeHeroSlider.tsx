@@ -78,6 +78,7 @@ export function HomeHeroSlider({ slides }: { slides: HomeHeroSlideResolved[] }) 
               fill
               priority={index === 0}
               loading={index === 0 ? "eager" : "lazy"}
+              fetchPriority={index === 0 ? "high" : "low"}
               sizes="100vw"
               className="object-cover"
             />

@@ -146,9 +146,16 @@ export function MediaLibraryClient({ media }: MediaLibraryClientProps) {
   async function copyUrl(item: MediaUploadRow) {
     const url = item.public_url ?? ""
     if (!url) return
-    await navigator.clipboard.writeText(url)
-    setCopiedId(item.id)
-    window.setTimeout(() => setCopiedId((current) => (current === item.id ? null : current)), 1600)
+    try {
+      if (!document.hasFocus()) {
+        window.focus()
+      }
+      await navigator.clipboard.writeText(url)
+      setCopiedId(item.id)
+      window.setTimeout(() => setCopiedId((current) => (current === item.id ? null : current)), 1600)
+    } catch {
+      /* clipboard blocked when tab is not focused */
+    }
   }
 
   return (

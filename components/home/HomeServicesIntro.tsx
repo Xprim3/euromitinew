@@ -1,18 +1,20 @@
-import Image from "next/image"
 import Link from "next/link"
 
 import { CmsCoverMedia } from "@/components/cms/CmsCoverMedia"
-import { ImageHoverZoom, Stagger } from "@/components/motion"
+import { HomeServiceColorBlocks } from "@/components/home/HomeServiceColorBlocks"
+import { ImageHoverZoom } from "@/components/motion"
 import { mediaKindFromMimeAndUrl } from "@/lib/media-kind"
 import { MaterialSymbol } from "@/components/ui/MaterialSymbol"
 import { SectionAccentRule } from "@/components/ui/SectionAccentRule"
+import type { HomeServiceColorBlockData } from "@/lib/data/homepage-singleton-public"
 import {
   getPublicHomepageSingleton,
+  homeServiceColorBlocksFromCMS,
   secondaryHomeServiceCardsFromCMS,
   servicesIntroEliteFromCMS,
 } from "@/lib/data/homepage-singleton-public"
 
-/** Pulse placeholder matching two-column services band + triple cards rhythm. */
+/** Pulse placeholder matching two-column services band + color panels. */
 export function HomeServicesIntroSkeleton() {
   return (
     <div id="services" className="overflow-hidden" aria-busy aria-label="Loading services section">
@@ -31,16 +33,14 @@ export function HomeServicesIntroSkeleton() {
           </div>
         </div>
       </section>
-      <section className="bg-white">
-        <div className="px-4 pb-14 pt-10 sm:px-6 lg:px-12">
-          <div className="mx-auto grid max-w-[1280px] animate-pulse gap-4 md:grid-cols-3 md:gap-5">
-            {[0, 1, 2].map((k) => (
-              <div key={k} className="rounded-2xl border border-brand-border-accent bg-brand-surface-tinted">
-                <div className="aspect-16/11 bg-brand-shell-deep/10" />
-                <div className="space-y-2 p-4">
-                  <div className="h-5 w-28 rounded bg-brand-shell-deep/15" />
-                  <div className="h-12 w-full rounded bg-brand-shell-deep/10" />
-                </div>
+      <section className="w-full bg-brand-surface-tinted">
+        <div className="w-full pb-14 pt-5 md:pb-16">
+          <div className="grid w-full animate-pulse grid-cols-1 overflow-hidden sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
+            {[0, 1, 2, 3, 4, 5].map((k) => (
+              <div key={k} className="min-h-[17.5rem] bg-brand-shell-deep/12 px-5 py-9">
+                <div className="mx-auto mb-5 size-14 rounded-full bg-brand-shell-deep/10" />
+                <div className="mx-auto h-5 w-24 rounded bg-brand-shell-deep/15" />
+                <div className="mx-auto mt-4 h-16 w-full max-w-[14rem] rounded bg-brand-shell-deep/10" />
               </div>
             ))}
           </div>
@@ -50,24 +50,11 @@ export function HomeServicesIntroSkeleton() {
   )
 }
 
-type CardKey = "detailing" | "family" | "market"
-
 export function HomeServicesIntroView(props: {
   elite: ReturnType<typeof servicesIntroEliteFromCMS>
-  carwashKey: Extract<CardKey, "detailing">
-  playgroundKey: Extract<CardKey, "family">
-  marketKey: Extract<CardKey, "market">
-  carwash: { imageSrc: string; imageAlt: string; body: string }
-  playground: { imageSrc: string; imageAlt: string; body: string }
-  market: { imageSrc: string; imageAlt: string; body: string }
+  colorBlocks: readonly HomeServiceColorBlockData[]
 }) {
-  const { elite, carwash, playground, market } = props
-
-  const rows: { key: CardKey; title: string; card: typeof carwash }[] = [
-    { key: props.carwashKey, title: "Autolarje", card: carwash },
-    { key: props.playgroundKey, title: "Këndi i lojërave", card: playground },
-    { key: props.marketKey, title: "Mini Market", card: market },
-  ]
+  const { elite, colorBlocks } = props
 
   return (
     <>
@@ -139,39 +126,9 @@ export function HomeServicesIntroView(props: {
         </div>
       </section>
 
-      <section id="services" className="relative overflow-hidden bg-brand-surface-tinted" aria-label="Services and amenities">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-linear-to-b from-[#eef2ff] to-transparent" aria-hidden />
-        <div className="relative px-4 pb-16 pt-5 sm:px-6 md:pb-20 lg:px-12">
-          <div className="mx-auto max-w-[1180px]">
-            <Stagger once className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
-              {rows.map((rowItem) => (
-                <article
-                  key={rowItem.key}
-                  className="overflow-hidden rounded-[1rem] border border-brand-shell-deep/8 bg-white shadow-[0_18px_48px_rgba(15,23,42,0.08)]"
-                >
-                  <div className="relative aspect-16/11 overflow-hidden">
-                    <Image
-                      src={rowItem.card.imageSrc}
-                      alt={rowItem.card.imageAlt}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      loading={rowItem.key === props.carwashKey ? "eager" : "lazy"}
-                      className="object-cover"
-                    />
-                    <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-brand-shell-deep/58 via-brand-shell/12 to-transparent" />
-                    <div className="absolute inset-x-0 bottom-0 p-4">
-                      <h3 className="font-(family-name:--font-montserrat) text-lg font-extrabold tracking-[-0.03em] text-white md:text-xl">
-                        {rowItem.title}
-                      </h3>
-                    </div>
-                  </div>
-                  <div className="p-4 sm:p-5">
-                    <p className="mt-5 text-[0.98rem] leading-8 text-brand-body-soft">{rowItem.card.body}</p>
-                  </div>
-                </article>
-              ))}
-            </Stagger>
-          </div>
+      <section id="services" className="relative w-full overflow-hidden bg-brand-surface-tinted" aria-label="Services and amenities">
+        <div className="relative w-full pb-16 pt-5 md:pb-20">
+          <HomeServiceColorBlocks blocks={colorBlocks} />
         </div>
       </section>
     </>
@@ -181,17 +138,9 @@ export function HomeServicesIntroView(props: {
 export async function HomeServicesIntro() {
   const { row, media } = await getPublicHomepageSingleton()
   const elite = servicesIntroEliteFromCMS(row, media)
-  const { carwash, playground, market } = secondaryHomeServiceCardsFromCMS(row, media)
+  const cards = secondaryHomeServiceCardsFromCMS(row, media)
+  const colorBlocks = homeServiceColorBlocksFromCMS(row, cards, elite)
 
-  return (
-    <HomeServicesIntroView
-      elite={elite}
-      carwashKey="detailing"
-      playgroundKey="family"
-      marketKey="market"
-      carwash={carwash}
-      playground={playground}
-      market={market}
-    />
-  )
+  return <HomeServicesIntroView elite={elite} colorBlocks={colorBlocks} />
 }
+

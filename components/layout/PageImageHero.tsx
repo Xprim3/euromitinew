@@ -96,7 +96,16 @@ export function PageImageHero({
         className
       )}
     >
-      <Image src={imageSrc} alt={imageAlt} fill priority={priority} sizes="100vw" className="object-cover" />
+      <Image
+        src={imageSrc}
+        alt={imageAlt}
+        fill
+        priority={priority}
+        loading={priority ? "eager" : undefined}
+        fetchPriority={priority ? "high" : undefined}
+        sizes="100vw"
+        className="object-cover"
+      />
       <div className={cn("absolute inset-0", preset.tint)} aria-hidden />
       {preset.bottomGradientHeight ? (
         <div

@@ -51,12 +51,12 @@ export function Navbar({ brand }: NavbarProps) {
               width={220}
               height={71}
               priority
-              className="block h-10 w-auto max-w-[min(46vw,10.5rem)] shrink-0 object-contain object-left sm:h-11 sm:max-w-48 md:h-12 md:max-w-52"
+              className="block h-8 w-auto max-w-[min(42vw,9rem)] shrink-0 object-contain object-left sm:h-9 sm:max-w-40 md:h-10 md:max-w-44"
             />
           </Link>
         </div>
 
-        <nav aria-label="Main" className="hidden items-center gap-6 lg:flex xl:gap-10 2xl:gap-12">
+        <nav aria-label="Main" className="hidden items-center gap-4 lg:flex xl:gap-5 2xl:gap-6">
           {TOPBAR_NAV_LINKS.map(({ href, label }) => (
             <Link
               key={href}

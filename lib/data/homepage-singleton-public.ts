@@ -347,6 +347,85 @@ export function secondaryHomeServiceCardsFromCMS(row: HomepageContentRow | null,
   return { carwash, playground, market }
 }
 
+export type HomeServiceColorBlockData = {
+  id: string
+  title: string
+  body: string
+  icon: string
+}
+
+const SERVICE_PANEL_SHORT_COPY = {
+  fuel: "Derivate me cilësi të lartë dhe furnizim të besueshëm në pikat tona të shitjes.",
+  restaurant: "Ushqim i freskët, ambient i rehatshëm dhe shërbim korrekt për çdo ndalesë.",
+  market: "Produkte të përditshme, pije dhe artikuj praktikë për rrugën.",
+  ev: "HIB është pjesë e së ardhmes së gjelbër! Në shumë nga pikat tona në gjithë Kosovën ofrojmë mbushje ultra të shpejtë për vetura elektrike.",
+  carwash: "Larje e shpejtë dhe e kujdesshme — veturë e pastër në pak minuta.",
+  playground: "Hapësirë e sigurt ku fëmijët luajnë ndërsa familja pushon.",
+} as const
+
+/** One–two short sentences for color panels (not full CMS intro paragraphs). */
+function shortServicePanelBody(source: string | undefined, fallback: string, maxLen = 148): string {
+  const trimmed = source?.trim()
+  if (!trimmed) return fallback
+  if (trimmed.length <= maxLen) return trimmed
+
+  const slice = trimmed.slice(0, maxLen)
+  const lastSentenceEnd = Math.max(slice.lastIndexOf(". "), slice.lastIndexOf(".\n"))
+  if (lastSentenceEnd >= 72) {
+    return slice.slice(0, lastSentenceEnd + 1).trim()
+  }
+
+  const lastSpace = slice.lastIndexOf(" ")
+  const cut = lastSpace > 64 ? slice.slice(0, lastSpace) : slice.trimEnd()
+  return `${cut.replace(/[,;]\s*$/, "")}…`
+}
+
+/** Flat color panels beneath the services intro (replaces photo cards). */
+export function homeServiceColorBlocksFromCMS(
+  _row: HomepageContentRow | null,
+  cards: ReturnType<typeof secondaryHomeServiceCardsFromCMS>,
+  _elite: ReturnType<typeof servicesIntroEliteFromCMS>
+): HomeServiceColorBlockData[] {
+  return [
+    {
+      id: "fuel",
+      title: "Derivate",
+      body: SERVICE_PANEL_SHORT_COPY.fuel,
+      icon: "local_gas_station",
+    },
+    {
+      id: "restaurant",
+      title: "Restorant",
+      body: SERVICE_PANEL_SHORT_COPY.restaurant,
+      icon: "restaurant",
+    },
+    {
+      id: "market",
+      title: "Markete",
+      body: shortServicePanelBody(cards.market.body, SERVICE_PANEL_SHORT_COPY.market),
+      icon: "shopping_bag",
+    },
+    {
+      id: "ev",
+      title: "Vetura Elektrike",
+      body: SERVICE_PANEL_SHORT_COPY.ev,
+      icon: "ev_station",
+    },
+    {
+      id: "carwash",
+      title: "Autolarje",
+      body: shortServicePanelBody(cards.carwash.body, SERVICE_PANEL_SHORT_COPY.carwash),
+      icon: "local_car_wash",
+    },
+    {
+      id: "playground",
+      title: "Këndi i lojërave",
+      body: shortServicePanelBody(cards.playground.body, SERVICE_PANEL_SHORT_COPY.playground),
+      icon: "toys",
+    },
+  ]
+}
+
 /** Homepage restaurant luxury block merged with singleton + media. */
 export function restaurantLuxuryFromCMS(row: HomepageContentRow | null, media: HomepageMediaLookup) {
   const r = homeBeyondDesign.restaurant

@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { Suspense } from "react"
 
 import { HomeAboutIntro } from "@/components/home/HomeAboutIntro"
-import { HomeHero, HomeHeroSkeleton } from "@/components/home/HomeHero"
+import { HomeHero } from "@/components/home/HomeHero"
 import { HomeHeroFuelPriceBar, HomeHeroFuelPriceBarSkeleton } from "@/components/home/HomeHeroFuelPriceBar"
 import { HomeNewsInsights, HomeNewsInsightsSkeleton } from "@/components/home/HomeNewsInsights"
 import { HomeRestaurantLuxury, HomeRestaurantLuxurySkeleton } from "@/components/home/HomeRestaurantLuxury"
@@ -35,9 +35,7 @@ export const revalidate = 120
 export default function HomePage() {
   return (
     <div className="overflow-x-hidden bg-brand-surface-tinted text-primary">
-      <Suspense fallback={<HomeHeroSkeleton />}>
-        <HomeHero />
-      </Suspense>
+      <HomeHero />
       <Suspense fallback={<HomeHeroFuelPriceBarSkeleton />}>
         <HomeHeroFuelPriceBar />
       </Suspense>
