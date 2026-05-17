@@ -71,6 +71,7 @@ async function loadHomepage(): Promise<
     about: null,
     servicesIntro: null,
     servicesIntroMime: null,
+    servicesIntroAlt: "",
     restaurantMain: null,
     restaurantFloat1: null,
     restaurantFloat2: null,
@@ -106,6 +107,7 @@ async function loadHomepage(): Promise<
     previews.about = urlOf(typed.about_preview_image_media_id)
     previews.servicesIntro = urlOf(typed.services_intro_media_id)
     previews.servicesIntroMime = mimeOf(typed.services_intro_media_id)
+    previews.servicesIntroAlt = altOf(typed.services_intro_media_id)
     previews.restaurantMain = urlOf(typed.restaurant_home_main_media_id)
     previews.restaurantFloat1 = urlOf(typed.restaurant_home_float_1_media_id)
     previews.restaurantFloat2 = urlOf(typed.restaurant_home_float_2_media_id)

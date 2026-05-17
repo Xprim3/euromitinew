@@ -1,6 +1,2 @@
-/**
- * Supabase client wiring is deferred to Phase 8.
- * Add `createBrowserClient` / `createServerClient` here when integrating.
- */
-
-export {}
+/** Browser Supabase client — use in Client Components only. */
+export { createSupabaseBrowserClient as createClient } from "@/lib/supabase/browser"

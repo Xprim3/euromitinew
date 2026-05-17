@@ -32,6 +32,7 @@ export type HomepageMediaPreviews = {
   about: string | null
   servicesIntro: string | null
   servicesIntroMime: string | null
+  servicesIntroAlt: string
   restaurantMain: string | null
   restaurantFloat1: string | null
   restaurantFloat2: string | null
@@ -303,6 +304,24 @@ export function HomepageContentForm({ initial, mediaPreviews, locationPreviews }
                 showCharacterCount
                 error={fieldErrors?.services_intro_body?.[0]}
               />
+              <FileUploadInput
+                label="Intro image or video"
+                name="services_intro_image"
+                mediaMode="image-or-video"
+                previewUrl={mediaPreviews.servicesIntro}
+                previewMimeType={mediaPreviews.servicesIntroMime}
+                previewAlt="Homepage services intro"
+                replaceLabel="Upload image or video"
+                removeLabel="Remove media"
+                helperText="Left panel on the homepage services band. MP4 recommended for video; plays muted on loop."
+                removeInputName="clear_services_intro_image"
+              />
+              <TextInput
+                label="Media alt text"
+                name="services_intro_image_alt"
+                defaultValue={mediaPreviews.servicesIntroAlt}
+                placeholder="Describe the image or video"
+              />
               <div className="space-y-3">
                 <div>
                   <p className="text-sm font-semibold text-[var(--admin-text)]">Highlight chips</p>
@@ -339,23 +358,6 @@ export function HomepageContentForm({ initial, mediaPreviews, locationPreviews }
                   ))}
                 </div>
               </div>
-              <FileUploadInput
-                label="Services preview media"
-                name="services_intro_image"
-                mediaMode="image-or-video"
-                previewUrl={mediaPreviews.servicesIntro}
-                previewMimeType={mediaPreviews.servicesIntroMime}
-                previewAlt="Homepage services preview"
-                replaceLabel="Upload image or video"
-                removeLabel="Remove media"
-                helperText="Shown in the dark services intro band on the homepage. Video plays muted on loop; use MP4 for best compatibility."
-                removeInputName="clear_services_intro_image"
-              />
-              <TextInput
-                label="Services media alt text"
-                name="services_intro_image_alt"
-                placeholder="Describe the image or video"
-              />
 
               <div className="space-y-4 border-[var(--admin-border)] border-t pt-5">
                 <div>
