@@ -68,11 +68,11 @@ export async function HomeAboutIntro() {
     >
       <div className="mx-auto max-w-[1280px]">
         <div className="grid grid-cols-1 overflow-hidden rounded-[1.2rem] lg:grid-cols-12">
-          <div className="relative flex flex-col justify-center bg-white px-5 py-8 text-brand-primary sm:px-7 sm:py-10 lg:col-span-7 lg:px-10 xl:px-12">
+          <div className="relative order-2 flex flex-col justify-center bg-white px-5 py-8 text-brand-primary sm:px-7 sm:py-10 lg:order-1 lg:col-span-7 lg:px-10 xl:px-12">
             <div className="relative max-w-2xl">
               <h2
                 id="about-intro-heading"
-                className="font-(family-name:--font-montserrat) text-[clamp(1.9rem,8vw,2.55rem)] font-extrabold leading-[1.05] tracking-[-0.045em] text-[#0F172A] sm:text-[clamp(2.35rem,4.4vw,3.7rem)]"
+                className="font-(family-name:--font-montserrat) text-[clamp(1.65rem,6.5vw,2.2rem)] font-extrabold leading-[1.08] tracking-[-0.045em] text-[#0F172A] sm:text-[clamp(1.95rem,3.6vw,3rem)]"
               >
                 {headlineCopy.main}
                 {headlineCopy.accent ? (
@@ -98,7 +98,7 @@ export async function HomeAboutIntro() {
             </div>
           </div>
 
-          <div className="relative min-h-72 overflow-hidden lg:col-span-5 lg:min-h-112">
+          <div className="relative order-1 min-h-72 overflow-hidden lg:order-2 lg:col-span-5 lg:min-h-112">
             <ImageHoverZoom className="absolute inset-0 h-full w-full">
               <Image
                 src={image?.public_url?.trim() || defaultImageSrc}

@@ -14,6 +14,27 @@ import {
   servicesIntroEliteFromCMS,
 } from "@/lib/data/homepage-singleton-public"
 
+/** First segment orange, remainder white (comma split when present). */
+function servicesTitleParts(title: string) {
+  const trimmed = title.trim()
+  const comma = trimmed.indexOf(",")
+  if (comma !== -1) {
+    return {
+      lead: trimmed.slice(0, comma + 1).trim(),
+      rest: trimmed.slice(comma + 1).trim(),
+    }
+  }
+  const words = trimmed.split(/\s+/)
+  if (words.length >= 2) {
+    const mid = Math.ceil(words.length / 2)
+    return {
+      lead: words.slice(0, mid).join(" "),
+      rest: words.slice(mid).join(" "),
+    }
+  }
+  return { lead: trimmed, rest: "" }
+}
+
 /** Pulse placeholder matching two-column services band + color panels. */
 export function HomeServicesIntroSkeleton() {
   return (
@@ -55,6 +76,7 @@ export function HomeServicesIntroView(props: {
   colorBlocks: readonly HomeServiceColorBlockData[]
 }) {
   const { elite, colorBlocks } = props
+  const titleParts = servicesTitleParts(elite.title)
 
   return (
     <>
@@ -87,9 +109,10 @@ export function HomeServicesIntroView(props: {
               <div className="relative max-w-2xl">
                 <h2
                   id="services-intro-heading"
-                  className="font-(family-name:--font-montserrat) text-[clamp(1.9rem,8vw,2.55rem)] font-extrabold leading-[1.05] tracking-[-0.045em] text-white sm:text-[clamp(2.35rem,4.4vw,3.7rem)]"
+                  className="font-(family-name:--font-montserrat) text-[clamp(1.65rem,6.5vw,2.2rem)] font-extrabold leading-[1.08] tracking-[-0.045em] text-white sm:text-[clamp(1.95rem,3.6vw,3rem)]"
                 >
-                  {elite.title}
+                  <span className="text-[#F97316]">{titleParts.lead}</span>
+                  {titleParts.rest ? <> {titleParts.rest}</> : null}
                 </h2>
                 <p className="mt-5 max-w-xl text-[0.98rem] leading-8 text-white/74 md:text-[1.04rem]">{elite.body}</p>
 
