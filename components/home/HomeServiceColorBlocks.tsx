@@ -55,23 +55,23 @@ export function HomeServiceColorBlocks({ blocks }: HomeServiceColorBlocksProps) 
           <article
             key={block.id}
             className={cn(
-              "relative flex min-h-[17.5rem] flex-col items-center px-5 py-9 text-center sm:min-h-[19rem] sm:px-6 sm:py-10",
+              "relative flex min-h-[590px] flex-col items-center justify-center px-6 py-12 text-center sm:px-8 sm:py-14",
               theme.panel
             )}
           >
             <span
               className={cn(
-                "mb-5 inline-flex size-14 items-center justify-center rounded-full border backdrop-blur-sm",
+                "mb-6 inline-flex size-16 items-center justify-center rounded-full border backdrop-blur-sm sm:mb-8 sm:size-[4.25rem]",
                 theme.icon
               )}
               aria-hidden
             >
-              <MaterialSymbol name={block.icon} className="text-[1.85rem]!" />
+              <MaterialSymbol name={block.icon} className="text-[2rem]! sm:text-[2.15rem]!" />
             </span>
-            <h3 className="font-(family-name:--font-montserrat) text-[1.15rem] font-extrabold tracking-[-0.02em] sm:text-[1.22rem]">
+            <h3 className="font-(family-name:--font-montserrat) text-[1.2rem] font-extrabold tracking-[-0.02em] sm:text-[1.35rem]">
               {block.title}
             </h3>
-            <p className="mt-3 line-clamp-5 max-w-[18rem] text-[0.84rem] leading-[1.65] opacity-92 sm:max-w-[14rem] sm:text-[0.88rem] sm:leading-[1.7] lg:max-w-[16rem] xl:max-w-[18rem]">
+            <p className="mt-4 max-w-[18rem] text-[0.88rem] leading-[1.7] opacity-92 sm:mt-5 sm:max-w-[15rem] sm:text-[0.92rem] sm:leading-[1.75] lg:max-w-[16rem] xl:max-w-[18rem]">
               {block.body}
             </p>
           </article>

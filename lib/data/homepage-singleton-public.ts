@@ -358,7 +358,7 @@ const SERVICE_PANEL_SHORT_COPY = {
   fuel: "Derivate me cilësi të lartë dhe furnizim të besueshëm në pikat tona të shitjes.",
   restaurant: "Ushqim i freskët, ambient i rehatshëm dhe shërbim korrekt për çdo ndalesë.",
   market: "Produkte të përditshme, pije dhe artikuj praktikë për rrugën.",
-  ev: "HIB është pjesë e së ardhmes së gjelbër! Në shumë nga pikat tona në gjithë Kosovën ofrojmë mbushje ultra të shpejtë për vetura elektrike.",
+  ev: "Mobiliteti elektrik është pjesë e së ardhmes së gjelbër. Në shumë pika në Kosovë ofrojmë mbushje ultra të shpejtë për vetura elektrike.",
   carwash: "Larje e shpejtë dhe e kujdesshme — veturë e pastër në pak minuta.",
   playground: "Hapësirë e sigurt ku fëmijët luajnë ndërsa familja pushon.",
 } as const
