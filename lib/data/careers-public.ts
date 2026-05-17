@@ -54,6 +54,52 @@ export const getActiveJobsPublic = cache(async (): Promise<JobRow[]> => {
   return (data ?? []).map((row) => normalizePublicJobRow(row as Record<string, unknown>))
 })
 
+export type JobApplicationOption = {
+  slug: string
+  title: string
+  location_city: string
+  is_active: boolean
+}
+
+/** Display labels for apply-form location dropdown (values match admin `location_city`). */
+export const JOB_APPLICATION_LOCATION_LABELS: Record<string, string> = {
+  Prishtina: "Prishtinë",
+  Ferizaj: "Ferizaj",
+  Gjilan: "Gjilan",
+  "Multiple locations": "Shumë lokacione",
+}
+
+export function jobApplicationLocationLabel(city: string): string {
+  return JOB_APPLICATION_LOCATION_LABELS[city] ?? city
+}
+
+/** All job titles for the public apply form (active and inactive). */
+export const getApplicationJobOptionsPublic = cache(async (): Promise<JobApplicationOption[]> => {
+  unstable_noStore()
+  const supabase = createPublicSupabaseServerClient()
+  if (!supabase) return []
+
+  const { data, error } = await supabase.rpc("get_application_job_options")
+  if (error) {
+    console.warn("[getApplicationJobOptionsPublic]", error.message)
+    return []
+  }
+
+  return (data ?? [])
+    .map((row: Record<string, unknown>) => {
+      const o = row
+      return {
+        slug: typeof o.slug === "string" ? o.slug.trim() : "",
+        title: typeof o.title === "string" ? o.title.trim() : "",
+        location_city: typeof o.location_city === "string" ? o.location_city.trim() : "",
+        is_active: Boolean(o.is_active),
+      }
+    })
+    .filter(
+      (o: JobApplicationOption) => o.slug.length > 0 && o.title.length > 0 && o.location_city.length > 0
+    )
+})
+
 export const getActiveJobBySlugPublic = cache(async (slug: string): Promise<JobRow | null> => {
   unstable_noStore()
   const supabase = createPublicSupabaseServerClient()

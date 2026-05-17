@@ -3,11 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 
-import {
-  jobAdminFieldsSchema,
-  linesFromAdminText,
-  paragraphsFromAdminText,
-} from "@/lib/validations/careers-admin"
+import { jobAdminFieldsSchema } from "@/lib/validations/careers-admin"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 
 export type JobSaveState =
@@ -17,6 +13,8 @@ export type JobSaveState =
   | { ok: false; fieldErrors: Record<string, string[] | undefined> }
 
 export type JobDeleteState = { ok: null } | { ok: true; message: string } | { ok: false; message: string }
+
+export type JobToggleState = { ok: null } | { ok: true; message: string } | { ok: false; message: string }
 
 function truthyCheckbox(v: FormDataEntryValue | null) {
   return v === "on" || v === "true"
@@ -110,22 +108,13 @@ export async function createJobAction(_prev: JobSaveState, formData: FormData): 
     title: formData.get("title"),
     location_city: formData.get("location_city"),
     summary: formData.get("summary") ?? "",
-    description: formData.get("description"),
-    requirements: formData.get("requirements"),
-    apply_channel: formData.get("apply_channel"),
-    apply_email: formData.get("apply_email") ?? "",
-    apply_phone: formData.get("apply_phone") ?? "",
-    apply_url: formData.get("apply_url") ?? "",
-    apply_instructions: formData.get("apply_instructions") ?? "",
   })
 
   if (!parsed.success) return { ok: false, fieldErrors: parsed.error.flatten().fieldErrors }
 
   const v = parsed.data
-  const description = paragraphsFromAdminText(v.description)
-  const requirements = linesFromAdminText(v.requirements)
-  if (!description.length) return { ok: false, message: "Add at least one description paragraph." }
-  if (!requirements.length) return { ok: false, message: "Add at least one requirement." }
+  const description: string[] = []
+  const requirements: string[] = []
 
   const isActive = truthyCheckbox(formData.get("is_active"))
   const slug = await uniqueJobSlug(supabase, v.title)
@@ -175,8 +164,6 @@ export async function updateJobAction(_prev: JobSaveState, formData: FormData): 
       title: formData.get("title"),
       location_city: formData.get("location_city"),
       summary: formData.get("summary") ?? "",
-      description: formData.get("description"),
-      requirements: formData.get("requirements"),
     })
 
     if (!parsed.success) return { ok: false, fieldErrors: parsed.error.flatten().fieldErrors }
@@ -185,10 +172,8 @@ export async function updateJobAction(_prev: JobSaveState, formData: FormData): 
     if (fetchErr || !existing) return { ok: false, message: "Job not found or could not be loaded." }
 
     const v = parsed.data
-    const description = paragraphsFromAdminText(v.description)
-    const requirements = linesFromAdminText(v.requirements)
-    if (!description.length) return { ok: false, message: "Add at least one description paragraph." }
-    if (!requirements.length) return { ok: false, message: "Add at least one requirement." }
+    const description = Array.isArray(existing.description) ? existing.description : []
+    const requirements = Array.isArray(existing.requirements) ? existing.requirements : []
 
     const isActive = truthyCheckbox(formData.get("is_active"))
     const existingTitle = typeof existing.title === "string" ? existing.title : ""
@@ -220,7 +205,51 @@ export async function updateJobAction(_prev: JobSaveState, formData: FormData): 
     revalidateCareersSurfaces([...new Set([existingSlug, slug].filter(Boolean))])
     revalidatePath(`/admin/careers/${id}`)
 
-    return { ok: true, message: "Job saved." }
+    return { ok: true, message: "Position saved." }
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : "Unexpected error" }
+  }
+}
+
+export async function setJobApplicationsOpenAction(
+  _prev: JobToggleState,
+  formData: FormData
+): Promise<JobToggleState> {
+  try {
+    const supabase = await createSupabaseServerClient()
+    const {
+      data: { user },
+      error: authErr,
+    } = await supabase.auth.getUser()
+    if (authErr || !user) return { ok: false, message: "You must be signed in as an admin." }
+
+    const adminReady = await ensureAdminProfile(supabase, user)
+    if (!adminReady.ok) return { ok: false, message: adminReady.message }
+
+    const id = String(formData.get("id") ?? "").trim()
+    if (!id) return { ok: false, message: "Missing position id." }
+
+    const openRaw = String(formData.get("is_active") ?? "").trim().toLowerCase()
+    const isActive = openRaw === "true" || openRaw === "1" || openRaw === "on"
+
+    const { data: existing, error: fetchErr } = await supabase.from("jobs").select("slug, posted_at").eq("id", id).maybeSingle()
+    if (fetchErr || !existing) return { ok: false, message: "Position not found." }
+
+    const slug = typeof existing.slug === "string" ? existing.slug : ""
+    const existingPostedAt = typeof existing.posted_at === "string" && existing.posted_at ? existing.posted_at : null
+
+    const { error } = await supabase
+      .from("jobs")
+      .update({
+        is_active: isActive,
+        posted_at: isActive ? existingPostedAt ?? todayIsoDate() : null,
+      })
+      .eq("id", id)
+
+    if (error) return { ok: false, message: error.message }
+
+    revalidateCareersSurfaces(slug ? [slug] : [])
+    return { ok: true, message: isActive ? "Applications enabled for this position." : "Applications paused for this position." }
   } catch (e) {
     return { ok: false, message: e instanceof Error ? e.message : "Unexpected error" }
   }
@@ -292,7 +321,7 @@ export async function deleteJobApplicationAction(
       if (storageErr) console.warn("[deleteJobApplicationAction] storage remove:", storageErr.message)
     }
 
-    revalidatePath("/admin/careers/applications")
+    revalidatePath("/admin/careers")
     revalidatePath(`/admin/careers/applications/${id}`)
     return { ok: true, message: "Application removed." }
   } catch (e) {

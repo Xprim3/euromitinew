@@ -66,7 +66,7 @@ function applicationRowsToCards(rows: RecentApplicationRow[]): AdminRecordCard[]
       { label: "Role", value: <span className="break-words">{row.job_title}</span> },
     ],
     footer: (
-      <Link href={`/admin/careers/applications/${row.id}`} className={cnDs(dsBtnGhost, "min-h-9 px-3 text-xs")}>
+      <Link href={`/admin/careers?applicant=${encodeURIComponent(row.id)}#candidates`} className={cnDs(dsBtnGhost, "min-h-9 px-3 text-xs")}>
         Open
       </Link>
     ),
@@ -131,9 +131,9 @@ async function loadDashboardData(): Promise<DashboardData> {
           icon: <Inbox className="size-5" aria-hidden />,
         },
         {
-          label: "Active job posts",
+          label: "Positions accepting applications",
           value: String(activeJobs.count ?? 0),
-          hint: "Open listings on the public careers page.",
+          hint: "Roles shown in the public apply-form dropdown.",
           icon: <Briefcase className="size-5" aria-hidden />,
         },
         {
@@ -167,7 +167,7 @@ async function loadDashboardData(): Promise<DashboardData> {
     return {
       metrics: [
         { label: "Job applications", value: "—", hint: "Connect Supabase to load counts.", icon: <Inbox className="size-5" aria-hidden /> },
-        { label: "Active job posts", value: "—", hint: "Connect Supabase to load counts.", icon: <Briefcase className="size-5" aria-hidden /> },
+        { label: "Positions accepting applications", value: "—", hint: "Connect Supabase to load counts.", icon: <Briefcase className="size-5" aria-hidden /> },
         { label: "Published news", value: "—", hint: "Connect Supabase to load counts.", icon: <Newspaper className="size-5" aria-hidden /> },
         { label: "Active locations", value: "—", hint: "Connect Supabase to load counts.", icon: <MapPin className="size-5" aria-hidden /> },
         { label: "Active fuel SKUs", value: "—", hint: "Connect Supabase to load counts.", icon: <Fuel className="size-5" aria-hidden /> },
@@ -191,8 +191,8 @@ export default async function AdminDashboardPage() {
         description="Live counts from Supabase. Review new job applications below when candidates apply."
         actions={
           hasNewApplications ? (
-            <Link href="/admin/careers/applications" className={cnDs(dsBtnGhost, "inline-flex min-h-9 items-center justify-center px-4 text-xs")}>
-              All applications
+            <Link href="/admin/careers#candidates" className={cnDs(dsBtnGhost, "inline-flex min-h-9 items-center justify-center px-4 text-xs")}>
+              All candidates
             </Link>
           ) : undefined
         }
@@ -215,7 +215,7 @@ export default async function AdminDashboardPage() {
         title="Recent job applications"
         description="Latest candidates from the public careers form. Opens the full record in admin."
         headerActions={
-          <Link href="/admin/careers/applications" className={cnDs(dsBtnGhost, "min-h-9 px-3 text-xs")}>
+          <Link href="/admin/careers#candidates" className={cnDs(dsBtnGhost, "min-h-9 px-3 text-xs")}>
             Open inbox
           </Link>
         }
@@ -234,7 +234,7 @@ export default async function AdminDashboardPage() {
             }
             icon={<Inbox className="size-10 opacity-80" aria-hidden />}
             action={
-              <Link href="/admin/careers/applications" className={cnDs(dsBtnTertiary, "inline-flex min-h-10 items-center px-4 text-xs")}>
+              <Link href="/admin/careers#candidates" className={cnDs(dsBtnTertiary, "inline-flex min-h-10 items-center px-4 text-xs")}>
                 Applications inbox
               </Link>
             }
@@ -267,7 +267,7 @@ export default async function AdminDashboardPage() {
                       </AdminTableTd>
                       <AdminTableTd className="max-w-48 truncate text-sm">{row.job_title}</AdminTableTd>
                       <AdminTableTd className="text-right">
-                        <Link href={`/admin/careers/applications/${row.id}`} className={cnDs(dsBtnGhost, "inline-flex min-h-9 px-3 text-xs")}>
+                        <Link href={`/admin/careers?applicant=${encodeURIComponent(row.id)}#candidates`} className={cnDs(dsBtnGhost, "inline-flex min-h-9 px-3 text-xs")}>
                           Open
                         </Link>
                       </AdminTableTd>
@@ -283,7 +283,7 @@ export default async function AdminDashboardPage() {
       <AdminSectionCard title="Shortcuts" description="Common admin destinations.">
         <AdminContentGrid columns={2}>
           <QuickActionCard
-            href="/admin/careers/applications"
+            href="/admin/careers#candidates"
             title="Job applications"
             description="Inbox, CVs, and applicant details."
             icon={<Inbox className="size-5" aria-hidden />}

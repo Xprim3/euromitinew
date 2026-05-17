@@ -1,28 +1,28 @@
 import type { Metadata } from "next"
 
-import { CareersManagementClient } from "@/components/admin/CareersManagementClient"
+import { CareersAdminClient } from "@/components/admin/CareersAdminClient"
 import { ErrorMessage } from "@/components/admin/design-system"
-import { listJobsAdmin } from "@/lib/data/careers-admin"
+import { loadCareersAdminOverview } from "@/lib/data/careers-admin-overview"
 
 export const metadata: Metadata = {
   title: "Careers",
 }
 
-async function loadJobs(): Promise<{ ok: true; rows: Awaited<ReturnType<typeof listJobsAdmin>> } | { ok: false; message: string }> {
-  try {
-    const rows = await listJobsAdmin()
-    return { ok: true, rows }
-  } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Unexpected error loading jobs." }
-  }
+type AdminCareersPageProps = {
+  searchParams: Promise<{ applicant?: string }>
 }
 
-export default async function AdminCareersPage() {
-  const result = await loadJobs()
-
-  if (!result.ok) {
-    return <ErrorMessage title="Careers content could not load">{result.message}</ErrorMessage>
+export default async function AdminCareersPage({ searchParams }: AdminCareersPageProps) {
+  try {
+    const { applicant } = await searchParams
+    const overview = await loadCareersAdminOverview()
+    const initialApplicantId = typeof applicant === "string" && applicant.trim() ? applicant.trim() : undefined
+    return <CareersAdminClient {...overview} initialApplicantId={initialApplicantId} />
+  } catch (e) {
+    return (
+      <ErrorMessage title="Careers could not load">
+        {e instanceof Error ? e.message : "Unexpected error loading careers data."}
+      </ErrorMessage>
+    )
   }
-
-  return <CareersManagementClient rows={result.rows} />
 }

@@ -25,18 +25,22 @@ export default async function AdminEditJobPage({ params }: Props) {
   return (
     <div className="space-y-6">
       <AdminSectionCard
-        title="Edit job"
-        description={row.is_active ? "This job is active." : "This job is inactive and hidden from public reads."}
+        title="Edit position"
+        description={
+          row.is_active
+            ? "Applications are open — this role appears in the public apply-form dropdown."
+            : "Applications are paused — hidden from the public dropdown."
+        }
         headerActions={
           <>
             <DeleteJobForm id={row.id} label={row.title} redirectOnSuccess />
             <Link href="/admin/careers" className={cnDs(dsBtnTertiary, "min-h-10 px-4 text-xs")}>
-              Back to jobs
+              Back to careers
             </Link>
           </>
         }
       >
-        <p className="text-sm text-[var(--admin-text-muted)]">Update the fields below and save the job.</p>
+        <p className="text-sm text-[var(--admin-text-muted)]">Update the title, location label, or application toggle.</p>
       </AdminSectionCard>
       <CareerJobForm mode="edit" submitAction={updateJobAction} initial={row} />
     </div>

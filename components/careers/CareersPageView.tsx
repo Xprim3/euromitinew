@@ -1,19 +1,39 @@
 import Link from "next/link"
 
+import { JobApplicationForm } from "@/components/careers/JobApplicationForm"
 import { Container } from "@/components/layout/Container"
 import { PageImageHero } from "@/components/layout/PageImageHero"
 import { SectionHeading } from "@/components/layout/SectionHeading"
 import { SectionReveal } from "@/components/motion/SectionReveal"
-import { Stagger } from "@/components/motion/Stagger"
-import { Button } from "@/components/ui/button"
-import { MaterialSymbol } from "@/components/ui/MaterialSymbol"
 import { SectionAccentRule } from "@/components/ui/SectionAccentRule"
 import { homeHeroDesign } from "@/data/mock/homepage-visual"
-import { formatNewsDate } from "@/lib/format-news-date"
-import type { JobRow } from "@/types/supabase-cms"
-import { cn } from "@/lib/utils"
+import type { JobApplicationOption } from "@/lib/data/careers-public"
 
-export function CareersPageView({ jobs }: { jobs: JobRow[] }) {
+type CareersPageViewProps = {
+  positions: JobApplicationOption[]
+  defaultPositionSlug?: string
+}
+
+const APPLY_STEPS = [
+  {
+    title: "Zgjidhni lokacionin dhe pozicionin",
+    body: "Së pari zgjidhni qytetin ose zonën, pastaj rolin që ju intereson — karburant, restorant, market, lavazh ose operacione.",
+  },
+  {
+    title: "Plotësoni të dhënat",
+    body: "Emri i plotë, email-i dhe telefoni janë të detyrueshëm që ekipi ynë t’ju kontaktojë.",
+  },
+  {
+    title: "Ngarkoni CV-në",
+    body: "PDF, Word (.doc, .docx), RTF ose ODT — deri në 5 MB. Mesazhi shoqërues është opsional.",
+  },
+  {
+    title: "Prisni përgjigjen",
+    body: "Çdo aplikim shqyrtohet nga ekipi i punësimit. Do t’ju kontaktojmë nëse profili juaj përputhet.",
+  },
+] as const
+
+export function CareersPageView({ positions, defaultPositionSlug }: CareersPageViewProps) {
   return (
     <>
       <PageImageHero
@@ -25,97 +45,64 @@ export function CareersPageView({ jobs }: { jobs: JobRow[] }) {
         priority
       />
 
-      <section className="border-t border-border/60 bg-background">
+      <section id="apliko" className="scroll-mt-24 border-t border-border/50 bg-brand-surface-tinted">
         <Container className="euromiti-section">
           <SectionReveal once variant="fade-up">
-            <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
-              <SectionHeading
-                align="center"
-                label="Pozicionet e hapura"
-                title="Bëhu pjesë e ekipit Euromiti"
-                description="Pozicionet aktive shfaqen këtu automatikisht. Hapni një rol për detajet dhe për të aplikuar online me dokument CV (PDF, Word, RTF ose ODT)."
-              />
-              <SectionAccentRule className="mt-6 w-28 md:mt-8" />
+            <div className="grid grid-cols-1 items-start gap-10 md:grid-cols-2 md:gap-12 lg:gap-16">
+              <div className="min-w-0 md:max-w-xl md:pr-4 lg:pr-8">
+                <SectionHeading
+                  align="left"
+                  label="Punësim"
+                  title="Si të aplikoni"
+                  description="Formulari i aplikimit është gjithmonë i hapur. Ndiqni hapat më poshtë dhe dërgoni aplikimin tuaj në pak minuta."
+                />
+                <SectionAccentRule className="mt-6 max-w-24 md:mt-8" />
+
+                <ol className="mt-8 space-y-6 sm:mt-10">
+                  {APPLY_STEPS.map((step, index) => (
+                    <li key={step.title} className="flex gap-4">
+                      <span
+                        className="flex size-10 shrink-0 items-center justify-center rounded-full border border-border/80 bg-background font-heading text-sm font-bold text-secondary shadow-(--shadow-euromiti-soft)"
+                        aria-hidden
+                      >
+                        {index + 1}
+                      </span>
+                      <div className="min-w-0 pt-0.5">
+                        <h3 className="font-heading text-base font-bold tracking-tight text-foreground sm:text-lg">
+                          {step.title}
+                        </h3>
+                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-[0.9375rem]">
+                          {step.body}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+
+                <p className="mt-8 border-border/60 border-t pt-8 text-sm leading-relaxed text-muted-foreground">
+                  Keni pyetje para se të aplikoni?{" "}
+                  <Link
+                    href="/contact"
+                    className="font-semibold text-foreground underline-offset-4 transition-colors hover:text-brand-red-vivid hover:underline"
+                  >
+                    Na kontaktoni
+                  </Link>
+                  .
+                </p>
+              </div>
+
+              <div className="min-w-0 md:sticky md:top-28">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-secondary md:sr-only">Formulari</p>
+                <h2 className="font-heading text-xl font-bold tracking-tight text-foreground md:sr-only">Apliko online</h2>
+                <div className="rounded-xl border border-border/70 bg-card p-5 shadow-(--shadow-euromiti-soft) sm:p-6 md:p-7 lg:p-8">
+                  <p className="mb-6 hidden text-sm leading-relaxed text-muted-foreground md:block">
+                    Plotësoni fushat dhe dërgoni aplikimin. Të dhënat përdoren vetëm për procesin e rekrutimit.
+                  </p>
+                  <JobApplicationForm positions={positions} defaultSlug={defaultPositionSlug} />
+                </div>
+              </div>
             </div>
           </SectionReveal>
-        </Container>
-      </section>
-
-      <section className="border-t border-border/50 bg-brand-surface-tinted">
-        <Container className="euromiti-section">
-          {jobs.length === 0 ? (
-            <SectionReveal once variant="fade-up">
-              <div className="mx-auto max-w-xl rounded-xl border border-border/70 bg-card px-5 py-10 text-center shadow-(--shadow-euromiti-soft) sm:px-8 sm:py-12">
-                <h2 className="font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl">
-                  Nuk ka pozicione të hapura për momentin
-                </h2>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
-                  Na vizitoni përsëri së shpejti ose na shkruani përmes faqes së kontaktit për mundësi të ardhshme.
-                </p>
-                <Button className="mt-8 w-full max-w-xs sm:w-auto" variant="outlinePrimary" render={<Link href="/contact" />}>
-                  Kontakti
-                </Button>
-              </div>
-            </SectionReveal>
-          ) : (
-            <SectionReveal once variant="fade-up">
-              <Stagger
-                once
-                className="mx-auto grid max-w-6xl grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 md:gap-6 lg:gap-8"
-              >
-                {jobs.map((job) => {
-                  const jobHref = `/careers/${job.slug}`
-                  return (
-                    <div
-                      key={job.id}
-                      className={cn(
-                        "flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-border/70 bg-background shadow-(--shadow-euromiti-soft) md:min-h-40",
-                        "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background"
-                      )}
-                    >
-                      <Link
-                        href={jobHref}
-                        className="flex min-h-0 flex-1 flex-col p-5 pb-4 outline-none sm:p-6 sm:pb-4 md:p-7 md:pb-5"
-                      >
-                        <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.65rem] font-bold uppercase tracking-[0.14em] text-muted-foreground sm:text-xs">
-                          <span>{job.location_city ?? "Shumë lokacione"}</span>
-                          {job.posted_at ? (
-                            <>
-                              <span aria-hidden className="text-border">
-                                ·
-                              </span>
-                              <time dateTime={job.posted_at}>{formatNewsDate(job.posted_at)}</time>
-                            </>
-                          ) : null}
-                        </p>
-                        <h3 className="mt-3 font-heading text-lg font-bold leading-snug tracking-tight text-foreground sm:text-xl md:text-2xl">
-                          {job.title}
-                          <span className="sr-only"> — detaje dhe aplikim</span>
-                        </h3>
-                        {job.summary ? (
-                          <p className="mt-2 line-clamp-3 flex-1 text-sm leading-relaxed text-muted-foreground sm:text-base">
-                            {job.summary}
-                          </p>
-                        ) : (
-                          <div className="flex-1" aria-hidden />
-                        )}
-                      </Link>
-                      <div className="border-border/60 border-t px-5 pb-5 pt-3 sm:px-6 sm:pb-6 sm:pt-4 md:px-7 md:pb-7">
-                        <Button
-                          variant="default"
-                          className="w-full gap-2 sm:w-auto"
-                          render={<Link href={jobHref} />}
-                        >
-                          Shiko rolin
-                          <MaterialSymbol name="arrow_forward" className="text-lg!" aria-hidden />
-                        </Button>
-                      </div>
-                    </div>
-                  )
-                })}
-              </Stagger>
-            </SectionReveal>
-          )}
         </Container>
       </section>
     </>

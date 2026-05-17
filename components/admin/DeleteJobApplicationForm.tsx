@@ -23,6 +23,7 @@ export function DeleteJobApplicationForm({
   label,
   triggerLabel = "Remove",
   redirectOnSuccess = false,
+  onSuccess,
 }: {
   id: string
   /** Shown in the confirmation dialog (e.g. name and email). */
@@ -30,6 +31,7 @@ export function DeleteJobApplicationForm({
   /** Compact label on the trigger button (table rows often use "Remove"). */
   triggerLabel?: string
   redirectOnSuccess?: boolean
+  onSuccess?: () => void
 }) {
   const router = useRouter()
   const formRef = useRef<HTMLFormElement>(null)
@@ -38,9 +40,10 @@ export function DeleteJobApplicationForm({
 
   useEffect(() => {
     if (state.ok !== true) return
-    if (redirectOnSuccess) router.replace("/admin/careers/applications")
+    onSuccess?.()
+    if (redirectOnSuccess) router.replace("/admin/careers#candidates")
     else router.refresh()
-  }, [redirectOnSuccess, router, state.ok])
+  }, [onSuccess, redirectOnSuccess, router, state.ok])
 
   return (
     <>

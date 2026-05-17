@@ -1,17 +1,23 @@
 import type { Metadata } from "next"
 
 import { CareersPageView } from "@/components/careers/CareersPageView"
-import { getActiveJobsPublic } from "@/lib/data/careers-public"
+import { getApplicationJobOptionsPublic } from "@/lib/data/careers-public"
 
 export const dynamic = "force-dynamic"
 
 export const metadata: Metadata = {
   title: "Karriera",
   description:
-    "Pozicionet e hapura në Euromiti — karburant, restorant, lavazh, market dhe operacione.",
+    "Aplikoni për punësim në Euromiti — zgjidhni lokacionin, pozicionin dhe dërgoni aplikimin tuaj online.",
 }
 
-export default async function CareersPage() {
-  const jobs = await getActiveJobsPublic()
-  return <CareersPageView jobs={jobs} />
+type CareersPageProps = {
+  searchParams: Promise<{ p?: string }>
+}
+
+export default async function CareersPage({ searchParams }: CareersPageProps) {
+  const { p } = await searchParams
+  const positions = await getApplicationJobOptionsPublic()
+  const defaultPositionSlug = typeof p === "string" && p.trim() ? p.trim() : undefined
+  return <CareersPageView positions={positions} defaultPositionSlug={defaultPositionSlug} />
 }

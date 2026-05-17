@@ -40,7 +40,7 @@ export function JobApplicationsManagementClient({ rows }: JobApplicationsManagem
   return (
     <AdminSectionCard
       title="Job applications"
-      description="Submissions from the public careers form (name, contact, cover letter, CV)."
+      description="Submissions from the careers apply form — review the position chosen and contact applicants as needed."
       headerActions={
         <Link href="/admin/careers" className={cnDs(dsBtnGhost, "min-h-10 px-4 text-xs")}>
           Back to jobs
@@ -63,7 +63,7 @@ export function JobApplicationsManagementClient({ rows }: JobApplicationsManagem
               <AdminTableTh>Submitted</AdminTableTh>
               <AdminTableTh>Applicant</AdminTableTh>
               <AdminTableTh>Email</AdminTableTh>
-              <AdminTableTh>Job</AdminTableTh>
+              <AdminTableTh>Position</AdminTableTh>
               <AdminTableTh className="text-right">Actions</AdminTableTh>
             </AdminTableRow>
           </AdminTableHead>

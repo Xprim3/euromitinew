@@ -21,6 +21,7 @@ export async function submitJobApplicationAction(
 ): Promise<JobApplicationSaveState> {
   try {
     const parsed = jobApplicationFieldsSchema.safeParse({
+      location_city: formData.get("location_city"),
       job_slug: formData.get("job_slug"),
       full_name: formData.get("full_name"),
       email: formData.get("email"),
@@ -47,11 +48,15 @@ export async function submitJobApplicationAction(
       .from("jobs")
       .select("id")
       .eq("slug", v.job_slug)
+      .eq("location_city", v.location_city)
       .eq("is_active", true)
       .maybeSingle()
 
     if (jobErr || !job?.id) {
-      return { ok: false, message: "Ky pozicion nuk është më i hapur ose nuk ekziston." }
+      return {
+        ok: false,
+        message: "Kombinimi i lokacionit dhe pozicionit nuk është i vlefshëm ose nuk pranon aplikime për momentin.",
+      }
     }
 
     const jobId = job.id as string
@@ -82,13 +87,13 @@ export async function submitJobApplicationAction(
 
     if (insErr) {
       await supabase.storage.from(CV_BUCKET).remove([objectPath])
-      if (insErr.message.includes("invalid_job")) {
-        return { ok: false, message: "Ky pozicion nuk është më i hapur." }
+      if (insErr.message.includes("job_not_accepting_applications") || insErr.message.includes("invalid_job")) {
+        return { ok: false, message: "Ky pozicion nuk pranon aplikime për momentin." }
       }
       return { ok: false, message: insErr.message }
     }
 
-    revalidatePath("/admin/careers/applications")
+    revalidatePath("/admin/careers")
     revalidatePath("/careers")
     revalidatePath(`/careers/${v.job_slug}`)
 

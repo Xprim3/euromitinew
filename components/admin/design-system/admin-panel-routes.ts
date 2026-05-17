@@ -21,7 +21,7 @@ export function adminRouteHeaderMeta(pathname: string): AdminRouteHeaderMeta {
   if (p === "/admin/careers/applications" || p === "/admin/careers/applications/") return { title: "Job applications" }
   if (p.startsWith("/admin/careers/applications/")) return { title: "Applicant" }
   if (p.startsWith("/admin/careers/")) return { title: "Edit job" }
-  if (p === "/admin/careers") return { title: "Careers" }
+  if (p === "/admin/careers") return { title: "Careers & candidates" }
   if (p === "/admin/site") return { title: "Contact info" }
   if (p === "/admin/media") return { title: "Media library" }
   if (p === "/admin/settings") return { title: "Settings" }
