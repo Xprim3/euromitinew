@@ -1,7 +1,9 @@
 import Image from "next/image"
 import Link from "next/link"
 
+import { CmsCoverMedia } from "@/components/cms/CmsCoverMedia"
 import { ImageHoverZoom, Stagger } from "@/components/motion"
+import { mediaKindFromMimeAndUrl } from "@/lib/media-kind"
 import { MaterialSymbol } from "@/components/ui/MaterialSymbol"
 import { SectionAccentRule } from "@/components/ui/SectionAccentRule"
 import {
@@ -73,15 +75,23 @@ export function HomeServicesIntroView(props: {
         <div className="mx-auto max-w-[1280px]">
           <div className="grid grid-cols-1 overflow-hidden rounded-[1.2rem] bg-brand-shell-deep shadow-[0_26px_75px_rgba(15,23,42,0.16)] lg:grid-cols-12">
             <div className="relative min-h-72 overflow-hidden lg:col-span-5 lg:min-h-112">
-              <ImageHoverZoom className="absolute inset-0 h-full w-full">
-                <Image
+              {mediaKindFromMimeAndUrl(elite.mediaMimeType, elite.imageSrc) === "video" ? (
+                <CmsCoverMedia
                   src={elite.imageSrc}
                   alt={elite.imageAlt}
-                  fill
+                  mimeType={elite.mediaMimeType}
                   sizes="(max-width: 1023px) 100vw, 42vw"
-                  className="object-cover"
                 />
-              </ImageHoverZoom>
+              ) : (
+                <ImageHoverZoom className="absolute inset-0 h-full w-full">
+                  <CmsCoverMedia
+                    src={elite.imageSrc}
+                    alt={elite.imageAlt}
+                    mimeType={elite.mediaMimeType}
+                    sizes="(max-width: 1023px) 100vw, 42vw"
+                  />
+                </ImageHoverZoom>
+              )}
               <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-brand-shell-deep/58 via-brand-shell-deep/10 to-transparent lg:bg-linear-to-r lg:from-transparent lg:via-brand-shell-deep/12 lg:to-brand-shell-deep/74" />
             </div>
 

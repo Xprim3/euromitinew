@@ -5,7 +5,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
-      bodySizeLimit: "10mb",
+      /** Large enough for homepage services-band video uploads (see ADMIN_VIDEO_MAX_BYTES). */
+      bodySizeLimit: "50mb",
     },
   },
   /* Prefer euromiti as Turbopack root when a lockfile exists in a parent directory. */

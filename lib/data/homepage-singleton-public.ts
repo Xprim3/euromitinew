@@ -5,7 +5,10 @@ import { createPublicSupabaseServerClient } from "@/lib/supabase/public-server-c
 import type { HomepageContentRow, HomepageHeroSlide } from "@/types/supabase-cms"
 
 /** Media rows keyed by UUID for resolving homepage_image fields. */
-export type HomepageMediaLookup = Record<string, { public_url: string; alt_text: string | null }>
+export type HomepageMediaLookup = Record<
+  string,
+  { public_url: string; alt_text: string | null; mime_type: string | null }
+>
 export type ServicesIntroChip = { icon: string; label: string }
 
 /** Coerce partially-known `homepage_content` JSON (e.g. before optional migration columns exist) into a full row shape. */
@@ -131,16 +134,22 @@ export const getPublicHomepageSingleton = cache(async (): Promise<{ row: Homepag
   if (idList.length > 0) {
     const { data: uploads, error: mErr } = await supabase
       .from("media_uploads")
-      .select("id, public_url, alt_text")
+      .select("id, public_url, alt_text, mime_type")
       .in("id", idList)
     if (mErr) {
       console.warn("[getPublicHomepageSingleton] Media lookup failed:", mErr.message)
     } else {
       media = Object.fromEntries(
-        (uploads ?? []).map((u: { id: string; public_url: string | null; alt_text: string | null }) => [
-          u.id,
-          { public_url: u.public_url ?? "", alt_text: u.alt_text },
-        ])
+        (uploads ?? []).map(
+          (u: { id: string; public_url: string | null; alt_text: string | null; mime_type: string | null }) => [
+            u.id,
+            {
+              public_url: u.public_url ?? "",
+              alt_text: u.alt_text,
+              mime_type: u.mime_type,
+            },
+          ]
+        )
       )
     }
   }
@@ -282,17 +291,20 @@ export function servicesIntroEliteFromCMS(row: HomepageContentRow | null, media:
       body: mock.body,
       imageSrc: mock.imageSrc,
       imageAlt: mock.imageAlt,
+      mediaMimeType: null,
       chips: [...mock.chips],
     }
   }
 
   const mid = row?.services_intro_media_id
   const dm = mid ? media[mid] : undefined
+  const mediaUrl = dm?.public_url?.trim() || mock.imageSrc
   return {
     title: textOrFallback(row.services_intro_title, mock.title),
     body: textOrFallback(row.services_intro_body, mock.body),
-    imageSrc: dm?.public_url?.trim() || mock.imageSrc,
+    imageSrc: mediaUrl,
     imageAlt: dm?.alt_text?.trim() || mock.imageAlt,
+    mediaMimeType: dm?.mime_type ?? null,
     chips: servicesIntroChipsFromCMS(row.services_intro_chips_json, mock.chips),
   }
 }

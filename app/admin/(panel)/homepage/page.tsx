@@ -70,6 +70,7 @@ async function loadHomepage(): Promise<
     heroSlides: heroSlides.map(() => null),
     about: null,
     servicesIntro: null,
+    servicesIntroMime: null,
     restaurantMain: null,
     restaurantFloat1: null,
     restaurantFloat2: null,
@@ -79,13 +80,21 @@ async function loadHomepage(): Promise<
   }
 
   if (mediaIds.length > 0) {
-    const { data: mediaRows } = await supabase.from("media_uploads").select("id, public_url, alt_text").in("id", mediaIds)
+    const { data: mediaRows } = await supabase
+      .from("media_uploads")
+      .select("id, public_url, alt_text, mime_type")
+      .in("id", mediaIds)
 
-    const urlOf = (id: string | null) => {
+    const mediaOf = (id: string | null) => {
       if (!id) return null
-      const hit = mediaRows?.find((m: { id: string }) => m.id === id) as { public_url: string } | undefined
-      return hit?.public_url ?? null
+      return (
+        (mediaRows?.find((m: { id: string }) => m.id === id) as
+          | { public_url: string; mime_type: string | null }
+          | undefined) ?? null
+      )
     }
+    const urlOf = (id: string | null) => mediaOf(id)?.public_url ?? null
+    const mimeOf = (id: string | null) => mediaOf(id)?.mime_type ?? null
     const altOf = (id: string | null) => {
       if (!id) return ""
       const hit = mediaRows?.find((m: { id: string }) => m.id === id) as { alt_text: string | null } | undefined
@@ -96,6 +105,7 @@ async function loadHomepage(): Promise<
     previews.heroSlides = heroSlides.map((slide) => urlOf(slide.mediaId))
     previews.about = urlOf(typed.about_preview_image_media_id)
     previews.servicesIntro = urlOf(typed.services_intro_media_id)
+    previews.servicesIntroMime = mimeOf(typed.services_intro_media_id)
     previews.restaurantMain = urlOf(typed.restaurant_home_main_media_id)
     previews.restaurantFloat1 = urlOf(typed.restaurant_home_float_1_media_id)
     previews.restaurantFloat2 = urlOf(typed.restaurant_home_float_2_media_id)

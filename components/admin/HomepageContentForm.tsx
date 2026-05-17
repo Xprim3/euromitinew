@@ -31,6 +31,7 @@ export type HomepageMediaPreviews = {
   heroSlides: (string | null)[]
   about: string | null
   servicesIntro: string | null
+  servicesIntroMime: string | null
   restaurantMain: string | null
   restaurantFloat1: string | null
   restaurantFloat2: string | null
@@ -339,14 +340,22 @@ export function HomepageContentForm({ initial, mediaPreviews, locationPreviews }
                 </div>
               </div>
               <FileUploadInput
-                label="Services preview image"
+                label="Services preview media"
                 name="services_intro_image"
+                mediaMode="image-or-video"
                 previewUrl={mediaPreviews.servicesIntro}
+                previewMimeType={mediaPreviews.servicesIntroMime}
                 previewAlt="Homepage services preview"
-                helperText="Existing backend supports this image slot; it is used by the current services intro band."
+                replaceLabel="Upload image or video"
+                removeLabel="Remove media"
+                helperText="Shown in the dark services intro band on the homepage. Video plays muted on loop; use MP4 for best compatibility."
                 removeInputName="clear_services_intro_image"
               />
-              <TextInput label="Services image alt text" name="services_intro_image_alt" placeholder="Describe the image" />
+              <TextInput
+                label="Services media alt text"
+                name="services_intro_image_alt"
+                placeholder="Describe the image or video"
+              />
 
               <div className="space-y-4 border-[var(--admin-border)] border-t pt-5">
                 <div>

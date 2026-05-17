@@ -3,11 +3,20 @@
 import { forwardRef, useCallback, useEffect, useId, useRef, useState, type DragEvent, type InputHTMLAttributes, type ReactNode } from "react"
 import { ImageIcon, Loader2, UploadCloud, X } from "lucide-react"
 
-import { ADMIN_IMAGE_ACCEPT, ADMIN_IMAGE_ACCEPT_LABEL, ADMIN_IMAGE_MAX_BYTES, validateAdminImageFile } from "@/lib/admin-image-file"
+import { ADMIN_IMAGE_ACCEPT, ADMIN_IMAGE_ACCEPT_LABEL, ADMIN_IMAGE_MAX_BYTES } from "@/lib/admin-image-file"
+import {
+  ADMIN_IMAGE_OR_VIDEO_ACCEPT,
+  ADMIN_IMAGE_OR_VIDEO_LABEL,
+  ADMIN_VIDEO_ACCEPT,
+  ADMIN_VIDEO_ACCEPT_LABEL,
+  ADMIN_VIDEO_MAX_BYTES,
+  validateAdminMediaFile,
+  type AdminMediaMode,
+} from "@/lib/admin-media-file"
 
+import { AdminMediaPreview } from "./AdminMediaPreview"
 import { cnDs } from "./cn-ds"
 import { dsBtnDanger, dsBtnTertiary } from "./ds-button-classes"
-import { ImagePreview } from "./ImagePreview"
 
 export type FileUploadInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "size"> & {
   label: string
@@ -22,6 +31,10 @@ export type FileUploadInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "
   removeLabel?: string
   acceptedFileTypesLabel?: string
   layout?: "auto" | "stacked"
+  /** Default `image`. Use `image-or-video` for homepage services band. */
+  mediaMode?: AdminMediaMode
+  /** MIME from CMS when previewing an existing upload (e.g. `video/mp4`). */
+  previewMimeType?: string | null
   onFileSelect?: (file: File) => void
   onRemove?: () => void
 }
@@ -41,14 +54,16 @@ export const FileUploadInput = forwardRef<HTMLInputElement, FileUploadInputProps
     removeInputName,
     replaceLabel = "Upload image",
     removeLabel = "Remove image",
-    acceptedFileTypesLabel = ADMIN_IMAGE_ACCEPT_LABEL,
+    acceptedFileTypesLabel,
     layout = "auto",
+    mediaMode = "image",
+    previewMimeType = null,
     onFileSelect,
     onRemove,
     className,
     id,
     required,
-    accept = ADMIN_IMAGE_ACCEPT,
+    accept,
     disabled,
     onChange,
     ...rest
@@ -65,10 +80,29 @@ export const FileUploadInput = forwardRef<HTMLInputElement, FileUploadInputProps
   const [processing, setProcessing] = useState(false)
   const [localError, setLocalError] = useState<string | null>(null)
   const [selectedPreview, setSelectedPreview] = useState<string | null>(null)
+  const [selectedPreviewMime, setSelectedPreviewMime] = useState<string | null>(null)
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null)
   const [removed, setRemoved] = useState(false)
   const activePreview = selectedPreview ?? (removed ? null : previewUrl)
   const displayError = error ?? localError ?? undefined
+  const acceptTypes =
+    accept ??
+    (mediaMode === "video"
+      ? ADMIN_VIDEO_ACCEPT
+      : mediaMode === "image-or-video"
+        ? ADMIN_IMAGE_OR_VIDEO_ACCEPT
+        : ADMIN_IMAGE_ACCEPT)
+  const typesLabel =
+    acceptedFileTypesLabel ??
+    (mediaMode === "video"
+      ? ADMIN_VIDEO_ACCEPT_LABEL
+      : mediaMode === "image-or-video"
+        ? ADMIN_IMAGE_OR_VIDEO_LABEL
+        : ADMIN_IMAGE_ACCEPT_LABEL)
+  const maxMb =
+    mediaMode === "video"
+      ? Math.round(ADMIN_VIDEO_MAX_BYTES / (1024 * 1024))
+      : Math.round(ADMIN_IMAGE_MAX_BYTES / (1024 * 1024))
 
   useEffect(() => {
     return () => {
@@ -96,6 +130,7 @@ export const FileUploadInput = forwardRef<HTMLInputElement, FileUploadInputProps
       setLocalError(null)
       setRemoved(false)
       setSelectedFileName(null)
+      setSelectedPreviewMime(null)
       setSelectedPreview((old) => {
         if (old?.startsWith("blob:")) URL.revokeObjectURL(old)
         return null
@@ -112,7 +147,7 @@ export const FileUploadInput = forwardRef<HTMLInputElement, FileUploadInputProps
   }, [disabled, processing])
 
   function applyFile(file: File) {
-    const validated = validateAdminImageFile(file, ADMIN_IMAGE_MAX_BYTES)
+    const validated = validateAdminMediaFile(file, mediaMode)
     if (!validated.ok) {
       setLocalError(validated.error)
       if (inputRef.current) inputRef.current.value = ""
@@ -122,6 +157,7 @@ export const FileUploadInput = forwardRef<HTMLInputElement, FileUploadInputProps
     setLocalError(null)
     setRemoved(false)
     setSelectedFileName(file.name)
+    setSelectedPreviewMime(file.type || null)
     setSelectedPreview((old) => {
       if (old?.startsWith("blob:")) URL.revokeObjectURL(old)
       return URL.createObjectURL(file)
@@ -168,7 +204,7 @@ export const FileUploadInput = forwardRef<HTMLInputElement, FileUploadInputProps
         id={safeId}
         type="file"
         required={required && !activePreview && !selectedFileName}
-        accept={accept}
+        accept={acceptTypes}
         disabled={disabled || processing}
         aria-invalid={Boolean(displayError)}
         aria-describedby={displayError ? errorId : helperText || hint ? helpId : undefined}
@@ -208,7 +244,13 @@ export const FileUploadInput = forwardRef<HTMLInputElement, FileUploadInputProps
           displayError && "border-red-400 bg-red-50/60"
         )}
       >
-        <ImagePreview src={activePreview} alt={previewAlt ?? label} className="max-w-full pointer-events-none" emptyLabel="Image preview" />
+        <AdminMediaPreview
+          src={activePreview}
+          alt={previewAlt ?? label}
+          mimeType={selectedPreview ? selectedPreviewMime : previewMimeType}
+          className="max-w-full pointer-events-none"
+          emptyLabel="Media preview"
+        />
         <span className="pointer-events-none flex flex-col justify-center gap-3 text-left">
           <span className="inline-flex size-11 items-center justify-center rounded-full bg-white text-[var(--admin-accent-active)] shadow-sm">
             {processing ? (
@@ -220,10 +262,16 @@ export const FileUploadInput = forwardRef<HTMLInputElement, FileUploadInputProps
             )}
           </span>
           <span className="text-sm font-semibold text-[var(--admin-text)]">
-            {processing ? "Preparing preview…" : "Drag and drop an image, or tap to choose a file"}
+            {processing
+              ? "Preparing preview…"
+              : mediaMode === "video"
+                ? "Drag and drop a video, or tap to choose a file"
+                : mediaMode === "image-or-video"
+                  ? "Drag and drop an image or video, or tap to choose a file"
+                  : "Drag and drop an image, or tap to choose a file"}
           </span>
           <span className="text-xs leading-5 text-[var(--admin-text-muted)]">
-            Accepted file types: {acceptedFileTypesLabel} (max {Math.round(ADMIN_IMAGE_MAX_BYTES / (1024 * 1024))} MB).
+            Accepted: {typesLabel} (max {maxMb} MB).
           </span>
           {selectedFileName ? (
             <span className="break-all text-xs font-medium text-[var(--admin-text)]">Selected: {selectedFileName}</span>
@@ -233,7 +281,7 @@ export const FileUploadInput = forwardRef<HTMLInputElement, FileUploadInputProps
 
       <div className="flex flex-wrap gap-2">
         <button type="button" className={cnDs(dsBtnTertiary, "min-h-10 px-3 text-xs")} disabled={disabled || processing} onClick={openPicker}>
-          {activePreview ? "Replace image" : replaceLabel}
+          {activePreview ? (mediaMode === "video" ? "Replace video" : "Replace media") : replaceLabel}
         </button>
         {activePreview || selectedFileName ? (
           <button
@@ -243,6 +291,7 @@ export const FileUploadInput = forwardRef<HTMLInputElement, FileUploadInputProps
             onClick={() => {
               setRemoved(true)
               setSelectedFileName(null)
+              setSelectedPreviewMime(null)
               setLocalError(null)
               setSelectedPreview((old) => {
                 if (old?.startsWith("blob:")) URL.revokeObjectURL(old)

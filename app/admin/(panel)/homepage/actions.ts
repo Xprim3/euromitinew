@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache"
 
 import { homepageContentFormSchema } from "@/lib/validations/homepage-content"
+import type { AdminMediaMode } from "@/lib/admin-media-file"
 import { uploadHomepageAssetRow } from "@/lib/server/upload-homepage-asset"
 import type { HomepageContentRow, HomepageHeroSlide } from "@/types/supabase-cms"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
@@ -275,7 +276,8 @@ export async function saveHomepageContent(
       clearKey: string,
       column: keyof MediaCols,
       alt: string,
-      usageSection: string
+      usageSection: string,
+      mediaMode: AdminMediaMode = "image"
     ): Promise<HomepageSaveState | undefined> {
       if (isTruthyCheckbox(formData.get(clearKey))) {
         mediaPatches[column] = null
@@ -287,6 +289,7 @@ export async function saveHomepageContent(
       const uploaded = await uploadHomepageAssetRow(supabase, editorId, file, {
         altText: alt,
         usageSection,
+        mediaMode,
       })
       if ("message" in uploaded) return { ok: false, message: uploaded.message }
       mediaPatches[column] = uploaded.id
@@ -301,7 +304,14 @@ export async function saveHomepageContent(
         v.about_preview_image_alt ?? "",
         "about-preview"
       ),
-      consumeUpload("services_intro_image", "clear_services_intro_image", "services_intro_media_id", v.services_intro_image_alt ?? "", "services-intro"),
+      consumeUpload(
+        "services_intro_image",
+        "clear_services_intro_image",
+        "services_intro_media_id",
+        v.services_intro_image_alt ?? "",
+        "services-intro",
+        "image-or-video"
+      ),
       consumeUpload("restaurant_main_image", "clear_restaurant_main_image", "restaurant_home_main_media_id", v.restaurant_main_alt ?? "", "restaurant-home-main"),
       consumeUpload(
         "restaurant_float_1_image",

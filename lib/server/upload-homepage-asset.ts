@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 
-import { validateAdminImageFile } from "@/lib/admin-image-file"
+import { validateAdminMediaFile, type AdminMediaMode } from "@/lib/admin-media-file"
 
 const BUCKET = "euromiti-media"
 
@@ -13,9 +13,9 @@ export async function uploadHomepageAssetRow(
   supabase: SupabaseClient,
   userId: string,
   file: File,
-  opts: { altText: string; usageSection: string; category?: string }
+  opts: { altText: string; usageSection: string; category?: string; mediaMode?: AdminMediaMode }
 ): Promise<{ id: string } | { message: string }> {
-  const validated = validateAdminImageFile(file)
+  const validated = validateAdminMediaFile(file, opts.mediaMode ?? "image")
   if (!validated.ok) {
     return { message: validated.error }
   }
