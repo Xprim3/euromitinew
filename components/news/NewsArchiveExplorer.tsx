@@ -7,9 +7,6 @@ import { MaterialSymbol } from "@/components/ui/MaterialSymbol"
 import type { NewsSummary } from "@/types/public"
 import { cn } from "@/lib/utils"
 
-import { SectionReveal } from "@/components/motion/SectionReveal"
-import { Stagger } from "@/components/motion/Stagger"
-
 import type { NewsFilterTab } from "@/lib/constants/news-archive"
 import { NEWS_FILTER_TABS } from "@/lib/constants/news-archive"
 import { newsFilterTabLabelSq } from "@/lib/news/category-labels"
@@ -145,21 +142,20 @@ export function NewsArchiveExplorer({ items, className }: NewsArchiveExplorerPro
       </div>
 
       <div className="mx-auto w-full max-w-[1280px] px-4 py-12 sm:px-6 lg:px-12 lg:py-16">
-        <SectionReveal once variant="fade-up">
+        <div>
           {slice.length === 0 ? (
             <p className="text-center text-sm text-brand-body-soft">Asnjë artikull nuk përputhet me filtrat.</p>
           ) : (
             <>
               <div ref={gridAnchorRef} id="news-archive-grid" className="scroll-mt-24">
-                <Stagger
+                <div
                   key={`${safePage}-${slice.map((i) => i.id).join()}`}
-                  once
                   className="flex flex-col divide-y divide-brand-border-muted"
                 >
                   {slice.map((item) => (
                     <NewsArchiveCard key={item.id} item={item} href={`/news/${item.slug}`} />
                   ))}
-                </Stagger>
+                </div>
               </div>
 
             <div className="mt-8 flex flex-col items-center gap-5 border-brand-border-muted border-t pt-8 sm:mt-10 sm:pt-10">
@@ -236,7 +232,7 @@ export function NewsArchiveExplorer({ items, className }: NewsArchiveExplorerPro
             </div>
           </>
           )}
-        </SectionReveal>
+        </div>
       </div>
     </div>
   )

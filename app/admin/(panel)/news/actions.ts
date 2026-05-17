@@ -93,14 +93,10 @@ export async function createNewsPostAction(_prev: NewsPostSaveState, formData: F
   const adminReady = await ensureAdminProfile(supabase, user)
   if (!adminReady.ok) return { ok: false, message: adminReady.message }
 
-  const teaserRaw = formData.get("teaser_label")
-  const teaserVal = teaserRaw instanceof File ? "" : typeof teaserRaw === "string" ? teaserRaw.trim() : ""
-
   const parsed = newsPostAdminFieldsSchema.safeParse({
     slug: formData.get("slug"),
     title: formData.get("title"),
     category: formData.get("category"),
-    teaser_label: teaserVal.length ? teaserVal : undefined,
     status: formData.get("status"),
     published_at: formData.get("published_at"),
     hero_image_alt: formData.get("hero_image_alt") ?? "",
@@ -148,7 +144,6 @@ export async function createNewsPostAction(_prev: NewsPostSaveState, formData: F
       title: v.title,
       excerpt,
       category: v.category,
-      teaser_label: v.teaser_label ?? null,
       published_at,
       hero_media_id: heroMediaId,
       hero_image_alt: v.hero_image_alt ?? null,
@@ -185,14 +180,10 @@ export async function updateNewsPostAction(_prev: NewsPostSaveState, formData: F
     const id = String(formData.get("id") ?? "").trim()
     if (!id) return { ok: false, message: "Missing post id." }
 
-    const teaserRaw = formData.get("teaser_label")
-    const teaserVal = teaserRaw instanceof File ? "" : typeof teaserRaw === "string" ? teaserRaw.trim() : ""
-
     const parsed = newsPostAdminFieldsSchema.safeParse({
       slug: formData.get("slug"),
       title: formData.get("title"),
       category: formData.get("category"),
-      teaser_label: teaserVal.length ? teaserVal : undefined,
       status: formData.get("status"),
       published_at: formData.get("published_at"),
       hero_image_alt: formData.get("hero_image_alt") ?? "",
@@ -230,7 +221,6 @@ export async function updateNewsPostAction(_prev: NewsPostSaveState, formData: F
       title: v.title,
       excerpt,
       category: v.category,
-      teaser_label: v.teaser_label ?? null,
       published_at,
       hero_image_alt: v.hero_image_alt ?? null,
       seo_title: v.seo_title ?? null,

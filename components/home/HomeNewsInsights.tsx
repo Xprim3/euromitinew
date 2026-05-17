@@ -6,6 +6,7 @@ import { SectionAccentRule } from "@/components/ui/SectionAccentRule"
 import { MaterialSymbol } from "@/components/ui/MaterialSymbol"
 import { homeNewsInsightsDesign } from "@/data/mock/homepage-visual"
 import { getPublishedNewsSummariesPublic } from "@/lib/data/news-public"
+import { formatNewsDateNumeric } from "@/lib/format-news-date"
 import { cn } from "@/lib/utils"
 
 export async function HomeNewsInsights() {
@@ -84,7 +85,7 @@ export async function HomeNewsInsights() {
                 </div>
                 <div className="space-y-2.5 p-4 md:p-5">
                   <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/60">
-                    {new Date(item.publishedAt).toLocaleDateString("sq-AL")}
+                    {formatNewsDateNumeric(item.publishedAt)}
                   </p>
                   <h3 className="font-[family-name:var(--font-montserrat)] text-lg font-bold leading-tight text-white">
                     {item.title}

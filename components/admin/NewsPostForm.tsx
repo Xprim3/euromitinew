@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import type { NewsPostSaveState } from "@/app/admin/(panel)/news/actions"
 import {
   AdminContentGrid,
+  AdminCollapsibleSection,
   AdminSectionCard,
   ErrorMessage,
   FileUploadInput,
@@ -62,6 +63,7 @@ export function NewsPostForm({ mode, submitAction, initial, heroPreviewUrl }: Ne
   const categoryDefault =
     initial?.category && cats.includes(initial.category) ? initial.category : NEWS_ADMIN_CATEGORIES[0]
   const categoryOptions = NEWS_ADMIN_CATEGORIES.map((category) => ({ value: category, label: category }))
+  const seoFieldError = Boolean(fieldErrors?.seo_title?.length || fieldErrors?.seo_description?.length)
 
   return (
     <form ref={formRef} action={formAction} className="space-y-6 pb-24">
@@ -130,13 +132,6 @@ export function NewsPostForm({ mode, submitAction, initial, heroPreviewUrl }: Ne
               error={fieldErrors?.category?.[0]}
             />
           </AdminContentGrid>
-          <TextInput
-            label="Homepage / archive badge"
-            name="teaser_label"
-            defaultValue={initial?.teaser_label ?? ""}
-            placeholder='e.g. "Network update"'
-            helperText="Optional — rarely shown; leave empty unless needed."
-          />
           <TextareaInput
             label="Article body"
             name="body_paragraphs"
@@ -168,9 +163,11 @@ export function NewsPostForm({ mode, submitAction, initial, heroPreviewUrl }: Ne
         </div>
       </AdminSectionCard>
 
-      <AdminSectionCard
+      <AdminCollapsibleSection
+        key={seoFieldError ? "seo-errors" : "seo"}
         title="SEO (opsionale)"
         description="Lini bosh për të përdorur titullin dhe përshkrimin e artikullit. Përdorni vetëm kur duhet diçka e veçantë për Google dhe rrjetet sociale."
+        defaultOpen={seoFieldError}
       >
         <div className="space-y-4">
           <TextInput
@@ -200,7 +197,7 @@ export function NewsPostForm({ mode, submitAction, initial, heroPreviewUrl }: Ne
             helperText="Kur aktivizohet, artikulli nuk indeksohet në Google (robots noindex)."
           />
         </div>
-      </AdminSectionCard>
+      </AdminCollapsibleSection>
 
       <SaveBar
         cancelLabel="Reset changes"

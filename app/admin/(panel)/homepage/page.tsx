@@ -5,7 +5,6 @@ import { HomepageContentForm } from "@/components/admin/HomepageContentForm"
 import { ErrorMessage } from "@/components/admin/design-system"
 import { homepageContentRowFromUnknown, heroSlidesFromCMS } from "@/lib/data/homepage-singleton-public"
 import { normalizeLocationRow } from "@/lib/data/locations-admin-shared"
-import { formatNewsDate } from "@/lib/format-news-date"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 import type { HomepageContentRow } from "@/types/supabase-cms"
 

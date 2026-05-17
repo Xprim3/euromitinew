@@ -21,12 +21,6 @@ export const newsPostAdminFieldsSchema = z.object({
   slug: slugSchema,
   title: z.string().trim().min(1).max(500),
   category: categorySchema,
-  teaser_label: z
-    .string()
-    .trim()
-    .max(120)
-    .optional()
-    .transform((s) => (s && s.length > 0 ? s : undefined)),
   status: z.enum(["draft", "published", "archived"]),
   published_at: z
     .string()

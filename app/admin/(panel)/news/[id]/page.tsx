@@ -48,9 +48,7 @@ export default async function AdminEditNewsPage({ params }: Props) {
             </Link>
           </>
         }
-      >
-        <p className="text-sm text-[var(--admin-text-muted)]">Update the fields below and save to revalidate public News pages.</p>
-      </AdminSectionCard>
+      />
       <NewsPostForm mode="edit" submitAction={updateNewsPostAction} initial={row} heroPreviewUrl={heroPreviewUrl} />
     </div>
   )

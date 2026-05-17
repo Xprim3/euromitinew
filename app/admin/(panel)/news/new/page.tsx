@@ -20,9 +20,7 @@ export default function AdminNewNewsPage() {
             Back to list
           </Link>
         }
-      >
-        <p className="text-sm text-[var(--admin-text-muted)]">Complete the editor below, then save the post.</p>
-      </AdminSectionCard>
+      />
       <NewsPostForm mode="create" submitAction={createNewsPostAction} initial={null} heroPreviewUrl={null} />
     </div>
   )

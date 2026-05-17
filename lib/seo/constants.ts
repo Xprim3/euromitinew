@@ -18,8 +18,8 @@ export const SITE_DEFAULT_DESCRIPTION =
 export const SITE_DEFAULT_TITLE = "Euromiti - Faqja Zyrtare"
 
 /**
- * Default social preview (Facebook, WhatsApp, LinkedIn, X).
- * File: `public/logo.png` — use PNG/JPEG here; SVG is not supported by most platforms.
+ * Default social preview (Facebook, WhatsApp, Viber, LinkedIn, X).
+ * Served from `app/opengraph-image.png` (same Euromiti logo; also at `public/logo.png`).
  */
 export const DEFAULT_OG_IMAGE_PATH = "/logo.png"
 
@@ -40,10 +40,18 @@ export const DEFAULT_KEYWORDS = [
 
 export function getSiteUrl(): string {
   const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim()
-  if (!raw) return DEFAULT_SITE_URL
-  try {
-    return new URL(raw).origin
-  } catch {
-    return DEFAULT_SITE_URL
+  if (raw) {
+    try {
+      return new URL(raw).origin
+    } catch {
+      /* fall through */
+    }
   }
+  /** Lets WhatsApp/Viber load OG images from the same host when sharing a Vercel preview URL. */
+  const vercel = process.env.VERCEL_URL?.trim()
+  if (vercel) {
+    const host = vercel.replace(/^https?:\/\//i, "")
+    return `https://${host}`
+  }
+  return DEFAULT_SITE_URL
 }

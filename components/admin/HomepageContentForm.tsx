@@ -565,41 +565,53 @@ export function HomepageContentForm({ initial, mediaPreviews, locationPreviews }
             </div>
           </SectionAccordion>
 
-          <SectionAccordion title="4. About Preview" description="Homepage About headline and text blocks.">
+          <SectionAccordion
+            title="4. Kush jemi (homepage)"
+            description="Dark card on the homepage before Services. Full story is edited under About Us."
+          >
             <div className="space-y-5">
               <input type="hidden" name="about_preview_kicker" value={initial.about_preview_kicker} />
               <input type="hidden" name="about_preview_eyebrow" value={initial.about_preview_eyebrow} />
               <input type="hidden" name="about_preview_why_title" value={initial.about_preview_why_title} />
-              <input type="hidden" name="about_preview_button_label" value={initial.about_preview_button_label || "Lexo më shumë për ne"} />
-              <input type="hidden" name="about_preview_button_href" value={initial.about_preview_button_href || "/about"} />
+              <input type="hidden" name="about_preview_why_text" value={initial.about_preview_why_text} />
               <TextInput
-                label="Main headline"
+                label="Headline"
                 name="about_preview_headline"
                 defaultValue={initial.about_preview_headline}
                 maxLength={320}
-                placeholder="Të ndërtuar në Kosovë. Të besuar në çdo rrugë."
+                placeholder="Euromiti cilësi, shërbim dhe besim në çdo ndalesë."
+                helperText="Last sentence can show in accent color if the headline uses periods."
                 error={fieldErrors?.about_preview_headline?.[0]}
               />
               <TextareaInput
-                label="Who we are text"
+                label="Short teaser"
                 name="about_preview_text"
                 defaultValue={initial.about_preview_text}
-                rows={5}
+                rows={3}
                 maxLength={4000}
                 showCharacterCount
+                helperText="Only ~200 characters appear on the homepage; keep this brief. The button links to /about for the full page."
                 error={fieldErrors?.about_preview_text?.[0]}
               />
-              <TextareaInput
-                label="Why choose us text"
-                name="about_preview_why_text"
-                defaultValue={initial.about_preview_why_text}
-                rows={4}
-                maxLength={1200}
-                showCharacterCount
-                error={fieldErrors?.about_preview_why_text?.[0]}
-              />
+              <AdminContentGrid columns={2}>
+                <TextInput
+                  label="Button label"
+                  name="about_preview_button_label"
+                  defaultValue={initial.about_preview_button_label || "Lexo më shumë për ne"}
+                  maxLength={120}
+                  error={fieldErrors?.about_preview_button_label?.[0]}
+                />
+                <TextInput
+                  label="Button link"
+                  name="about_preview_button_href"
+                  defaultValue={initial.about_preview_button_href || "/about"}
+                  maxLength={500}
+                  placeholder="/about"
+                  error={fieldErrors?.about_preview_button_href?.[0]}
+                />
+              </AdminContentGrid>
               <FileUploadInput
-                label="About preview image"
+                label="Section image"
                 name="about_preview_image"
                 layout="stacked"
                 previewUrl={mediaPreviews.about}

@@ -7,7 +7,7 @@ export type AdminSectionCardProps = {
   description?: string
   /** Right side of header (e.g. small button). */
   headerActions?: ReactNode
-  children: ReactNode
+  children?: ReactNode
   className?: string
   /** Optional anchor for in-page links / deep links from docs. */
   id?: string
@@ -18,6 +18,7 @@ export type AdminSectionCardProps = {
  */
 export function AdminSectionCard({ title, description, headerActions, children, className, id }: AdminSectionCardProps) {
   const hasHeader = Boolean(title || description || headerActions)
+  const hasBody = children != null
 
   return (
     <section
@@ -28,7 +29,12 @@ export function AdminSectionCard({ title, description, headerActions, children, 
       )}
     >
       {hasHeader ? (
-        <div className="flex flex-col gap-3 border-[var(--admin-border)] border-b px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:gap-3 sm:px-6 sm:py-4">
+        <div
+          className={cnDs(
+            "flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:gap-3 sm:px-6 sm:py-4",
+            hasBody && "border-[var(--admin-border)] border-b"
+          )}
+        >
           <div className="min-w-0 flex-1">
             {title ? (
               <h2 className="font-[family-name:var(--font-montserrat)] text-base font-semibold tracking-tight text-[var(--admin-text)] sm:text-lg">
@@ -46,7 +52,7 @@ export function AdminSectionCard({ title, description, headerActions, children, 
           ) : null}
         </div>
       ) : null}
-      <div className="min-w-0 px-4 py-5 sm:px-6">{children}</div>
+      {hasBody ? <div className="min-w-0 px-4 py-5 sm:px-6">{children}</div> : null}
     </section>
   )
 }
