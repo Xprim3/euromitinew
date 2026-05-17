@@ -93,7 +93,7 @@ export function BackToTopButton() {
       aria-label="Kthehu në fillim të faqes"
       title="Kthehu lart"
       className={cn(
-        "fixed z-30 flex size-11 items-center justify-center rounded-full border border-white/12 bg-brand-shell-deep text-white shadow-[0_8px_28px_rgba(0,0,0,0.35)] backdrop-blur-sm transition-[opacity,background-color,border-color,color] duration-300 ease-out",
+        "fixed z-30 flex size-11 items-center justify-center rounded-full border border-white/12 bg-brand-shell-deep text-white transition-[opacity,background-color,border-color,color] duration-300 ease-out",
         "right-[max(1rem,env(safe-area-inset-right,0px))] bottom-[max(1rem,env(safe-area-inset-bottom,0px))]",
         "sm:size-12 sm:right-6 sm:bottom-6",
         "hover:border-brand-accent-soft/40 hover:bg-brand-shell-deep hover:text-brand-accent-soft",
