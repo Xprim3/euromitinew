@@ -1,10 +1,9 @@
 import type { Metadata } from "next"
-import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
 import { Container } from "@/components/layout/Container"
-import { PageHeader } from "@/components/layout/PageHeader"
+import { PageImageHero } from "@/components/layout/PageImageHero"
 import { SectionReveal } from "@/components/motion/SectionReveal"
 import { JsonLd } from "@/components/seo/JsonLd"
 import { getNewsArticleBySlugPublic } from "@/lib/data/news-public"
@@ -73,17 +72,17 @@ export default async function NewsArticlePage({ params }: Props) {
           ]),
         ]}
       />
-      <PageHeader
+      <PageImageHero
+        imageSrc={article.imageSrc}
+        imageAlt={article.imageAlt}
+        trail={[
+          { label: "Ballina", href: "/" },
+          { label: "Lajme", href: "/news" },
+          { label: article.title },
+        ]}
         title={article.title}
-        breadcrumbs={
-          <>
-            <Link href="/">Ballina</Link>
-            <span className="px-2 text-muted-foreground/80">/</span>
-            <Link href="/news">Lajme</Link>
-            <span className="px-2 text-muted-foreground/80">/</span>
-            <span className="line-clamp-1 text-foreground">{article.title}</span>
-          </>
-        }
+        visualPreset="flat-heavy"
+        priority
       />
 
       <Container className="euromiti-section">
@@ -92,18 +91,7 @@ export default async function NewsArticlePage({ params }: Props) {
             {formatNewsDate(article.publishedAt)}
           </p>
 
-          <div className="relative mx-auto mt-8 aspect-21/11 max-w-4xl overflow-hidden rounded-[var(--rounded-lg)] border border-border/80 bg-muted shadow-(--shadow-euromiti-soft)">
-            <Image
-              src={article.imageSrc}
-              alt={article.imageAlt}
-              fill
-              priority
-              sizes="(max-width: 1024px) 100vw, 56rem"
-              className="object-cover"
-            />
-          </div>
-
-          <article className="mx-auto mt-12 max-w-3xl">
+          <article className="mx-auto mt-10 max-w-3xl md:mt-12">
             <div className="space-y-6 text-base leading-relaxed text-muted-foreground md:text-[1.0625rem]">
               {[...article.contentParagraphs].map((paragraph, i) => (
                 <p key={i}>{paragraph}</p>
