@@ -3,8 +3,9 @@
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 
-import { jobAdminFieldsSchema } from "@/lib/validations/careers-admin"
+import { buildJobSlugBase } from "@/lib/careers-job-slug"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
+import { jobAdminFieldsSchema } from "@/lib/validations/careers-admin"
 
 export type JobSaveState =
   | { ok: null }
@@ -18,16 +19,6 @@ export type JobToggleState = { ok: null } | { ok: true; message: string } | { ok
 
 function truthyCheckbox(v: FormDataEntryValue | null) {
   return v === "on" || v === "true"
-}
-
-function slugify(value: string) {
-  const slug = value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .replace(/-{2,}/g, "-")
-  return slug || "job"
 }
 
 async function ensureAdminProfile(
@@ -59,15 +50,41 @@ async function ensureAdminProfile(
 async function uniqueJobSlug(
   supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
   title: string,
+  locationCity: string,
   excludeId?: string
 ) {
-  const base = slugify(title).slice(0, 180)
+  const base = buildJobSlugBase(title, locationCity)
   for (let i = 0; i < 50; i++) {
     const candidate = i === 0 ? base : `${base}-${i + 1}`
     const { data } = await supabase.from("jobs").select("id").eq("slug", candidate).maybeSingle()
     if (!data || (excludeId && data.id === excludeId)) return candidate
   }
   return `${base}-${Date.now().toString(36)}`
+}
+
+async function findDuplicatePosition(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  title: string,
+  locationCity: string,
+  excludeId?: string
+) {
+  const { data, error } = await supabase
+    .from("jobs")
+    .select("id, title")
+    .eq("location_city", locationCity)
+    .ilike("title", title.trim())
+
+  if (error) {
+    console.warn("[findDuplicatePosition]", error.message)
+    return null
+  }
+
+  return (data ?? []).find((row) => {
+    const id = String((row as { id?: string }).id ?? "")
+    const rowTitle = typeof (row as { title?: string }).title === "string" ? (row as { title: string }).title : ""
+    if (excludeId && id === excludeId) return false
+    return rowTitle.trim().toLowerCase() === title.trim().toLowerCase()
+  })
 }
 
 function revalidateCareersSurfaces(slugs: string[] = []) {
@@ -117,7 +134,16 @@ export async function createJobAction(_prev: JobSaveState, formData: FormData): 
   const requirements: string[] = []
 
   const isActive = truthyCheckbox(formData.get("is_active"))
-  const slug = await uniqueJobSlug(supabase, v.title)
+
+  const duplicate = await findDuplicatePosition(supabase, v.title, v.location_city)
+  if (duplicate) {
+    return {
+      ok: false,
+      message: `“${v.title}” already exists for ${v.location_city}. Edit that row or choose a different title.`,
+    }
+  }
+
+  const slug = await uniqueJobSlug(supabase, v.title, v.location_city)
 
   const { data, error } = await supabase
     .from("jobs")
@@ -178,7 +204,19 @@ export async function updateJobAction(_prev: JobSaveState, formData: FormData): 
     const isActive = truthyCheckbox(formData.get("is_active"))
     const existingTitle = typeof existing.title === "string" ? existing.title : ""
     const existingSlug = typeof existing.slug === "string" ? existing.slug : ""
-    const slug = existingTitle === v.title && existingSlug ? existingSlug : await uniqueJobSlug(supabase, v.title, id)
+    const existingLocation =
+      typeof existing.location_city === "string" ? existing.location_city : ""
+
+    const duplicate = await findDuplicatePosition(supabase, v.title, v.location_city, id)
+    if (duplicate) {
+      return {
+        ok: false,
+        message: `“${v.title}” already exists for ${v.location_city}.`,
+      }
+    }
+
+    const slugUnchanged = existingTitle === v.title && existingLocation === v.location_city && existingSlug
+    const slug = slugUnchanged ? existingSlug : await uniqueJobSlug(supabase, v.title, v.location_city, id)
     const existingPostedAt = typeof existing.posted_at === "string" && existing.posted_at ? existing.posted_at : null
 
     const { error } = await supabase

@@ -23,21 +23,22 @@ function normalizeApplicationRow(raw: Record<string, unknown>): JobApplicationRo
 export type JobApplicationWithJob = JobApplicationRow & {
   job_title: string
   job_slug: string
+  job_location_city: string
 }
 
-type JobTitleRow = { id: string; title: string; slug: string }
+type JobTitleRow = { id: string; title: string; slug: string; location_city: string | null }
 
 async function attachJobMeta(supabase: SupabaseClient, rows: JobApplicationRow[]): Promise<JobApplicationWithJob[]> {
   if (!rows.length) return []
   const jobIds = [...new Set(rows.map((r) => r.job_id).filter(Boolean))]
   if (!jobIds.length) {
-    return rows.map((base) => ({ ...base, job_title: "—", job_slug: "" }))
+    return rows.map((base) => ({ ...base, job_title: "—", job_slug: "", job_location_city: "" }))
   }
 
-  const { data: jobs, error } = await supabase.from("jobs").select("id, title, slug").in("id", jobIds)
+  const { data: jobs, error } = await supabase.from("jobs").select("id, title, slug, location_city").in("id", jobIds)
   if (error) {
     console.warn("[attachJobMeta]", error.message)
-    return rows.map((base) => ({ ...base, job_title: "—", job_slug: "" }))
+    return rows.map((base) => ({ ...base, job_title: "—", job_slug: "", job_location_city: "" }))
   }
 
   const map = new Map<string, JobTitleRow>()
@@ -49,6 +50,8 @@ async function attachJobMeta(supabase: SupabaseClient, rows: JobApplicationRow[]
       id,
       title: typeof o.title === "string" ? o.title : "",
       slug: typeof o.slug === "string" ? o.slug : "",
+      location_city:
+        typeof o.location_city === "string" && o.location_city.trim() ? o.location_city.trim() : null,
     })
   }
 
@@ -58,6 +61,7 @@ async function attachJobMeta(supabase: SupabaseClient, rows: JobApplicationRow[]
       ...base,
       job_title: j?.title?.trim() ? j.title : "—",
       job_slug: j?.slug ?? "",
+      job_location_city: j?.location_city ?? "",
     }
   })
 }

@@ -6,6 +6,7 @@ import { DeleteJobApplicationForm } from "@/components/admin/DeleteJobApplicatio
 import { AdminSectionCard, cnDs, dsBtnGhost, dsBtnPrimary, dsBtnTertiary } from "@/components/admin/design-system"
 import { formatNewsDate } from "@/lib/format-news-date"
 import type { JobApplicationWithJob } from "@/lib/data/job-applications-admin"
+import { jobLocationAdminLabel } from "@/lib/validations/careers-admin"
 
 function formatFileSize(n: number) {
   if (!Number.isFinite(n) || n < 0) return "—"
@@ -79,6 +80,14 @@ export function CareerApplicantDetailPanel({ applicant, onClose }: CareerApplica
             <dt className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-[var(--admin-text-muted)]">Phone</dt>
             <dd className="mt-1 min-w-0 break-words text-[var(--admin-text)]">
               {applicant.phone.trim() ? applicant.phone : "—"}
+            </dd>
+          </div>
+          <div className="min-w-0">
+            <dt className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-[var(--admin-text-muted)]">
+              Location
+            </dt>
+            <dd className="mt-1 min-w-0 break-words font-medium text-[var(--admin-text)]">
+              {applicant.job_location_city ? jobLocationAdminLabel(applicant.job_location_city) : "—"}
             </dd>
           </div>
           <div className="min-w-0">

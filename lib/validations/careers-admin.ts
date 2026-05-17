@@ -1,10 +1,26 @@
 import { z } from "zod"
 
-export const JOB_LOCATION_OPTIONS = ["Prishtina", "Ferizaj", "Gjilan", "Multiple locations"] as const
+/** Euromiti station cities — one position row per city + role title. */
+export const JOB_LOCATION_OPTIONS = ["Prishtina", "Ferizaj", "Gjilan"] as const
+
+export type JobLocationOption = (typeof JOB_LOCATION_OPTIONS)[number]
+
+export const JOB_LOCATION_ADMIN_LABELS: Record<JobLocationOption, string> = {
+  Prishtina: "Prishtinë",
+  Ferizaj: "Ferizaj",
+  Gjilan: "Gjilan",
+}
+
+export function jobLocationAdminLabel(city: string): string {
+  if (city in JOB_LOCATION_ADMIN_LABELS) {
+    return JOB_LOCATION_ADMIN_LABELS[city as JobLocationOption]
+  }
+  return city
+}
 
 export const jobAdminFieldsSchema = z.object({
   title: z.string().trim().min(1, "Position title is required.").max(240),
-  location_city: z.enum(JOB_LOCATION_OPTIONS),
+  location_city: z.enum(JOB_LOCATION_OPTIONS, { message: "Select a location." }),
   summary: z.string().trim().max(1000).optional(),
 })
 

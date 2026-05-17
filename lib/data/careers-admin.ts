@@ -28,7 +28,11 @@ export function normalizeJobRow(raw: Record<string, unknown>): JobRow {
 
 export async function listJobsAdmin(): Promise<JobRow[]> {
   const supabase = await createSupabaseServerClient()
-  const { data, error } = await supabase.from("jobs").select("*").order("updated_at", { ascending: false })
+  const { data, error } = await supabase
+    .from("jobs")
+    .select("*")
+    .order("location_city", { ascending: true })
+    .order("title", { ascending: true })
   if (error || !data?.length) return []
   return data.map((row) => normalizeJobRow(row as Record<string, unknown>))
 }

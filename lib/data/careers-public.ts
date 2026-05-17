@@ -66,7 +66,6 @@ export const JOB_APPLICATION_LOCATION_LABELS: Record<string, string> = {
   Prishtina: "Prishtinë",
   Ferizaj: "Ferizaj",
   Gjilan: "Gjilan",
-  "Multiple locations": "Shumë lokacione",
 }
 
 export function jobApplicationLocationLabel(city: string): string {

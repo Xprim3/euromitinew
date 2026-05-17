@@ -51,7 +51,7 @@ export function AboutPageView({ data }: { data: ResolvedAboutPage }) {
                     id="about-story-heading"
                     className="font-[family-name:var(--font-montserrat)] text-[clamp(1.65rem,8vw,2.45rem)] font-extrabold leading-[1.08] tracking-[-0.045em] text-foreground md:text-[clamp(2rem,4vw,3.2rem)] md:leading-[1.04] md:tracking-[-0.055em]"
                   >
-                    Kush jemi
+                    Rreth Nesh
                   </h2>
                   <SectionAccentRule className="mt-4 md:mt-6" />
                 </div>

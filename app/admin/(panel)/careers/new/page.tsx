@@ -6,22 +6,24 @@ import { CareerJobForm } from "@/components/admin/CareerJobForm"
 import { AdminSectionCard, cnDs, dsBtnTertiary } from "@/components/admin/design-system"
 
 export const metadata: Metadata = {
-  title: "New job",
+  title: "New position",
 }
 
-export default function AdminNewJobPage() {
+export default async function AdminNewJobPage() {
   return (
     <div className="space-y-6">
       <AdminSectionCard
         title="Add position"
-        description="Creates a new option in the public apply-form dropdown."
+        description="One entry per city and role — the same job title can be added separately for Prishtinë, Ferizaj, and Gjilan."
         headerActions={
           <Link href="/admin/careers" className={cnDs(dsBtnTertiary, "min-h-10 px-4 text-xs")}>
             Back to careers
           </Link>
         }
       >
-        <p className="text-sm text-[var(--admin-text-muted)]">Set the title and whether applications are open for this role.</p>
+        <p className="text-sm text-[var(--admin-text-muted)]">
+          Use the form below: pick a location, then enter the position title.
+        </p>
       </AdminSectionCard>
       <CareerJobForm mode="create" submitAction={createJobAction} initial={null} />
     </div>
