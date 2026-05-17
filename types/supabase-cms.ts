@@ -211,6 +211,9 @@ export type NewsPostRow = {
   published_at: string | null
   hero_media_id: string | null
   hero_image_alt: string | null
+  seo_title: string | null
+  seo_description: string | null
+  no_index: boolean
   body: unknown
   created_at: string
   updated_at: string

@@ -13,6 +13,20 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname),
   },
+  async redirects() {
+    return [
+      {
+        source: "/lokacionet",
+        destination: "/locations",
+        permanent: true,
+      },
+      {
+        source: "/lokacionet/:slug",
+        destination: "/locations/:slug",
+        permanent: true,
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {

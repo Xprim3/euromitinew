@@ -3,6 +3,9 @@ import { Geist_Mono, Inter, Montserrat, Playfair_Display } from "next/font/googl
 
 import "./globals.css"
 
+import { DEFAULT_KEYWORDS, DEFAULT_OG_IMAGE_PATH, getSiteUrl, SITE_LOCALE, SITE_NAME } from "@/lib/seo/constants"
+import { resolveOgImageUrl } from "@/lib/seo/metadata"
+
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
@@ -30,7 +33,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 })
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://euromiti.com"
+const siteUrl = getSiteUrl()
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -43,28 +46,26 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Euromiti",
-    template: "%s | Euromiti",
+    default: `${SITE_NAME} — Karburant dhe shërbime në Kosovë`,
+    template: `%s | ${SITE_NAME}`,
   },
   description:
-    "Euromiti — petrol stations, premium restaurant, carwash, and mini markets across Prishtina, Ferizaj, and Gjilan, Kosovo.",
-  keywords: [
-    "Euromiti",
-    "petrol",
-    "gas station",
-    "Kosovo",
-    "Prishtina",
-    "Ferizaj",
-    "Gjilan",
-    "restaurant",
-    "carwash",
-  ],
+    "Euromiti ofron karburant, restaurant, autolarje dhe mini market në Prishtinë, Ferizaj dhe Gjilan — stacione moderne në Kosovë.",
+  keywords: [...DEFAULT_KEYWORDS],
   openGraph: {
-    title: "Euromiti",
+    title: SITE_NAME,
     description:
-      "Fuel, dining, carwash, and convenience — Euromiti locations across Kosovo.",
-    locale: "en_XK",
+      "Karburant, restaurant, autolarje dhe mini market — Euromiti në Prishtinë, Ferizaj dhe Gjilan.",
+    locale: SITE_LOCALE,
     type: "website",
+    siteName: SITE_NAME,
+    images: [{ url: resolveOgImageUrl(DEFAULT_OG_IMAGE_PATH), alt: SITE_NAME }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_NAME,
+    description: "Stacione Euromiti në Kosovë — karburant dhe shërbime premium.",
+    images: [resolveOgImageUrl(DEFAULT_OG_IMAGE_PATH)],
   },
 }
 
@@ -75,7 +76,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="sq"
       className={`${inter.variable} ${montserrat.variable} ${playfair.variable} ${geistMono.variable} h-full`}
     >
       <head>

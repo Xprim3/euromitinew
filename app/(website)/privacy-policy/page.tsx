@@ -5,11 +5,9 @@ import { DocumentSections } from "@/components/layout/DocumentSections"
 import { Container } from "@/components/layout/Container"
 import { PageHeader } from "@/components/layout/PageHeader"
 import { privacyPolicySections } from "@/data/mock/legal"
+import { metadataForStaticPage } from "@/lib/seo/pages"
 
-export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description: "Euromiti privacy policy (placeholder content for development).",
-}
+export const metadata: Metadata = metadataForStaticPage("privacy")
 
 export default function PrivacyPolicyPage() {
   return (

@@ -12,11 +12,9 @@ import { resolveRestaurantReservationStations } from "@/lib/data/restaurant-rese
 import { getContactDetailsPublic, type SocialLinkItem } from "@/lib/data/site-contact-public"
 import { telHrefFromDisplayPhone } from "@/lib/utils"
 
-export const metadata: Metadata = {
-  title: "Kontakt",
-  description:
-    "Selia e Euromitit në Prishtinë — telefon, email dhe orari. Na kontaktoni për çdo pyetje.",
-}
+import { metadataForStaticPage } from "@/lib/seo/pages"
+
+export const metadata: Metadata = metadataForStaticPage("contact")
 
 export const dynamic = "force-dynamic"
 

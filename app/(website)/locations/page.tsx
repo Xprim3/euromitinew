@@ -1,18 +1,12 @@
-import type { Metadata } from "next"
 import { Suspense } from "react"
 
 import { LocationsPageContent } from "./LocationsPageContent"
 import { LocationsPageSkeleton } from "./LocationsPageSkeleton"
+import { metadataForStaticPage } from "@/lib/seo/pages"
 
 export const dynamic = "force-dynamic"
-
 export const revalidate = 120
-
-export const metadata: Metadata = {
-  title: "Locations",
-  description:
-    "Euromiti stations in Prishtina, Ferizaj, and Gjilan — addresses, hours, services, and Google Maps.",
-}
+export const metadata = metadataForStaticPage("locations")
 
 export default function LocationsPage() {
   return (

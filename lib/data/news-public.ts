@@ -36,6 +36,9 @@ export function normalizeNewsPostRow(raw: Record<string, unknown>): NewsPostRow 
     published_at: typeof raw.published_at === "string" ? raw.published_at : null,
     hero_media_id: typeof raw.hero_media_id === "string" && raw.hero_media_id.length > 0 ? raw.hero_media_id : null,
     hero_image_alt: typeof raw.hero_image_alt === "string" ? raw.hero_image_alt : null,
+    seo_title: "seo_title" in raw && typeof raw.seo_title === "string" ? raw.seo_title : null,
+    seo_description: "seo_description" in raw && typeof raw.seo_description === "string" ? raw.seo_description : null,
+    no_index: "no_index" in raw ? Boolean(raw.no_index) : false,
     body: raw.body ?? [],
     created_at: typeof raw.created_at === "string" ? raw.created_at : "",
     updated_at: typeof raw.updated_at === "string" ? raw.updated_at : "",
@@ -150,5 +153,9 @@ export const getNewsArticleBySlugPublic = cache(async (slug: string): Promise<Ne
   return {
     ...summary,
     contentParagraphs,
+    seoTitle: row.seo_title,
+    seoDescription: row.seo_description,
+    noIndex: row.no_index,
+    updatedAt: row.updated_at,
   }
 })

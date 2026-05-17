@@ -4,10 +4,13 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 
 import { Container } from "@/components/layout/Container"
-import { SectionReveal } from "@/components/motion/SectionReveal"
 import { PageHeader } from "@/components/layout/PageHeader"
+import { SectionReveal } from "@/components/motion/SectionReveal"
+import { JsonLd } from "@/components/seo/JsonLd"
 import { getNewsArticleBySlugPublic } from "@/lib/data/news-public"
 import { formatNewsDate } from "@/lib/format-news-date"
+import { buildPageMetadata, resolveOgImageUrl } from "@/lib/seo/metadata"
+import { buildBreadcrumbSchema, buildNewsArticleSchema } from "@/lib/seo/json-ld"
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -17,21 +20,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const article = await getNewsArticleBySlugPublic(slug)
   if (!article) {
-    return { title: "News" }
+    return buildPageMetadata({
+      title: "Lajme",
+      description: "Artikulli i kërkuar nuk u gjet.",
+      path: `/news/${slug}`,
+      noIndex: true,
+    })
   }
-  return {
-    title: article.title,
-    description: article.excerpt,
-    openGraph: {
-      title: article.title,
-      description: article.excerpt,
-      type: "article",
-      publishedTime: article.publishedAt,
-      ...(article.imageSrc.startsWith("https://")
-        ? { images: [{ url: article.imageSrc }] }
-        : {}),
-    },
-  }
+
+  const title = article.seoTitle?.trim() || article.title
+  const description = article.seoDescription?.trim() || article.excerpt
+
+  return buildPageMetadata({
+    title,
+    description,
+    path: `/news/${article.slug}`,
+    ogType: "article",
+    ogImage: article.imageSrc,
+    publishedTime: article.publishedAt,
+    modifiedTime: article.updatedAt,
+    noIndex: article.noIndex,
+  })
 }
 
 export default async function NewsArticlePage({ params }: Props) {
@@ -41,17 +50,38 @@ export default async function NewsArticlePage({ params }: Props) {
     notFound()
   }
 
+  const imageForSchema = article.imageSrc.startsWith("http")
+    ? article.imageSrc
+    : resolveOgImageUrl(article.imageSrc)
+
   return (
     <>
+      <JsonLd
+        data={[
+          buildNewsArticleSchema({
+            title: article.title,
+            description: article.excerpt,
+            slug: article.slug,
+            publishedAt: article.publishedAt,
+            updatedAt: article.updatedAt,
+            imageUrl: imageForSchema,
+          }),
+          buildBreadcrumbSchema([
+            { name: "Ballina", path: "/" },
+            { name: "Lajme", path: "/news" },
+            { name: article.title, path: `/news/${article.slug}` },
+          ]),
+        ]}
+      />
       <PageHeader
         title={article.title}
         breadcrumbs={
           <>
-            <Link href="/">Home</Link>
+            <Link href="/">Ballina</Link>
             <span className="px-2 text-muted-foreground/80">/</span>
-            <Link href="/news">News</Link>
+            <Link href="/news">Lajme</Link>
             <span className="px-2 text-muted-foreground/80">/</span>
-            <span className="text-foreground line-clamp-1">{article.title}</span>
+            <span className="line-clamp-1 text-foreground">{article.title}</span>
           </>
         }
       />
@@ -86,7 +116,7 @@ export default async function NewsArticlePage({ params }: Props) {
               href="/news"
               className="inline-flex items-center gap-2 font-semibold text-primary hover:underline"
             >
-              ← Back to news
+              ← Kthehu te lajmet
             </Link>
           </p>
         </SectionReveal>

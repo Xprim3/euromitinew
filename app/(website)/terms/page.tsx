@@ -5,11 +5,9 @@ import { DocumentSections } from "@/components/layout/DocumentSections"
 import { Container } from "@/components/layout/Container"
 import { PageHeader } from "@/components/layout/PageHeader"
 import { termsAndLegalSections } from "@/data/mock/legal"
+import { metadataForStaticPage } from "@/lib/seo/pages"
 
-export const metadata: Metadata = {
-  title: "Terms & Legal",
-  description: "Euromiti terms of use (placeholder content for development).",
-}
+export const metadata: Metadata = metadataForStaticPage("terms")
 
 export default function TermsPage() {
   return (

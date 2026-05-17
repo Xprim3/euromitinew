@@ -1,17 +1,18 @@
 import type { MetadataRoute } from "next"
 
-const site = process.env.NEXT_PUBLIC_SITE_URL ?? "https://euromiti.com"
+import { getSiteUrl } from "@/lib/seo/constants"
 
-/** Production search crawlers — keep `/admin/*` indexable=no via layout robots and disallow here too. */
 export default function robots(): MetadataRoute.Robots {
+  const site = getSiteUrl()
   return {
     rules: [
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/admin", "/admin/"],
+        disallow: ["/admin", "/admin/", "/api/"],
       },
     ],
     sitemap: new URL("/sitemap.xml", site).toString(),
+    host: new URL(site).host,
   }
 }

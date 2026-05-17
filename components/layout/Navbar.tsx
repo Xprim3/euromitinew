@@ -62,7 +62,7 @@ export function Navbar({ brand }: NavbarProps) {
               key={href}
               href={href}
               className={cn(
-                "whitespace-nowrap text-xs font-bold tracking-wide uppercase transition-colors",
+                "whitespace-nowrap text-sm font-bold tracking-wide uppercase transition-colors",
                 navLinkTone(href, pathname)
               )}
             >

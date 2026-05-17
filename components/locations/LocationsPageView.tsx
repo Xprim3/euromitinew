@@ -1,4 +1,5 @@
 import Image from "next/image"
+import Link from "next/link"
 
 import { Container } from "@/components/layout/Container"
 import { PageImageHero } from "@/components/layout/PageImageHero"
@@ -59,7 +60,19 @@ function LocationInfoPanel({ entry, index, phoneHref, emailHref, variant }: Loca
       <div className="relative max-w-xl">
         <p className={cn("text-[0.65rem] font-semibold uppercase tracking-[0.32em]", label)}>Euromiti forecourt</p>
         <h2 className={cn("mt-4 font-heading text-[clamp(1.75rem,3.2vw,2.35rem)] font-semibold leading-[1.12] tracking-tight", heading)}>
-          {entry.pageHeading}
+          {entry.slug.trim() ? (
+            <Link
+              href={`/locations/${entry.slug}`}
+              className={cn(
+                "underline-offset-4 transition hover:underline",
+                dark ? "text-white hover:text-brand-accent-gold" : "text-foreground hover:text-secondary"
+              )}
+            >
+              {entry.pageHeading}
+            </Link>
+          ) : (
+            entry.pageHeading
+          )}
         </h2>
         <p className={cn("mt-5 text-base leading-relaxed md:text-[1.05rem]", bodyMuted)}>{entry.pageSummary}</p>
 
@@ -184,9 +197,9 @@ export function LocationsPageView({ locations }: LocationsPageViewProps) {
     <>
       <PageImageHero
         imageSrc={homeHeroDesign.imageSrc}
-        imageAlt="Euromiti locations in Kosovo"
-        trail={[{ label: "Home", href: "/" }, { label: "Locations" }]}
-        title="Locations"
+        imageAlt="Pikat e shitjes Euromiti në Prishtinë, Ferizaj dhe Gjilan"
+        trail={[{ label: "Ballina", href: "/" }, { label: "Pikat e Shitjes" }]}
+        title="Pikat e Shitjes"
         priority
       />
 

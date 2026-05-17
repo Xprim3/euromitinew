@@ -1,4 +1,3 @@
-import type { Metadata } from "next"
 import { Suspense } from "react"
 
 import { HomeAboutIntro } from "@/components/home/HomeAboutIntro"
@@ -8,24 +7,9 @@ import { HomeNewsInsights, HomeNewsInsightsSkeleton } from "@/components/home/Ho
 import { HomeRestaurantLuxury, HomeRestaurantLuxurySkeleton } from "@/components/home/HomeRestaurantLuxury"
 import { HomeServicesIntro, HomeServicesIntroSkeleton } from "@/components/home/HomeServicesIntro"
 import { HomeStrategicNetwork, HomeStrategicNetworkSkeleton } from "@/components/home/HomeStrategicNetwork"
+import { metadataForStaticPage } from "@/lib/seo/pages"
 
-export const metadata: Metadata = {
-  title: "Home",
-  description:
-    "Euromiti — reliability in every liter. Fuel, hospitality, retail, and car care across Kosovo.",
-  openGraph: {
-    title: "Euromiti — reliability in every liter",
-    description:
-      "Fuel, hospitality, retail, and car care across Kosovo — Prishtina, Ferizaj, and Gjilan.",
-    url: "/",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Euromiti",
-    description: "Premium forecourts and hospitality across Kosovo.",
-  },
-}
+export const metadata = metadataForStaticPage("home")
 
 export const dynamic = "force-dynamic"
 
@@ -39,16 +23,16 @@ export default function HomePage() {
       <Suspense fallback={<HomeHeroFuelPriceBarSkeleton />}>
         <HomeHeroFuelPriceBar />
       </Suspense>
+      <HomeAboutIntro />
       <Suspense fallback={<HomeServicesIntroSkeleton />}>
         <HomeServicesIntro />
-      </Suspense>
-      <Suspense fallback={<HomeRestaurantLuxurySkeleton />}>
-        <HomeRestaurantLuxury />
       </Suspense>
       <Suspense fallback={<HomeStrategicNetworkSkeleton />}>
         <HomeStrategicNetwork />
       </Suspense>
-      <HomeAboutIntro />
+      <Suspense fallback={<HomeRestaurantLuxurySkeleton />}>
+        <HomeRestaurantLuxury />
+      </Suspense>
       <Suspense fallback={<HomeNewsInsightsSkeleton />}>
         <HomeNewsInsights />
       </Suspense>

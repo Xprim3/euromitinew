@@ -132,6 +132,40 @@ export function NewsPostForm({ mode, submitAction, initial, heroPreviewUrl }: Ne
         </div>
       </AdminSectionCard>
 
+      <AdminSectionCard
+        title="SEO (opsionale)"
+        description="Lini bosh për të përdorur titullin dhe përshkrimin e artikullit. Përdorni vetëm kur duhet diçka e veçantë për Google dhe rrjetet sociale."
+      >
+        <div className="space-y-5">
+          <TextInput
+            label="SEO title"
+            name="seo_title"
+            defaultValue={initial?.seo_title ?? ""}
+            maxLength={120}
+            placeholder={initial?.title ?? "Titulli i artikullit"}
+            error={fieldErrors?.seo_title?.[0]}
+          />
+          <TextareaInput
+            label="SEO description"
+            name="seo_description"
+            rows={3}
+            defaultValue={initial?.seo_description ?? ""}
+            maxLength={320}
+            showCharacterCount
+            placeholder="Përshkrim i shkurtër për motorët e kërkimit…"
+            error={fieldErrors?.seo_description?.[0]}
+          />
+          <ToggleInput
+            label="Hide from search engines"
+            name="no_index"
+            defaultChecked={Boolean(initial?.no_index)}
+            checkedLabel="No index"
+            uncheckedLabel="Indexable"
+            helperText="Kur aktivizohet, artikulli nuk indeksohet në Google (robots noindex)."
+          />
+        </div>
+      </AdminSectionCard>
+
       <AdminSectionCard title="Publishing" description="Draft posts stay hidden from the public News page.">
         <AdminContentGrid columns={2}>
           <ToggleInput

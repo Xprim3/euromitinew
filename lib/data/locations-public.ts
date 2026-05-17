@@ -143,3 +143,10 @@ export async function fetchLocationsPublicPageRows(): Promise<
 }
 
 export const getLocationsPublicCached = cache(fetchLocationsPublicPageRows)
+
+export const getLocationBySlugPublic = cache(async (slug: string): Promise<ResolvedPublicLocation | null> => {
+  const result = await fetchLocationsPublicPageRows()
+  if (!result.ok) return null
+  const normalized = slug.trim().toLowerCase()
+  return result.rows.find((row) => row.slug.trim().toLowerCase() === normalized) ?? null
+})

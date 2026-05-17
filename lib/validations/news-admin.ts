@@ -35,6 +35,18 @@ export const newsPostAdminFieldsSchema = z.object({
     .optional()
     .transform((s) => (s && s.length > 0 ? s : undefined)),
   hero_image_alt: z.string().trim().max(500).transform((s) => (s.length ? s : undefined)),
+  seo_title: z
+    .string()
+    .trim()
+    .max(120)
+    .optional()
+    .transform((s) => (s && s.length > 0 ? s : undefined)),
+  seo_description: z
+    .string()
+    .trim()
+    .max(320)
+    .optional()
+    .transform((s) => (s && s.length > 0 ? s : undefined)),
   /** Plain textarea: paragraphs separated by a blank line. */
   body_paragraphs: z.string().max(80000),
 })

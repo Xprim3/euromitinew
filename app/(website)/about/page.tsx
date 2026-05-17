@@ -1,14 +1,10 @@
-import type { Metadata } from "next"
 import { Suspense } from "react"
 
 import { AboutPageBody } from "@/components/about/AboutPageBody"
 import { AboutPageSkeleton } from "@/components/about/AboutPageSkeleton"
+import { metadataForStaticPage } from "@/lib/seo/pages"
 
-export const metadata: Metadata = {
-  title: "Rreth Nesh",
-  description:
-    "Euromiti - stacione në Kosovë me karburante të besueshme, mikpritje, mini market dhe kujdes për veturën.",
-}
+export const metadata = metadataForStaticPage("about")
 
 export const dynamic = "force-dynamic"
 

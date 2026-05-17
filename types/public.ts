@@ -57,6 +57,10 @@ export interface NewsSummary {
 /** Full article for `/news/[slug]` (mock/CMS later). */
 export interface NewsArticle extends NewsSummary {
   contentParagraphs: readonly string[]
+  seoTitle?: string | null
+  seoDescription?: string | null
+  noIndex?: boolean
+  updatedAt?: string
 }
 
 /** Titled paragraphs for legal pages and similar long-form blocks. */

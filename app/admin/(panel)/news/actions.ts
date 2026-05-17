@@ -65,6 +65,7 @@ function revalidateNewsPublic(slugs: string[]) {
     if (t) revalidatePath(`/news/${t}`)
   }
   revalidatePath("/admin/news")
+  revalidatePath("/sitemap.xml")
 }
 
 function resolvePublishedAt(status: string, input: string | undefined, existing?: string | null) {
@@ -100,6 +101,8 @@ export async function createNewsPostAction(_prev: NewsPostSaveState, formData: F
     status: formData.get("status"),
     published_at: formData.get("published_at"),
     hero_image_alt: formData.get("hero_image_alt") ?? "",
+    seo_title: formData.get("seo_title"),
+    seo_description: formData.get("seo_description"),
     body_paragraphs: formData.get("body_paragraphs"),
   })
 
@@ -108,6 +111,7 @@ export async function createNewsPostAction(_prev: NewsPostSaveState, formData: F
   }
 
   const v = parsed.data
+  const noIndex = truthyCheckbox(formData.get("no_index"))
   const paragraphs = paragraphsFromAdminBodyText(v.body_paragraphs)
   if (!paragraphs.length) {
     return { ok: false, message: "Add at least one paragraph in the body (separate paragraphs with a blank line)." }
@@ -144,6 +148,9 @@ export async function createNewsPostAction(_prev: NewsPostSaveState, formData: F
       published_at,
       hero_media_id: heroMediaId,
       hero_image_alt: v.hero_image_alt ?? null,
+      seo_title: v.seo_title ?? null,
+      seo_description: v.seo_description ?? null,
+      no_index: noIndex,
       body: paragraphs,
     })
     .select("id")
@@ -186,6 +193,8 @@ export async function updateNewsPostAction(_prev: NewsPostSaveState, formData: F
       status: formData.get("status"),
       published_at: formData.get("published_at"),
       hero_image_alt: formData.get("hero_image_alt") ?? "",
+      seo_title: formData.get("seo_title"),
+      seo_description: formData.get("seo_description"),
       body_paragraphs: formData.get("body_paragraphs"),
     })
 
@@ -194,6 +203,7 @@ export async function updateNewsPostAction(_prev: NewsPostSaveState, formData: F
     }
 
     const v = parsed.data
+    const noIndex = truthyCheckbox(formData.get("no_index"))
     const paragraphs = paragraphsFromAdminBodyText(v.body_paragraphs)
     if (!paragraphs.length) {
       return { ok: false, message: "Add at least one paragraph in the body (separate paragraphs with a blank line)." }
@@ -219,6 +229,9 @@ export async function updateNewsPostAction(_prev: NewsPostSaveState, formData: F
       teaser_label: v.teaser_label ?? null,
       published_at,
       hero_image_alt: v.hero_image_alt ?? null,
+      seo_title: v.seo_title ?? null,
+      seo_description: v.seo_description ?? null,
+      no_index: noIndex,
       body: paragraphs,
     }
 
