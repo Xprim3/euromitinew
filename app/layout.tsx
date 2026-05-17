@@ -67,6 +67,11 @@ export const metadata: Metadata = {
     description: "Stacione Euromiti në Kosovë — karburant dhe shërbime premium.",
     images: [resolveOgImageUrl(DEFAULT_OG_IMAGE_PATH)],
   },
+  icons: {
+    icon: [{ url: "/logo.png", type: "image/png" }],
+    apple: [{ url: "/logo.png", type: "image/png" }],
+    shortcut: "/logo.png",
+  },
 }
 
 export default function RootLayout({
