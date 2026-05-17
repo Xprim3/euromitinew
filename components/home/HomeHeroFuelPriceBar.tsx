@@ -15,33 +15,33 @@ function formatHeroUpdatedAgo(isoDate: string) {
 function FuelPriceBarContent({ items }: { items: HomepageFuelCard[] }) {
   if (!items.length) {
     return (
-      <div className="rounded-(--rounded-DEFAULT) border border-white/20 bg-[#F97316] px-5 py-4 text-sm font-semibold text-white/88">
+      <div className="rounded-(--rounded-DEFAULT) border border-white/20 px-5 py-4 text-sm font-semibold text-white/88">
         Çmimet e karburanteve do të shfaqen së shpejti.
       </div>
     )
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-white/20 bg-[#F97316] text-white">
+    <div className="overflow-hidden rounded-lg border border-white/20 text-white">
       <div className="grid grid-cols-1 divide-y divide-white/15 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
         {items.slice(0, 3).map((p) => (
           <div
             key={p.productKey}
-            className="flex items-center justify-between gap-4 px-4 py-4 sm:block sm:px-5 sm:py-5 sm:text-center"
+            className="flex items-center justify-between gap-4 px-4 py-4 sm:block sm:px-5 sm:py-5 sm:text-center lg:px-6 lg:py-6"
           >
             <div className="min-w-0">
-              <p className="truncate text-xs font-extrabold uppercase tracking-widest sm:text-[0.82rem]">
+              <p className="truncate text-xs font-extrabold uppercase tracking-widest sm:text-[0.82rem] lg:text-base lg:tracking-[0.2em]">
                 {p.headlineLabel}
               </p>
-              <p className="mt-1 truncate text-[0.6rem] font-medium text-white/70 sm:text-xs">
+              <p className="mt-1 truncate text-[0.6rem] font-medium text-white/70 sm:text-xs lg:mt-1.5 lg:text-sm">
                 {formatHeroUpdatedAgo(p.updatedAtIso)}
               </p>
             </div>
-            <div className="flex shrink-0 items-baseline gap-1 sm:mt-2 sm:justify-center">
-              <span className="text-2xl font-black tracking-tight sm:text-3xl">
+            <div className="flex shrink-0 items-baseline gap-1 sm:mt-2 sm:justify-center lg:mt-3 lg:gap-1.5">
+              <span className="text-2xl font-black tracking-tight sm:text-3xl lg:text-4xl">
                 {p.price.toFixed(p.currencyCode === "EUR" ? 2 : 3)}
               </span>
-              <span className="text-xs font-extrabold text-white/90 sm:text-sm">
+              <span className="text-xs font-extrabold text-white/90 sm:text-sm lg:text-base">
                 {p.currencyCode === "EUR" ? "€/L" : `${p.currencyCode}/L`}
               </span>
             </div>
@@ -55,12 +55,12 @@ function FuelPriceBarContent({ items }: { items: HomepageFuelCard[] }) {
 export function HomeHeroFuelPriceBarSkeleton() {
   return (
     <section
-      className="relative z-20 bg-brand-surface-tinted px-4 py-6 sm:px-6 sm:py-8 lg:px-12"
+      className="relative z-20 bg-[#F97316] px-4 py-6 sm:px-6 sm:py-8 lg:px-12"
       aria-busy
       aria-label="Loading fuel prices"
     >
       <div className="mx-auto max-w-[1280px]">
-        <div className="grid overflow-hidden rounded-lg border border-white/20 bg-[#F97316] sm:grid-cols-3">
+        <div className="grid overflow-hidden rounded-lg border border-white/20 sm:grid-cols-3">
           {[0, 1, 2].map((i) => (
             <div
               key={i}
@@ -81,7 +81,7 @@ export async function HomeHeroFuelPriceBar() {
   const result = await getHomepageFuelPrices()
 
   return (
-    <section className="relative z-20 bg-brand-surface-tinted px-4 py-6 sm:px-6 sm:py-8 lg:px-12">
+    <section className="relative z-20 bg-[#F97316] px-4 py-6 sm:px-6 sm:py-8 lg:px-12">
       <div className="mx-auto max-w-[1280px]">
         <FuelPriceBarContent items={result.items} />
       </div>
