@@ -1,4 +1,4 @@
-import { getHomepageFuelPrices, type HomepageFuelCard } from "@/lib/data/get-homepage-fuel-prices"
+﻿import { getHomepageFuelPrices, type HomepageFuelCard } from "@/lib/data/get-homepage-fuel-prices"
 
 function formatHeroUpdatedAgo(isoDate: string) {
   const ms = Date.now() - new Date(isoDate).getTime()
@@ -15,33 +15,33 @@ function formatHeroUpdatedAgo(isoDate: string) {
 function FuelPriceBarContent({ items }: { items: HomepageFuelCard[] }) {
   if (!items.length) {
     return (
-      <div className="rounded-(--rounded-DEFAULT) border border-white/12 bg-[#0F172A] px-5 py-4 text-sm font-semibold text-white/72">
+      <div className="rounded-(--rounded-DEFAULT) border border-white/20 bg-[#F97316] px-5 py-4 text-sm font-semibold text-white/88">
         Çmimet e karburanteve do të shfaqen së shpejti.
       </div>
     )
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-white/12 bg-[#0F172A]">
-      <div className="grid grid-cols-1 divide-y divide-white/12 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+    <div className="overflow-hidden rounded-lg border border-white/20 bg-[#F97316] text-white">
+      <div className="grid grid-cols-1 divide-y divide-white/15 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
         {items.slice(0, 3).map((p) => (
           <div
             key={p.productKey}
             className="flex items-center justify-between gap-4 px-4 py-4 sm:block sm:px-5 sm:py-5 sm:text-center"
           >
             <div className="min-w-0">
-              <p className="truncate text-xs font-extrabold uppercase tracking-widest text-white sm:text-[0.82rem]">
+              <p className="truncate text-xs font-extrabold uppercase tracking-widest sm:text-[0.82rem]">
                 {p.headlineLabel}
               </p>
-              <p className="mt-1 truncate text-[0.6rem] font-medium text-white/46 sm:text-xs">
+              <p className="mt-1 truncate text-[0.6rem] font-medium text-white/70 sm:text-xs">
                 {formatHeroUpdatedAgo(p.updatedAtIso)}
               </p>
             </div>
             <div className="flex shrink-0 items-baseline gap-1 sm:mt-2 sm:justify-center">
-              <span className="text-2xl font-black tracking-tight text-white sm:text-3xl">
+              <span className="text-2xl font-black tracking-tight sm:text-3xl">
                 {p.price.toFixed(p.currencyCode === "EUR" ? 2 : 3)}
               </span>
-              <span className="text-xs font-extrabold text-brand-accent-soft sm:text-sm">
+              <span className="text-xs font-extrabold text-white/90 sm:text-sm">
                 {p.currencyCode === "EUR" ? "€/L" : `${p.currencyCode}/L`}
               </span>
             </div>
@@ -60,15 +60,15 @@ export function HomeHeroFuelPriceBarSkeleton() {
       aria-label="Loading fuel prices"
     >
       <div className="mx-auto max-w-[1280px]">
-        <div className="grid overflow-hidden rounded-lg border border-white/12 bg-[#0F172A] sm:grid-cols-3">
+        <div className="grid overflow-hidden rounded-lg border border-white/20 bg-[#F97316] sm:grid-cols-3">
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="space-y-2 border-white/12 border-b px-4 py-4 last:border-b-0 sm:border-r sm:border-b-0 sm:last:border-r-0"
+              className="space-y-2 border-white/15 border-b px-4 py-4 last:border-b-0 sm:border-r sm:border-b-0 sm:last:border-r-0"
             >
-              <div className="h-3 w-28 animate-pulse rounded bg-white/16" />
-              <div className="h-8 w-20 animate-pulse rounded bg-white/16" />
-              <div className="h-2 w-24 animate-pulse rounded bg-white/16" />
+              <div className="h-3 w-28 animate-pulse rounded bg-white/25" />
+              <div className="h-8 w-20 animate-pulse rounded bg-white/25" />
+              <div className="h-2 w-24 animate-pulse rounded bg-white/25" />
             </div>
           ))}
         </div>
