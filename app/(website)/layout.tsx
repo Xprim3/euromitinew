@@ -1,5 +1,6 @@
 import { Footer } from "@/components/layout/Footer"
 import { Navbar } from "@/components/layout/Navbar"
+import { BackToTopButton } from "@/components/layout/BackToTopButton"
 import { ScrollToTop } from "@/components/layout/ScrollToTop"
 import { JsonLd } from "@/components/seo/JsonLd"
 import { getContactDetailsPublic, getSiteFooterPublic } from "@/lib/data/site-contact-public"
@@ -17,6 +18,7 @@ export default async function WebsiteLayout({
         data={[buildOrganizationSchema(organizationSchemaInputFromCms(contact, brand)), buildWebSiteSchema()]}
       />
       <ScrollToTop />
+      <BackToTopButton />
       <Navbar brand={brand} />
       <main id="main-content" className="flex flex-1 flex-col">
         {children}
