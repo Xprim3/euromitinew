@@ -117,7 +117,7 @@ export function MobileMenu({ className }: MobileMenuProps) {
                 )}
               >
                 <div
-                  className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_10%,rgba(255,180,171,0.12),transparent_36%),linear-gradient(180deg,var(--brand-shell)_0%,var(--brand-shell-deep)_100%)]"
+                  className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_10%,rgba(249,115,22,0.12),transparent_36%),linear-gradient(180deg,var(--brand-shell)_0%,var(--brand-shell-deep)_100%)]"
                   aria-hidden
                 />
                 <div className="relative flex items-center justify-start border-white/10 border-b px-3 py-3 sm:px-4 sm:py-4">

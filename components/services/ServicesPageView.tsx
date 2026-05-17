@@ -86,7 +86,7 @@ export function ServicesPageView({ data }: ServicesPageViewProps) {
 
       <section className="relative overflow-hidden bg-brand-shell-deep text-white">
         <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgba(255,180,171,0.12),transparent_34%),linear-gradient(135deg,var(--brand-shell-deep)_0%,var(--brand-shell)_52%,var(--brand-primary-hover)_100%)]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgba(249,115,22,0.12),transparent_34%),linear-gradient(135deg,var(--brand-shell-deep)_0%,var(--brand-shell)_52%,var(--brand-primary-hover)_100%)]"
           aria-hidden
         />
         <Container className="relative euromiti-section">
@@ -113,7 +113,7 @@ export function ServicesPageView({ data }: ServicesPageViewProps) {
               <Stagger once className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
                 <article className="relative overflow-hidden rounded-[1.1rem] border border-white/12 bg-white/8 p-6 shadow-[0_22px_55px_rgba(0,0,0,0.2)] backdrop-blur-md md:p-7">
                   <div
-                    className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_82%_16%,rgba(255,180,171,0.18),transparent_34%)]"
+                    className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_82%_16%,rgba(249,115,22,0.18),transparent_34%)]"
                     aria-hidden
                   />
                   <div className="relative">

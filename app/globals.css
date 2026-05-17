@@ -103,8 +103,8 @@
   /** Card / panel stops on shell gradient (news, dark UI) */
   --brand-shell-mid: #151f33;
   --brand-shell-elevated: #1a2438;
-  /** Warm headline accent on inverse / footer / nav active */
-  --brand-accent-soft: #ffb4ab;
+  /** Brand orange — nav active, links, accents, CTAs */
+  --brand-accent-soft: #f97316;
   /** Primary CTA / emphasis red (distinct from canonical secondary slug) */
   --brand-red-vivid: #d9352f;
   --brand-primary-hover: #0b1220;
@@ -197,7 +197,7 @@
   --popover-foreground: #edf0ff;
   --primary: #bec6e0;
   --primary-foreground: #0f172a;
-  --secondary: #ffb4ab;
+  --secondary: #f97316;
   --secondary-foreground: #410002;
   --accent: #ffb95f;
   --accent-foreground: #2a1700;

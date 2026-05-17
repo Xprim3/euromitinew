@@ -40,7 +40,7 @@ export function HomeRestaurantLuxuryView(r: ReturnType<typeof restaurantLuxuryFr
       aria-labelledby="restaurant-luxury-heading"
     >
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(255,180,171,0.1),transparent_34%),linear-gradient(135deg,var(--brand-shell-deep)_0%,var(--brand-shell)_48%,var(--brand-primary-hover)_100%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(249,115,22,0.1),transparent_34%),linear-gradient(135deg,var(--brand-shell-deep)_0%,var(--brand-shell)_48%,var(--brand-primary-hover)_100%)]"
         aria-hidden
       />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/18" aria-hidden />

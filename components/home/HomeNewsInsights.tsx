@@ -107,7 +107,7 @@ export async function HomeNewsInsights() {
             className="group relative flex min-h-[min(52vw,17.5rem)] flex-col justify-end overflow-hidden rounded-2xl border border-white/15 bg-linear-to-br from-brand-shell-elevated via-brand-shell-mid to-brand-shell p-5 transition duration-300 hover:-translate-y-0.5 hover:border-brand-accent-soft/40 sm:min-h-[16rem] md:min-h-[17rem]"
           >
             <div
-              className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,180,171,0.24),transparent_40%),radial-gradient(circle_at_20%_85%,rgba(217,53,47,0.20),transparent_42%)]"
+              className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(249,115,22,0.24),transparent_40%),radial-gradient(circle_at_20%_85%,rgba(217,53,47,0.20),transparent_42%)]"
               aria-hidden
             />
             <div className="relative space-y-3">

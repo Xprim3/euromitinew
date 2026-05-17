@@ -78,7 +78,7 @@ export async function HomeAboutIntro() {
                 {headlineCopy.accent ? (
                   <>
                     {" "}
-                    <span className="text-[#F97316]">{headlineCopy.accent}</span>
+                    <span className="text-brand-accent-soft">{headlineCopy.accent}</span>
                   </>
                 ) : null}
               </h2>
@@ -91,7 +91,7 @@ export async function HomeAboutIntro() {
                 className="group mt-7 inline-flex w-full max-w-none items-center justify-between gap-4 rounded-[0.85rem] border border-[#0F172A]/10 bg-[#0F172A] px-4 py-3 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_32px_rgba(15,23,42,0.12)] transition-colors duration-300 hover:bg-brand-primary-hover sm:w-auto sm:min-w-64 sm:px-5 lg:mt-8"
               >
                 <span>{buttonLabel}</span>
-                <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#F97316] text-white transition-transform duration-300 group-hover:translate-x-1">
+                <span className="grid size-8 shrink-0 place-items-center rounded-full bg-brand-accent-soft text-white transition-transform duration-300 group-hover:translate-x-1">
                   <MaterialSymbol name="arrow_forward" className="text-base" />
                 </span>
               </Link>

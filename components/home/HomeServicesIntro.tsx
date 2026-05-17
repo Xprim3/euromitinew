@@ -105,13 +105,13 @@ export function HomeServicesIntroView(props: {
             </div>
 
             <div className="relative flex flex-col justify-center px-5 py-8 sm:px-7 sm:py-10 lg:col-span-7 lg:px-10 xl:px-12">
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_18%,rgba(255,180,171,0.12),transparent_34%)]" aria-hidden />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_18%,rgba(249,115,22,0.12),transparent_34%)]" aria-hidden />
               <div className="relative max-w-2xl">
                 <h2
                   id="services-intro-heading"
                   className="font-(family-name:--font-montserrat) text-[clamp(1.65rem,6.5vw,2.2rem)] font-extrabold leading-[1.08] tracking-[-0.045em] text-white sm:text-[clamp(1.95rem,3.6vw,3rem)]"
                 >
-                  <span className="text-[#F97316]">{titleParts.lead}</span>
+                  <span className="text-brand-accent-soft">{titleParts.lead}</span>
                   {titleParts.rest ? <> {titleParts.rest}</> : null}
                 </h2>
                 <p className="mt-5 max-w-xl text-[0.98rem] leading-8 text-white/74 md:text-[1.04rem]">{elite.body}</p>
