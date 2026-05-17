@@ -57,7 +57,7 @@ export async function HomeAboutIntro() {
     >
       <div className="mx-auto max-w-[1280px]">
         <div className="grid grid-cols-1 overflow-hidden rounded-[1.2rem] lg:grid-cols-12">
-          <div className="relative flex flex-col justify-center bg-[#F97316] px-5 py-8 text-white sm:px-7 sm:py-10 lg:col-span-7 lg:px-10 xl:px-12">
+          <div className="relative flex flex-col justify-center bg-[#14213D] px-5 py-8 text-white sm:px-7 sm:py-10 lg:col-span-7 lg:px-10 xl:px-12">
             <div
               className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(255,255,255,0.12),transparent_42%)]"
               aria-hidden
