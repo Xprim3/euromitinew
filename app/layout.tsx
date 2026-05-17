@@ -73,7 +73,6 @@ export const metadata: Metadata = {
     description: SITE_DEFAULT_DESCRIPTION,
     images: [resolveOgImageUrl(DEFAULT_OG_IMAGE_PATH)],
   },
-  /** Favicon + social fallbacks: `app/icon.png`, `app/apple-icon.png`, `app/opengraph-image.png`. */
 }
 
 export default function RootLayout({
