@@ -1,7 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 
+import { validateAdminImageFile } from "@/lib/admin-image-file"
+
 const BUCKET = "euromiti-media"
-const ALLOWED = ["image/jpeg", "image/png", "image/webp", "image/gif"]
 
 export function sanitizeHomepageFilename(name: string) {
   const base = name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 120)
@@ -14,17 +15,16 @@ export async function uploadHomepageAssetRow(
   file: File,
   opts: { altText: string; usageSection: string; category?: string }
 ): Promise<{ id: string } | { message: string }> {
-  if (!ALLOWED.includes(file.type)) {
-    return { message: "Image must be JPEG, PNG, WebP, or GIF." }
+  const validated = validateAdminImageFile(file)
+  if (!validated.ok) {
+    return { message: validated.error }
   }
-  if (file.size > 5 * 1024 * 1024) {
-    return { message: "Image must be 5 MB or smaller." }
-  }
+  const contentType = validated.mime
 
   const objectPath = `homepage/${crypto.randomUUID()}-${sanitizeHomepageFilename(file.name)}`
   const buf = Buffer.from(await file.arrayBuffer())
   const { error: upErr } = await supabase.storage.from(BUCKET).upload(objectPath, buf, {
-    contentType: file.type,
+    contentType,
     upsert: false,
   })
   if (upErr) {
@@ -39,7 +39,7 @@ export async function uploadHomepageAssetRow(
       storage_bucket: BUCKET,
       object_path: objectPath,
       public_url: pub.publicUrl,
-      mime_type: file.type,
+      mime_type: contentType,
       byte_size: file.size,
       original_filename: file.name,
       alt_text: opts.altText.trim() || null,

@@ -177,7 +177,7 @@ export function ImageGalleryManager({
                   id={fileInputs[index]}
                   name={fileInputName ? fileInputName(slot, index) : `${name}_${index}_file`}
                   type="file"
-                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  accept="image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif,.jpg,.jpeg,.png,.webp,.gif,.heic,.heif"
                   className="sr-only"
                   onChange={(e) => {
                     const f = e.target.files?.[0]
