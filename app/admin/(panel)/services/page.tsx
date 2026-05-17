@@ -42,6 +42,7 @@ async function loadServices(): Promise<
   const row = normalizeServicesRow(raw as Record<string, unknown>)
 
   const mediaIds = [
+    row.hero_page_image_media_id,
     row.petrol_image_media_id,
     row.restaurant_image_media_id,
     row.carwash_image_media_id,
@@ -49,6 +50,7 @@ async function loadServices(): Promise<
   ].filter((x): x is string => typeof x === "string" && x.length > 0)
 
   const previews: ServicesMediaPreviews = {
+    pageHero: null,
     petrol: null,
     restaurant: null,
     carwash: null,
@@ -61,6 +63,7 @@ async function loadServices(): Promise<
       .select("id, public_url")
       .in("id", [...new Set(mediaIds)])
     const mediaRows = uploads ?? null
+    previews.pageHero = urlFromRows(mediaRows, row.hero_page_image_media_id)
     previews.petrol = urlFromRows(mediaRows, row.petrol_image_media_id)
     previews.restaurant = urlFromRows(mediaRows, row.restaurant_image_media_id)
     previews.carwash = urlFromRows(mediaRows, row.carwash_image_media_id)

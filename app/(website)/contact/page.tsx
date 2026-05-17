@@ -6,8 +6,8 @@ import { SectionReveal } from "@/components/motion/SectionReveal"
 import { SectionAccentRule } from "@/components/ui/SectionAccentRule"
 import { MaterialSymbol } from "@/components/ui/MaterialSymbol"
 import { contactPageMock } from "@/data/mock/contact"
-import { homeHeroDesign } from "@/data/mock/homepage-visual"
 import { getLocationsPublicCached } from "@/lib/data/locations-public"
+import { getInteriorPageHeroPublic } from "@/lib/data/page-hero-public"
 import { resolveRestaurantReservationStations } from "@/lib/data/restaurant-reservation-stations-public"
 import { getContactDetailsPublic, type SocialLinkItem } from "@/lib/data/site-contact-public"
 import { telHrefFromDisplayPhone } from "@/lib/utils"
@@ -39,7 +39,11 @@ function SocialRow({ links }: { links: readonly SocialLinkItem[] }) {
 }
 
 export default async function ContactPage() {
-  const [c, locationsResult] = await Promise.all([getContactDetailsPublic(), getLocationsPublicCached()])
+  const [c, locationsResult, pageHero] = await Promise.all([
+    getContactDetailsPublic(),
+    getLocationsPublicCached(),
+    getInteriorPageHeroPublic("contact", "Euromiti — mikpritje dhe operacione"),
+  ])
   const stationPhones = resolveRestaurantReservationStations(locationsResult.ok ? locationsResult.rows : [])
   const ferizajStation = stationPhones.find(
     (s) => s.slug.toLowerCase() === "ferizaj" || s.city.toLowerCase() === "ferizaj"
@@ -52,8 +56,8 @@ export default async function ContactPage() {
   return (
     <>
       <PageImageHero
-        imageSrc={homeHeroDesign.imageSrc}
-        imageAlt="Euromiti — mikpritje dhe operacione"
+        imageSrc={pageHero.imageSrc}
+        imageAlt={pageHero.imageAlt}
         trail={[{ label: "Ballina", href: "/" }, { label: "Kontakt" }]}
         title="Kontakt"
         visualPreset="flat-heavy"

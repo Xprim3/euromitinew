@@ -7,6 +7,7 @@ const alt = text.max(500).optional()
 export const servicesContentFormSchema = z.object({
   hero_page_title: text.max(240),
   hero_page_subtitle: text.max(1600),
+  hero_page_image_alt: alt,
   why_choose_kicker: text.max(120),
   why_choose_title: text.max(240),
   why_choose_body: text.max(1600),

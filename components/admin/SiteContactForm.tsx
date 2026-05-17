@@ -8,13 +8,21 @@ import {
   AdminContentGrid,
   AdminSectionCard,
   ErrorMessage,
+  FileUploadInput,
   SaveBar,
   SuccessMessage,
   TextareaInput,
   TextInput,
 } from "@/components/admin/design-system"
 import { parseSocialLinks, type SocialLinkItem } from "@/lib/data/site-contact-public"
-import type { ContactInfoRow } from "@/types/supabase-cms"
+import type { ContactInfoRow, SiteSettingsRow } from "@/types/supabase-cms"
+
+export type SitePageHeroPreviews = {
+  contact: string | null
+  locations: string | null
+  careers: string | null
+  news: string | null
+}
 
 const initialState: SiteContactSaveState = { ok: null }
 
@@ -28,10 +36,51 @@ function padSocial(links: SocialLinkItem[]): SocialLinkItem[] {
 
 type SiteContactFormProps = {
   contact: ContactInfoRow
+  site: SiteSettingsRow
+  pageHeroPreviews: SitePageHeroPreviews
   submitAction: (prev: SiteContactSaveState, formData: FormData) => Promise<SiteContactSaveState>
 }
 
-export function SiteContactForm({ contact, submitAction }: SiteContactFormProps) {
+const PAGE_HEADER_SLOTS = [
+  {
+    key: "contact",
+    label: "Kontakt (/contact)",
+    fileName: "contact_page_hero_image",
+    clearName: "clear_contact_page_hero_image",
+    altName: "contact_page_hero_image_alt",
+    altValue: (site: SiteSettingsRow) => site.contact_page_hero_image_alt,
+    previewKey: "contact" as const,
+  },
+  {
+    key: "locations",
+    label: "Pikat e shitjes (/locations)",
+    fileName: "locations_page_hero_image",
+    clearName: "clear_locations_page_hero_image",
+    altName: "locations_page_hero_image_alt",
+    altValue: (site: SiteSettingsRow) => site.locations_page_hero_image_alt,
+    previewKey: "locations" as const,
+  },
+  {
+    key: "careers",
+    label: "Karriera (/careers)",
+    fileName: "careers_page_hero_image",
+    clearName: "clear_careers_page_hero_image",
+    altName: "careers_page_hero_image_alt",
+    altValue: (site: SiteSettingsRow) => site.careers_page_hero_image_alt,
+    previewKey: "careers" as const,
+  },
+  {
+    key: "news",
+    label: "Lajme (/news)",
+    fileName: "news_page_hero_image",
+    clearName: "clear_news_page_hero_image",
+    altName: "news_page_hero_image_alt",
+    altValue: (site: SiteSettingsRow) => site.news_page_hero_image_alt,
+    previewKey: "news" as const,
+  },
+] as const
+
+export function SiteContactForm({ contact, site, pageHeroPreviews, submitAction }: SiteContactFormProps) {
   const router = useRouter()
   const formRef = useRef<HTMLFormElement>(null)
   const [state, formAction] = useActionState(submitAction, initialState)
@@ -60,6 +109,33 @@ export function SiteContactForm({ contact, submitAction }: SiteContactFormProps)
           Fix the highlighted fields and try again.
         </ErrorMessage>
       ) : null}
+
+      <AdminSectionCard
+        title="Page header images"
+        description="Top banner photos for interior pages that use the wide image hero. Leave empty to use the homepage hero as fallback."
+      >
+        <div className="space-y-8">
+          {PAGE_HEADER_SLOTS.map((slot) => (
+            <div key={slot.key} className="space-y-4 rounded-lg border border-border/60 bg-muted/15 p-4">
+              <p className="font-medium text-foreground text-sm">{slot.label}</p>
+              <FileUploadInput
+                label="Header image"
+                name={slot.fileName}
+                previewUrl={pageHeroPreviews[slot.previewKey]}
+                previewAlt={`${slot.label} header`}
+                removeInputName={slot.clearName}
+              />
+              <TextInput
+                label="Image alt text"
+                name={slot.altName}
+                defaultValue={slot.altValue(site)}
+                placeholder="Describe this page header image"
+                maxLength={500}
+              />
+            </div>
+          ))}
+        </div>
+      </AdminSectionCard>
 
       <AdminSectionCard title="Contact Info" description="Company contact details used by the public contact page.">
         <div className="space-y-5">
@@ -153,7 +229,7 @@ export function SiteContactForm({ contact, submitAction }: SiteContactFormProps)
       <SaveBar
         cancelLabel="Reset changes"
         onCancel={() => formRef.current?.reset()}
-        submitLabel="Save contact & social"
+        submitLabel="Save site & contact"
         submitPendingLabel="Saving…"
       />
     </form>

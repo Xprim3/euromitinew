@@ -84,6 +84,7 @@ export async function saveServicesContent(
     const parsedText = servicesContentFormSchema.safeParse({
       hero_page_title: formData.get("hero_page_title"),
       hero_page_subtitle: formData.get("hero_page_subtitle"),
+      hero_page_image_alt: formData.get("hero_page_image_alt") ?? "",
       why_choose_kicker: formData.get("why_choose_kicker"),
       why_choose_title: formData.get("why_choose_title"),
       why_choose_body: formData.get("why_choose_body"),
@@ -155,6 +156,14 @@ export async function saveServicesContent(
       return { next: undefined }
     }
 
+    const pageHeroImg = await resolveImageSlot({
+      clearName: "clear_hero_page_image",
+      fileField: "hero_page_image",
+      alt: v.hero_page_image_alt ?? "",
+      usageSection: "services-page-hero",
+    })
+    if ("error" in pageHeroImg) return { ok: false, message: pageHeroImg.error }
+
     const petrolImg = await resolveImageSlot({
       clearName: "clear_petrol_image",
       fileField: "petrol_image",
@@ -209,9 +218,11 @@ export async function saveServicesContent(
       mini_market_section_title: v.mini_market_section_title,
       mini_market_description: v.mini_market_description,
       mini_market_highlights_json: miniMarketBulletsR.value,
+      hero_page_image_alt: v.hero_page_image_alt ?? "",
       updated_by: editorId,
     }
 
+    if (pageHeroImg.next !== undefined) patch.hero_page_image_media_id = pageHeroImg.next
     if (petrolImg.next !== undefined) patch.petrol_image_media_id = petrolImg.next
     if (restImg.next !== undefined) patch.restaurant_image_media_id = restImg.next
     if (carwashImg.next !== undefined) patch.carwash_image_media_id = carwashImg.next

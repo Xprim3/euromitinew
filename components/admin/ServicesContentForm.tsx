@@ -23,6 +23,7 @@ import {
 import type { ServicesContentRow } from "@/types/supabase-cms"
 
 export type ServicesMediaPreviews = {
+  pageHero: string | null
   petrol: string | null
   restaurant: string | null
   carwash: string | null
@@ -118,8 +119,24 @@ export function ServicesContentForm({ initial, previews }: ServicesContentFormPr
         description="Edit the Services page copy and media. CTA fields are shown as read-only until the public schema supports editable CTAs."
       >
         <div className="space-y-3">
-          <EditorAccordion title="Page hero" description="Editable text above all service sections." defaultOpen>
+          <EditorAccordion title="Page hero" description="Top banner on /services — image, title, and subtitle." defaultOpen>
             <div className="space-y-5">
+              <FileUploadInput
+                label="Hero image"
+                name="hero_page_image"
+                previewUrl={previews.pageHero}
+                previewAlt="Services page hero"
+                removeInputName="clear_hero_page_image"
+                helperText="Wide image shown behind the page title at the top of /services."
+              />
+              <TextInput
+                label="Hero image alt text"
+                name="hero_page_image_alt"
+                defaultValue={initial.hero_page_image_alt}
+                placeholder="Describe the services page hero image"
+                maxLength={500}
+                error={fieldErrors?.hero_page_image_alt?.[0]}
+              />
               <TextInput label="Title" name="hero_page_title" defaultValue={initial.hero_page_title} />
               <TextareaInput
                 label="Subtitle"

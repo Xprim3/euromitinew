@@ -1,6 +1,7 @@
 import { CareersPageView } from "@/components/careers/CareersPageView"
 import { JsonLd } from "@/components/seo/JsonLd"
 import { getApplicationJobOptionsPublic } from "@/lib/data/careers-public"
+import { getInteriorPageHeroPublic } from "@/lib/data/page-hero-public"
 import { buildJobPostingSchema } from "@/lib/seo/json-ld"
 import { metadataForStaticPage } from "@/lib/seo/pages"
 
@@ -13,7 +14,10 @@ type CareersPageProps = {
 
 export default async function CareersPage({ searchParams }: CareersPageProps) {
   const { p } = await searchParams
-  const positions = await getApplicationJobOptionsPublic()
+  const [positions, pageHero] = await Promise.all([
+    getApplicationJobOptionsPublic(),
+    getInteriorPageHeroPublic("careers", "Euromiti — karriera dhe operacione"),
+  ])
   const activePositions = positions.filter((job) => job.is_active)
   const defaultPositionSlug = typeof p === "string" && p.trim() ? p.trim() : undefined
 
@@ -22,7 +26,12 @@ export default async function CareersPage({ searchParams }: CareersPageProps) {
       {activePositions.length > 0 ? (
         <JsonLd data={activePositions.map((job) => buildJobPostingSchema(job))} />
       ) : null}
-      <CareersPageView positions={positions} defaultPositionSlug={defaultPositionSlug} />
+      <CareersPageView
+        positions={positions}
+        defaultPositionSlug={defaultPositionSlug}
+        heroImageSrc={pageHero.imageSrc}
+        heroImageAlt={pageHero.imageAlt}
+      />
     </>
   )
 }

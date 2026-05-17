@@ -2,15 +2,29 @@ import { createSupabaseServerClient } from "@/lib/supabase/server"
 import type { ContactInfoRow, SiteSettingsRow } from "@/types/supabase-cms"
 
 function normalizeSiteSettings(raw: Record<string, unknown>): SiteSettingsRow {
+  const fk = (key: string): string | null =>
+    typeof raw[key] === "string" && (raw[key] as string).length > 0 ? (raw[key] as string) : null
+
   return {
     id: Number(raw.id) || 1,
-    logo_media_id: typeof raw.logo_media_id === "string" && raw.logo_media_id ? raw.logo_media_id : null,
+    logo_media_id: fk("logo_media_id"),
     company_name: typeof raw.company_name === "string" ? raw.company_name : "",
     social_links: raw.social_links ?? [],
     footer_body: typeof raw.footer_body === "string" ? raw.footer_body : "",
     footer_copyright_line: typeof raw.footer_copyright_line === "string" ? raw.footer_copyright_line : null,
+    contact_page_hero_media_id: fk("contact_page_hero_media_id"),
+    contact_page_hero_image_alt:
+      typeof raw.contact_page_hero_image_alt === "string" ? raw.contact_page_hero_image_alt : "",
+    locations_page_hero_media_id: fk("locations_page_hero_media_id"),
+    locations_page_hero_image_alt:
+      typeof raw.locations_page_hero_image_alt === "string" ? raw.locations_page_hero_image_alt : "",
+    careers_page_hero_media_id: fk("careers_page_hero_media_id"),
+    careers_page_hero_image_alt:
+      typeof raw.careers_page_hero_image_alt === "string" ? raw.careers_page_hero_image_alt : "",
+    news_page_hero_media_id: fk("news_page_hero_media_id"),
+    news_page_hero_image_alt: typeof raw.news_page_hero_image_alt === "string" ? raw.news_page_hero_image_alt : "",
     updated_at: typeof raw.updated_at === "string" ? raw.updated_at : "",
-    updated_by: typeof raw.updated_by === "string" ? raw.updated_by : null,
+    updated_by: fk("updated_by"),
   }
 }
 

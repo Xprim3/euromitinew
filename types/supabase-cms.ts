@@ -133,6 +133,8 @@ export type ServicesContentRow = {
   mini_market_highlights_json: unknown
   hero_page_title: string
   hero_page_subtitle: string
+  hero_page_image_media_id: string | null
+  hero_page_image_alt: string
   why_choose_kicker: string
   why_choose_title: string
   why_choose_body: string
@@ -280,6 +282,14 @@ export type SiteSettingsRow = {
   social_links: unknown
   footer_body: string
   footer_copyright_line: string | null
+  contact_page_hero_media_id: string | null
+  contact_page_hero_image_alt: string
+  locations_page_hero_media_id: string | null
+  locations_page_hero_image_alt: string
+  careers_page_hero_media_id: string | null
+  careers_page_hero_image_alt: string
+  news_page_hero_media_id: string | null
+  news_page_hero_image_alt: string
   updated_at: string
   updated_by: string | null
 }

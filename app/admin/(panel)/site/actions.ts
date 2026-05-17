@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 
+import { uploadHomepageAssetRow } from "@/lib/server/upload-homepage-asset"
 import {
   siteContactFormSchema,
   socialLinksFromFormData,
@@ -47,9 +48,41 @@ function revalidateContactSurfaces() {
   revalidatePath("/services")
   revalidatePath("/restaurant")
   revalidatePath("/locations")
+  revalidatePath("/careers")
   revalidatePath("/news")
   revalidatePath("/contact")
   revalidatePath("/admin/site")
+}
+
+function isTruthyCheckbox(v: FormDataEntryValue | null) {
+  return v === "on" || v === "true"
+}
+
+type OptionalUuid = string | null | undefined
+
+async function resolvePageHeroSlot(opts: {
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>
+  editorId: string
+  formData: FormData
+  clearName: string
+  fileField: string
+  alt: string
+  usageSection: string
+}): Promise<{ next: OptionalUuid } | { error: string }> {
+  if (isTruthyCheckbox(opts.formData.get(opts.clearName))) {
+    return { next: null }
+  }
+  const file = opts.formData.get(opts.fileField)
+  if (file instanceof File && file.size > 0) {
+    const up = await uploadHomepageAssetRow(opts.supabase, opts.editorId, file, {
+      altText: opts.alt,
+      usageSection: opts.usageSection,
+      category: "site",
+    })
+    if ("message" in up) return { error: up.message }
+    return { next: up.id }
+  }
+  return { next: undefined }
 }
 
 export async function saveSiteContactAction(
@@ -91,10 +124,65 @@ export async function saveSiteContactAction(
 
     const socialJson = social
 
-    const { error: siteErr } = await supabase
-      .from("site_settings")
-      .update({ social_links: socialJson, updated_by: editorId })
-      .eq("id", 1)
+    const contactHero = await resolvePageHeroSlot({
+      supabase,
+      editorId,
+      formData,
+      clearName: "clear_contact_page_hero_image",
+      fileField: "contact_page_hero_image",
+      alt: String(formData.get("contact_page_hero_image_alt") ?? "").trim(),
+      usageSection: "page-hero-contact",
+    })
+    if ("error" in contactHero) return { ok: false, message: contactHero.error }
+
+    const locationsHero = await resolvePageHeroSlot({
+      supabase,
+      editorId,
+      formData,
+      clearName: "clear_locations_page_hero_image",
+      fileField: "locations_page_hero_image",
+      alt: String(formData.get("locations_page_hero_image_alt") ?? "").trim(),
+      usageSection: "page-hero-locations",
+    })
+    if ("error" in locationsHero) return { ok: false, message: locationsHero.error }
+
+    const careersHero = await resolvePageHeroSlot({
+      supabase,
+      editorId,
+      formData,
+      clearName: "clear_careers_page_hero_image",
+      fileField: "careers_page_hero_image",
+      alt: String(formData.get("careers_page_hero_image_alt") ?? "").trim(),
+      usageSection: "page-hero-careers",
+    })
+    if ("error" in careersHero) return { ok: false, message: careersHero.error }
+
+    const newsHero = await resolvePageHeroSlot({
+      supabase,
+      editorId,
+      formData,
+      clearName: "clear_news_page_hero_image",
+      fileField: "news_page_hero_image",
+      alt: String(formData.get("news_page_hero_image_alt") ?? "").trim(),
+      usageSection: "page-hero-news",
+    })
+    if ("error" in newsHero) return { ok: false, message: newsHero.error }
+
+    const sitePatch: Record<string, unknown> = {
+      social_links: socialJson,
+      contact_page_hero_image_alt: String(formData.get("contact_page_hero_image_alt") ?? "").trim(),
+      locations_page_hero_image_alt: String(formData.get("locations_page_hero_image_alt") ?? "").trim(),
+      careers_page_hero_image_alt: String(formData.get("careers_page_hero_image_alt") ?? "").trim(),
+      news_page_hero_image_alt: String(formData.get("news_page_hero_image_alt") ?? "").trim(),
+      updated_by: editorId,
+    }
+
+    if (contactHero.next !== undefined) sitePatch.contact_page_hero_media_id = contactHero.next
+    if (locationsHero.next !== undefined) sitePatch.locations_page_hero_media_id = locationsHero.next
+    if (careersHero.next !== undefined) sitePatch.careers_page_hero_media_id = careersHero.next
+    if (newsHero.next !== undefined) sitePatch.news_page_hero_media_id = newsHero.next
+
+    const { error: siteErr } = await supabase.from("site_settings").update(sitePatch).eq("id", 1)
     if (siteErr) return { ok: false, message: siteErr.message }
 
     const contactUpdate = {
@@ -116,7 +204,7 @@ export async function saveSiteContactAction(
 
     revalidateContactSurfaces()
 
-    return { ok: true, message: "Contact and social links saved." }
+    return { ok: true, message: "Contact, page headers, and social links saved." }
   } catch (e) {
     return { ok: false, message: e instanceof Error ? e.message : "Unexpected error" }
   }

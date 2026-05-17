@@ -1,15 +1,23 @@
 import { Container } from "@/components/layout/Container"
 import { PageImageHero } from "@/components/layout/PageImageHero"
 import { LocationsPageView } from "@/components/locations/LocationsPageView"
-import { homeHeroDesign } from "@/data/mock/homepage-visual"
 import { getLocationsPublicCached } from "@/lib/data/locations-public"
+import { getInteriorPageHeroPublic } from "@/lib/data/page-hero-public"
 
-function LocationsPageErrorBanner({ message }: { message: string }) {
+function LocationsPageErrorBanner({
+  message,
+  heroImageSrc,
+  heroImageAlt,
+}: {
+  message: string
+  heroImageSrc: string
+  heroImageAlt: string
+}) {
   return (
     <>
       <PageImageHero
-        imageSrc={homeHeroDesign.imageSrc}
-        imageAlt="Euromiti locations in Kosovo"
+        imageSrc={heroImageSrc}
+        imageAlt={heroImageAlt}
         trail={[{ label: "Home", href: "/" }, { label: "Locations" }]}
         title="Locations"
         priority
@@ -29,12 +37,12 @@ function LocationsPageErrorBanner({ message }: { message: string }) {
   )
 }
 
-function LocationsEmptyState() {
+function LocationsEmptyState({ heroImageSrc, heroImageAlt }: { heroImageSrc: string; heroImageAlt: string }) {
   return (
     <>
       <PageImageHero
-        imageSrc={homeHeroDesign.imageSrc}
-        imageAlt="Euromiti locations in Kosovo"
+        imageSrc={heroImageSrc}
+        imageAlt={heroImageAlt}
         trail={[{ label: "Home", href: "/" }, { label: "Locations" }]}
         title="Locations"
         priority
@@ -54,15 +62,30 @@ function LocationsEmptyState() {
 }
 
 export async function LocationsPageContent() {
-  const data = await getLocationsPublicCached()
+  const [data, pageHero] = await Promise.all([
+    getLocationsPublicCached(),
+    getInteriorPageHeroPublic("locations", "Pikat e shitjes Euromiti në Prishtinë, Ferizaj dhe Gjilan"),
+  ])
 
   if (!data.ok) {
-    return <LocationsPageErrorBanner message={data.message} />
+    return (
+      <LocationsPageErrorBanner
+        message={data.message}
+        heroImageSrc={pageHero.imageSrc}
+        heroImageAlt={pageHero.imageAlt}
+      />
+    )
   }
 
   if (data.rows.length === 0) {
-    return <LocationsEmptyState />
+    return <LocationsEmptyState heroImageSrc={pageHero.imageSrc} heroImageAlt={pageHero.imageAlt} />
   }
 
-  return <LocationsPageView locations={data.rows} />
+  return (
+    <LocationsPageView
+      locations={data.rows}
+      heroImageSrc={pageHero.imageSrc}
+      heroImageAlt={pageHero.imageAlt}
+    />
+  )
 }

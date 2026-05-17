@@ -5,13 +5,14 @@ import { Container } from "@/components/layout/Container"
 import { PageImageHero } from "@/components/layout/PageImageHero"
 import { Reveal, Stagger } from "@/components/motion"
 import { MaterialSymbol } from "@/components/ui/MaterialSymbol"
-import { homeHeroDesign } from "@/data/mock/homepage-visual"
 import { LOCATION_PAGE_SERVICE_LABELS, type ResolvedPublicLocation } from "@/lib/data/locations-public"
 import { cn, telHrefFromDisplayPhone } from "@/lib/utils"
 import type { LocationAmenity } from "@/types/public"
 
 export type LocationsPageViewProps = {
   locations: ResolvedPublicLocation[]
+  heroImageSrc: string
+  heroImageAlt: string
 }
 
 function mailHref(display: string) {
@@ -192,12 +193,12 @@ function LocationImagePanel({ visual, priority, tone = "light" }: LocationImageP
   )
 }
 
-export function LocationsPageView({ locations }: LocationsPageViewProps) {
+export function LocationsPageView({ locations, heroImageSrc, heroImageAlt }: LocationsPageViewProps) {
   return (
     <>
       <PageImageHero
-        imageSrc={homeHeroDesign.imageSrc}
-        imageAlt="Pikat e shitjes Euromiti në Prishtinë, Ferizaj dhe Gjilan"
+        imageSrc={heroImageSrc}
+        imageAlt={heroImageAlt}
         trail={[{ label: "Ballina", href: "/" }, { label: "Pikat e Shitjes" }]}
         title="Pikat e Shitjes"
         priority

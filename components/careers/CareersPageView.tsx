@@ -6,12 +6,13 @@ import { PageImageHero } from "@/components/layout/PageImageHero"
 import { SectionHeading } from "@/components/layout/SectionHeading"
 import { SectionReveal } from "@/components/motion/SectionReveal"
 import { SectionAccentRule } from "@/components/ui/SectionAccentRule"
-import { homeHeroDesign } from "@/data/mock/homepage-visual"
 import type { JobApplicationOption } from "@/lib/data/careers-public"
 
 type CareersPageViewProps = {
   positions: JobApplicationOption[]
   defaultPositionSlug?: string
+  heroImageSrc: string
+  heroImageAlt: string
 }
 
 const APPLY_STEPS = [
@@ -33,12 +34,12 @@ const APPLY_STEPS = [
   },
 ] as const
 
-export function CareersPageView({ positions, defaultPositionSlug }: CareersPageViewProps) {
+export function CareersPageView({ positions, defaultPositionSlug, heroImageSrc, heroImageAlt }: CareersPageViewProps) {
   return (
     <>
       <PageImageHero
-        imageSrc={homeHeroDesign.imageSrc}
-        imageAlt="Euromiti — karriera dhe operacione"
+        imageSrc={heroImageSrc}
+        imageAlt={heroImageAlt}
         trail={[{ label: "Ballina", href: "/" }, { label: "Karriera" }]}
         title="Karriera"
         visualPreset="flat-heavy"

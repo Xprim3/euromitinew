@@ -113,6 +113,8 @@ export function normalizeServicesRow(raw: Record<string, unknown>): ServicesCont
       typeof raw.hero_page_title === "string" ? raw.hero_page_title : SERVICES_PAGE_DEFAULT_HERO.title,
     hero_page_subtitle:
       typeof raw.hero_page_subtitle === "string" ? raw.hero_page_subtitle : empty,
+    hero_page_image_media_id: fk("hero_page_image_media_id"),
+    hero_page_image_alt: typeof raw.hero_page_image_alt === "string" ? raw.hero_page_image_alt : "",
     why_choose_kicker:
       typeof raw.why_choose_kicker === "string" ? raw.why_choose_kicker : DEFAULT_SERVICES_WHY_SECTION.kicker,
     why_choose_title:
@@ -212,6 +214,7 @@ export const getServicesContentPublic = cache(async (): Promise<{
   const row = normalizeServicesRow(rawRow as Record<string, unknown>)
 
   const ids = [
+    row.hero_page_image_media_id,
     row.petrol_image_media_id,
     row.restaurant_image_media_id,
     row.carwash_image_media_id,
@@ -317,11 +320,19 @@ export function resolveServicesPage(row: ServicesContentRow | null, media: Servi
     },
   ]
 
+  const pageHero = mediaSrc(
+    media,
+    row.hero_page_image_media_id,
+    SERVICES_PAGE_DEFAULT_HERO.imageSrc,
+    SERVICES_PAGE_DEFAULT_HERO.imageAlt
+  )
+  const pageHeroAlt = row.hero_page_image_alt.trim() || pageHero.alt
+
   return {
     heroTitle: row.hero_page_title,
     heroSubtitle: row.hero_page_subtitle,
-    heroImageSrc: SERVICES_PAGE_DEFAULT_HERO.imageSrc,
-    heroImageAlt: SERVICES_PAGE_DEFAULT_HERO.imageAlt,
+    heroImageSrc: pageHero.src,
+    heroImageAlt: pageHeroAlt,
     sections,
     whyChoose: {
       kicker: textOrFallback(row.why_choose_kicker, DEFAULT_SERVICES_WHY_SECTION.kicker),
