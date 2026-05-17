@@ -85,9 +85,6 @@ export function HomeServicesIntroView(props: {
             <div className="relative flex flex-col justify-center px-5 py-8 sm:px-7 sm:py-10 lg:col-span-7 lg:px-10 xl:px-12">
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_18%,rgba(255,180,171,0.12),transparent_34%)]" aria-hidden />
               <div className="relative max-w-2xl">
-                <p className="mb-4 text-[0.62rem] font-black uppercase tracking-[0.3em] text-brand-accent-soft">
-                  Cilësi & standard
-                </p>
                 <h2
                   id="services-intro-heading"
                   className="font-(family-name:--font-montserrat) text-[clamp(1.9rem,8vw,2.55rem)] font-extrabold leading-[1.05] tracking-[-0.045em] text-white sm:text-[clamp(2.35rem,4.4vw,3.7rem)]"
