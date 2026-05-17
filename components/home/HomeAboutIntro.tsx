@@ -29,15 +29,26 @@ function aboutHomeTeaser(text: string, maxLen = ABOUT_HOME_TEASER_MAX) {
 }
 
 function headlineParts(headline: string) {
-  const parts = headline
+  const trimmed = headline.trim()
+  const parts = trimmed
     .split(".")
     .map((part) => part.trim())
     .filter(Boolean)
-  if (parts.length < 2) return { main: headline, accent: "" }
-  return {
-    main: `${parts.slice(0, -1).join(". ")}.`,
-    accent: `${parts.at(-1)}.`,
+  if (parts.length >= 2) {
+    return {
+      main: `${parts.slice(0, -1).join(". ")}.`,
+      accent: `${parts.at(-1)}.`,
+    }
   }
+  const words = trimmed.split(/\s+/)
+  if (words.length >= 2) {
+    const mid = Math.ceil(words.length / 2)
+    return {
+      main: words.slice(0, mid).join(" "),
+      accent: words.slice(mid).join(" "),
+    }
+  }
+  return { main: trimmed, accent: "" }
 }
 
 export async function HomeAboutIntro() {
@@ -57,29 +68,30 @@ export async function HomeAboutIntro() {
     >
       <div className="mx-auto max-w-[1280px]">
         <div className="grid grid-cols-1 overflow-hidden rounded-[1.2rem] lg:grid-cols-12">
-          <div className="relative flex flex-col justify-center bg-[#14213D] px-5 py-8 text-white sm:px-7 sm:py-10 lg:col-span-7 lg:px-10 xl:px-12">
-            <div
-              className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(255,255,255,0.12),transparent_42%)]"
-              aria-hidden
-            />
+          <div className="relative flex flex-col justify-center bg-white px-5 py-8 text-brand-primary sm:px-7 sm:py-10 lg:col-span-7 lg:px-10 xl:px-12">
             <div className="relative max-w-2xl">
               <h2
                 id="about-intro-heading"
-                className="font-(family-name:--font-montserrat) text-[clamp(1.9rem,8vw,2.55rem)] font-extrabold leading-[1.05] tracking-[-0.045em] text-white sm:text-[clamp(2.35rem,4.4vw,3.7rem)]"
+                className="font-(family-name:--font-montserrat) text-[clamp(1.9rem,8vw,2.55rem)] font-extrabold leading-[1.05] tracking-[-0.045em] text-[#0F172A] sm:text-[clamp(2.35rem,4.4vw,3.7rem)]"
               >
                 {headlineCopy.main}
-                {headlineCopy.accent ? <> {headlineCopy.accent}</> : null}
+                {headlineCopy.accent ? (
+                  <>
+                    {" "}
+                    <span className="text-[#F97316]">{headlineCopy.accent}</span>
+                  </>
+                ) : null}
               </h2>
 
-              <p className="mt-5 max-w-xl text-[0.98rem] leading-8 text-white/88 md:text-[1.04rem]">{teaser}</p>
+              <p className="mt-5 max-w-xl text-[0.98rem] leading-8 text-[#0F172A]/85 md:text-[1.04rem]">{teaser}</p>
 
-              <SectionAccentRule className="mt-6 !from-white/65" />
+              <SectionAccentRule className="mt-6" />
               <Link
                 href={buttonHref}
-                className="group mt-7 inline-flex w-full max-w-none items-center justify-between gap-4 rounded-[0.85rem] border border-white/30 bg-white px-4 py-3 text-sm font-extrabold uppercase tracking-[0.12em] text-brand-shell-deep shadow-[0_12px_32px_rgba(10,17,32,0.14)] transition-colors duration-300 hover:bg-white/92 sm:w-auto sm:min-w-64 sm:px-5 lg:mt-8"
+                className="group mt-7 inline-flex w-full max-w-none items-center justify-between gap-4 rounded-[0.85rem] border border-[#0F172A]/10 bg-[#0F172A] px-4 py-3 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_12px_32px_rgba(15,23,42,0.12)] transition-colors duration-300 hover:bg-brand-primary-hover sm:w-auto sm:min-w-64 sm:px-5 lg:mt-8"
               >
                 <span>{buttonLabel}</span>
-                <span className="grid size-8 shrink-0 place-items-center rounded-full bg-brand-shell-deep text-white transition-transform duration-300 group-hover:translate-x-1">
+                <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#F97316] text-white transition-transform duration-300 group-hover:translate-x-1">
                   <MaterialSymbol name="arrow_forward" className="text-base" />
                 </span>
               </Link>
