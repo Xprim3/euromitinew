@@ -5,6 +5,7 @@ import { getSiteUrl } from "@/lib/seo/constants"
 
 export const dynamic = "force-dynamic"
 
+/** Indexable marketing routes only (exclude pages with robots noindex). */
 const staticRoutes = [
   "",
   "/about",
@@ -14,8 +15,6 @@ const staticRoutes = [
   "/news",
   "/careers",
   "/contact",
-  "/privacy-policy",
-  "/terms",
 ] as const
 
 type SitemapSlugRow = {
@@ -36,10 +35,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   if (!supabase) return staticEntries
 
-  const [newsResult, locationsResult] = await Promise.all([
-    supabase.from("news_posts").select("slug, updated_at, published_at, no_index").eq("status", "published"),
-    supabase.from("locations").select("slug, updated_at").eq("is_active", true),
-  ])
+  const newsWithNoIndex = await supabase
+    .from("news_posts")
+    .select("slug, updated_at, published_at, no_index")
+    .eq("status", "published")
+
+  const newsResult = newsWithNoIndex.error?.message.includes("no_index")
+    ? await supabase.from("news_posts").select("slug, updated_at, published_at").eq("status", "published")
+    : newsWithNoIndex
+
+  const locationsResult = await supabase.from("locations").select("slug, updated_at").eq("is_active", true)
 
   const dynamicEntries: MetadataRoute.Sitemap = []
 
@@ -47,7 +52,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.warn("[sitemap] news_posts:", newsResult.error.message)
   } else {
     for (const row of (newsResult.data ?? []) as (SitemapSlugRow & { no_index?: boolean })[]) {
-      if (row.no_index) continue
+      if ("no_index" in row && row.no_index) continue
       const slug = row.slug?.trim()
       if (!slug) continue
       dynamicEntries.push({
