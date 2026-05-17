@@ -41,6 +41,11 @@ function SocialRow({ links }: { links: readonly SocialLinkItem[] }) {
 export default async function ContactPage() {
   const [c, locationsResult] = await Promise.all([getContactDetailsPublic(), getLocationsPublicCached()])
   const stationPhones = resolveRestaurantReservationStations(locationsResult.ok ? locationsResult.rows : [])
+  const ferizajStation = stationPhones.find(
+    (s) => s.slug.toLowerCase() === "ferizaj" || s.city.toLowerCase() === "ferizaj"
+  )
+  const hqPhone = ferizajStation?.phone.trim() || c.phone.trim()
+  const hqPhoneHref = telHrefFromDisplayPhone(hqPhone)
   const m = contactPageMock
   const mailHref = `mailto:${c.email}`
 
@@ -132,31 +137,21 @@ export default async function ContactPage() {
                     <MaterialSymbol name="call" className="mt-0.5 shrink-0 text-xl! text-muted-foreground" aria-hidden />
                     <div className="min-w-0">
                       <dt className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">Telefoni</dt>
-                      <dd className="mt-2 space-y-4">
-                        {stationPhones.map((station) => {
-                          const href = telHrefFromDisplayPhone(station.phone)
-                          return (
-                            <div key={station.slug}>
-                              <p className="text-[0.58rem] font-bold uppercase tracking-[0.16em] text-muted-foreground">
-                                {station.city}
-                              </p>
-                              <div className="mt-1">
-                                {href ? (
-                                  <a
-                                    href={href}
-                                    className="inline-block font-medium text-[0.9375rem] text-muted-foreground transition-colors hover:text-brand-red-vivid"
-                                  >
-                                    {station.phone}
-                                  </a>
-                                ) : (
-                                  <span className="text-[0.9375rem] font-medium text-muted-foreground">
-                                    {station.phone}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
+                      <dd className="mt-1">
+                        {hqPhone ? (
+                          hqPhoneHref ? (
+                            <a
+                              href={hqPhoneHref}
+                              className="inline-block font-semibold text-foreground text-lg transition-colors hover:text-brand-red-vivid"
+                            >
+                              {hqPhone}
+                            </a>
+                          ) : (
+                            <span className="font-semibold text-foreground text-lg">{hqPhone}</span>
                           )
-                        })}
+                        ) : (
+                          <span className="text-muted-foreground text-sm">—</span>
+                        )}
                       </dd>
                     </div>
                   </div>

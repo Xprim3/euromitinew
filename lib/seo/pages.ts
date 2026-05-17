@@ -1,12 +1,13 @@
+import { SITE_DEFAULT_DESCRIPTION, SITE_DEFAULT_TITLE } from "@/lib/seo/constants"
 import { buildPageMetadata } from "@/lib/seo/metadata"
 
 /** Static public routes — Albanian SEO copy. */
 export const staticPageSeo = {
   home: {
-    title: "Euromiti — Karburant, Restaurant dhe Shërbime në Kosovë",
-    description:
-      "Euromiti ofron karburant cilësor, restaurant premium, autolarje dhe mini market në stacionet e Prishtinës, Ferizajit dhe Gjilanit. Besueshmëri në çdo litër.",
+    title: SITE_DEFAULT_TITLE,
+    description: SITE_DEFAULT_DESCRIPTION,
     path: "/",
+    absoluteTitle: true,
   },
   about: {
     title: "Rreth Nesh",
@@ -78,14 +79,14 @@ export function metadataForStaticPage(key: keyof typeof staticPageSeo) {
     description: page.description,
     path: page.path,
     ...("noIndex" in page && page.noIndex ? { noIndex: true } : {}),
-    ...("absoluteTitle" in page && page.absoluteTitle ? { absoluteTitle: true } : {}),
+    ...("absoluteTitle" in page && page.absoluteTitle === true ? { absoluteTitle: true } : {}),
   })
 }
 
 export function metadataForLocation(city: string, slug: string, summary: string) {
   const cityLabel = city.trim() || "Kosovë"
   return buildPageMetadata({
-    title: `Euromiti ${cityLabel} — Karburant, Restaurant, Autolarje`,
+    title: `Stacioni Euromiti në ${cityLabel}`,
     description:
       summary.trim() ||
       `Stacioni Euromiti në ${cityLabel}: karburant, restaurant, autolarje dhe mini market. Adresa, orar dhe shërbime.`,

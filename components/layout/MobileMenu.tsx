@@ -190,13 +190,13 @@ export function MobileMenu({ className }: MobileMenuProps) {
                 </nav>
 
                 <div className="relative border-white/10 border-t px-6 py-5">
-                  <p className="text-center text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-white/38">
-                    Design By{" "}
+                  <p className="text-center text-[0.62rem] font-light leading-relaxed tracking-[0.02em] text-white/38">
+                    Faqja e zhvilluar nga{" "}
                     <a
                       href="https://www.denisjanuzi.dev"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-white/62 transition hover:text-brand-accent-soft"
+                      className="text-brand-accent-soft transition hover:text-brand-accent-gold"
                     >
                       Denis Januzi
                     </a>

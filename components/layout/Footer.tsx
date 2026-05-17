@@ -105,12 +105,12 @@ function FooterView({ data }: { data: SiteFooterPublic }) {
             <p className="max-w-2xl text-[0.7rem] font-light leading-relaxed tracking-[0.02em] text-white/38">
               © {year} {data.footerCopyrightLine}
               <span className="text-white/28"> · </span>
-              Dizajnuar nga{" "}
+              Faqja e zhvilluar nga{" "}
               <a
                 href="https://www.denisjanuzi.dev"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-white/48 transition-colors duration-300 hover:text-brand-accent-soft"
+                className="text-brand-accent-soft transition-colors duration-300 hover:text-brand-accent-gold"
               >
                 Denis Januzi
               </a>

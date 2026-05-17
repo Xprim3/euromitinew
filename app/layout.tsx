@@ -3,7 +3,15 @@ import { Geist_Mono, Inter, Montserrat, Playfair_Display } from "next/font/googl
 
 import "./globals.css"
 
-import { DEFAULT_KEYWORDS, DEFAULT_OG_IMAGE_PATH, getSiteUrl, SITE_LOCALE, SITE_NAME } from "@/lib/seo/constants"
+import {
+  DEFAULT_KEYWORDS,
+  DEFAULT_OG_IMAGE_PATH,
+  getSiteUrl,
+  SITE_DEFAULT_DESCRIPTION,
+  SITE_DEFAULT_TITLE,
+  SITE_LOCALE,
+  SITE_NAME,
+} from "@/lib/seo/constants"
 import { resolveOgImageUrl } from "@/lib/seo/metadata"
 
 const inter = Inter({
@@ -46,16 +54,14 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: `${SITE_NAME} — Karburant dhe shërbime në Kosovë`,
+    default: SITE_DEFAULT_TITLE,
     template: `%s | ${SITE_NAME}`,
   },
-  description:
-    "Euromiti ofron karburant, restaurant, autolarje dhe mini market në Prishtinë, Ferizaj dhe Gjilan — stacione moderne në Kosovë.",
+  description: SITE_DEFAULT_DESCRIPTION,
   keywords: [...DEFAULT_KEYWORDS],
   openGraph: {
     title: SITE_NAME,
-    description:
-      "Karburant, restaurant, autolarje dhe mini market — Euromiti në Prishtinë, Ferizaj dhe Gjilan.",
+    description: SITE_DEFAULT_DESCRIPTION,
     locale: SITE_LOCALE,
     type: "website",
     siteName: SITE_NAME,
@@ -64,7 +70,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: SITE_NAME,
-    description: "Stacione Euromiti në Kosovë — karburant dhe shërbime premium.",
+    description: SITE_DEFAULT_DESCRIPTION,
     images: [resolveOgImageUrl(DEFAULT_OG_IMAGE_PATH)],
   },
   icons: {

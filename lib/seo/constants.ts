@@ -11,6 +11,12 @@ export const SITE_NAME = "Euromiti"
 
 export const SITE_LOCALE = "sq_AL"
 
+/** Default meta description for home, Open Graph, and site-wide fallbacks. */
+export const SITE_DEFAULT_DESCRIPTION =
+  "Euromiti është kompani moderne në Kosovë që ofron karburant cilësor, restaurant, autolarje në Ferizaj, Prishtinë dhe Gjilan, me shërbim profesional dhe përkushtim ndaj klientit."
+
+export const SITE_DEFAULT_TITLE = "Euromiti - Faqja Zyrtare"
+
 /**
  * Default social preview (Facebook, WhatsApp, LinkedIn, X).
  * File: `public/logo.png` — use PNG/JPEG here; SVG is not supported by most platforms.

@@ -57,7 +57,7 @@ function defaultFooter(): SiteFooterPublic {
     logoUrl: null,
     logoAlt: "Euromiti",
     footerBody: DEFAULT_FOOTER_BODY,
-    footerCopyrightLine: "Euromiti Kosovo",
+    footerCopyrightLine: "Euromiti. Të gjitha të drejtat e rezervuara.",
     socialLinks: [],
   }
 }
