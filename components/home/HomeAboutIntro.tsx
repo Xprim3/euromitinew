@@ -56,35 +56,30 @@ export async function HomeAboutIntro() {
       aria-labelledby="about-intro-heading"
     >
       <div className="mx-auto max-w-[1280px]">
-        <div className="grid grid-cols-1 overflow-hidden rounded-[1.2rem] bg-brand-shell-deep shadow-[0_26px_75px_rgba(15,23,42,0.16)] lg:grid-cols-12">
-          <div className="relative flex flex-col justify-center px-5 py-8 sm:px-7 sm:py-10 lg:col-span-7 lg:px-10 xl:px-12">
+        <div className="grid grid-cols-1 overflow-hidden rounded-[1.2rem] lg:grid-cols-12">
+          <div className="relative flex flex-col justify-center bg-brand-accent-soft px-5 py-8 text-brand-shell-deep sm:px-7 sm:py-10 lg:col-span-7 lg:px-10 xl:px-12">
             <div
-              className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(255,180,171,0.12),transparent_34%)]"
+              className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(255,255,255,0.22),transparent_40%)]"
               aria-hidden
             />
             <div className="relative max-w-2xl">
               <h2
                 id="about-intro-heading"
-                className="font-(family-name:--font-montserrat) text-[clamp(1.9rem,8vw,2.55rem)] font-extrabold leading-[1.05] tracking-[-0.045em] text-white sm:text-[clamp(2.35rem,4.4vw,3.7rem)]"
+                className="font-(family-name:--font-montserrat) text-[clamp(1.9rem,8vw,2.55rem)] font-extrabold leading-[1.05] tracking-[-0.045em] text-brand-shell-deep sm:text-[clamp(2.35rem,4.4vw,3.7rem)]"
               >
                 {headlineCopy.main}
-                {headlineCopy.accent ? (
-                  <>
-                    {" "}
-                    <span className="text-brand-accent-soft">{headlineCopy.accent}</span>
-                  </>
-                ) : null}
+                {headlineCopy.accent ? <> {headlineCopy.accent}</> : null}
               </h2>
 
-              <p className="mt-5 max-w-xl text-[0.98rem] leading-8 text-white/74 md:text-[1.04rem]">{teaser}</p>
+              <p className="mt-5 max-w-xl text-[0.98rem] leading-8 text-brand-shell-deep/85 md:text-[1.04rem]">{teaser}</p>
 
-              <SectionAccentRule className="mt-6" />
+              <SectionAccentRule className="mt-6 !from-brand-shell-deep/55" />
               <Link
                 href={buttonHref}
-                className="group mt-7 inline-flex w-full max-w-none items-center justify-between gap-4 rounded-[0.85rem] border border-white/16 bg-white/8 px-4 py-3 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_18px_45px_rgba(15,23,42,0.22)] backdrop-blur-md transition-colors duration-300 hover:border-brand-accent-soft/45 hover:bg-white/10 sm:w-auto sm:min-w-64 sm:px-5 lg:mt-8"
+                className="group mt-7 inline-flex w-full max-w-none items-center justify-between gap-4 rounded-[0.85rem] border border-brand-shell-deep/12 bg-brand-shell-deep px-4 py-3 text-sm font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_18px_45px_rgba(10,17,32,0.28)] transition-colors duration-300 hover:bg-brand-primary-hover sm:w-auto sm:min-w-64 sm:px-5 lg:mt-8"
               >
                 <span>{buttonLabel}</span>
-                <span className="grid size-8 shrink-0 place-items-center rounded-full bg-brand-accent-soft text-brand-shell-deep transition-transform duration-300 group-hover:translate-x-1">
+                <span className="grid size-8 shrink-0 place-items-center rounded-full bg-white text-brand-shell-deep transition-transform duration-300 group-hover:translate-x-1">
                   <MaterialSymbol name="arrow_forward" className="text-base" />
                 </span>
               </Link>
@@ -101,10 +96,6 @@ export async function HomeAboutIntro() {
                 className="object-cover"
               />
             </ImageHoverZoom>
-            <div
-              className="pointer-events-none absolute inset-0 bg-linear-to-t from-brand-shell-deep/58 via-brand-shell-deep/10 to-transparent lg:bg-linear-to-l lg:from-brand-shell-deep/74 lg:via-brand-shell-deep/12 lg:to-transparent"
-              aria-hidden
-            />
           </div>
         </div>
       </div>
