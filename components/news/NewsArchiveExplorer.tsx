@@ -12,6 +12,7 @@ import { Stagger } from "@/components/motion/Stagger"
 
 import type { NewsFilterTab } from "@/lib/constants/news-archive"
 import { NEWS_FILTER_TABS } from "@/lib/constants/news-archive"
+import { newsFilterTabLabelSq } from "@/lib/news/category-labels"
 
 import { NewsArchiveCard } from "./NewsArchiveCard"
 
@@ -59,7 +60,7 @@ export function NewsArchiveExplorer({ items, className }: NewsArchiveExplorerPro
       const cat = item.category ?? "Company Updates"
       if (active !== "All News" && cat !== active) return false
       if (!q) return true
-      return `${item.title} ${item.excerpt}`.toLowerCase().includes(q)
+      return `${item.title} ${item.excerpt} ${item.bodyPlain ?? ""}`.toLowerCase().includes(q)
     })
   }, [items, active, query])
 
@@ -87,7 +88,7 @@ export function NewsArchiveExplorer({ items, className }: NewsArchiveExplorerPro
     <div className={cn("euromiti-section bg-brand-surface-tinted", className)}>
       <div
         className="sticky top-20 z-30 border-brand-border-muted border-b bg-brand-surface-tinted/95 backdrop-blur-md supports-backdrop-filter:bg-brand-surface-tinted/88"
-        aria-label="News filters"
+        aria-label="Filtrat e lajmeve"
       >
         <div className="mx-auto flex w-full max-w-[1280px] flex-wrap items-center justify-between gap-4 px-4 py-5 sm:px-6 lg:px-12">
           <div
@@ -114,7 +115,7 @@ export function NewsArchiveExplorer({ items, className }: NewsArchiveExplorerPro
                       : "border-transparent text-brand-body-soft hover:text-[#0F172A]"
                   )}
                 >
-                  {tab}
+                  {newsFilterTabLabelSq(tab)}
                 </button>
               )
             })}
@@ -126,7 +127,7 @@ export function NewsArchiveExplorer({ items, className }: NewsArchiveExplorerPro
               aria-hidden
             />
             <label htmlFor="news-search" className="sr-only">
-              Search news
+              Kërko lajme
             </label>
             <input
               id="news-search"
@@ -135,7 +136,7 @@ export function NewsArchiveExplorer({ items, className }: NewsArchiveExplorerPro
                 setQuery(e.target.value)
                 setPage(1)
               }}
-              placeholder="Search news…"
+              placeholder="Kërko lajme…"
               className="w-full rounded-full border border-brand-border-muted bg-background py-2.5 pr-4 pl-10 text-sm outline-none ring-brand-red-vivid/30 transition-[box-shadow,border-color] placeholder:text-brand-neutrals-mid focus:border-brand-red-vivid focus:ring-3"
               type="search"
             />
@@ -146,14 +147,14 @@ export function NewsArchiveExplorer({ items, className }: NewsArchiveExplorerPro
       <div className="mx-auto w-full max-w-[1280px] px-4 py-12 sm:px-6 lg:px-12 lg:py-16">
         <SectionReveal once variant="fade-up">
           {slice.length === 0 ? (
-            <p className="text-center text-sm text-brand-body-soft">No stories match those filters.</p>
+            <p className="text-center text-sm text-brand-body-soft">Asnjë artikull nuk përputhet me filtrat.</p>
           ) : (
             <>
               <div ref={gridAnchorRef} id="news-archive-grid" className="scroll-mt-24">
                 <Stagger
                   key={`${safePage}-${slice.map((i) => i.id).join()}`}
                   once
-                  className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-7 lg:grid-cols-3 lg:gap-8"
+                  className="flex flex-col divide-y divide-brand-border-muted"
                 >
                   {slice.map((item) => (
                     <NewsArchiveCard key={item.id} item={item} href={`/news/${item.slug}`} />
@@ -163,20 +164,20 @@ export function NewsArchiveExplorer({ items, className }: NewsArchiveExplorerPro
 
             <div className="mt-8 flex flex-col items-center gap-5 border-brand-border-muted border-t pt-8 sm:mt-10 sm:pt-10">
               <p className="text-center text-xs font-medium text-brand-neutrals-mid sm:text-sm">
-                Showing <span className="font-semibold text-[#0F172A]">{showingFrom}</span>–
-                <span className="font-semibold text-[#0F172A]">{showingTo}</span> of{" "}
+                Duke shfaqur <span className="font-semibold text-[#0F172A]">{showingFrom}</span>–
+                <span className="font-semibold text-[#0F172A]">{showingTo}</span> nga{" "}
                 <span className="font-semibold text-[#0F172A]">{filtered.length}</span>
                 {totalPages > 1 ? (
                   <>
                     {" "}
-                    · Page <span className="font-semibold text-[#0F172A]">{safePage}</span> of{" "}
+                    · Faqja <span className="font-semibold text-[#0F172A]">{safePage}</span> nga{" "}
                     <span className="font-semibold text-[#0F172A]">{totalPages}</span>
                   </>
                 ) : null}
               </p>
 
               {totalPages > 1 ? (
-                <nav className="flex flex-wrap items-center justify-center gap-2" aria-label="News pagination">
+                <nav className="flex flex-wrap items-center justify-center gap-2" aria-label="Faqëzimi i lajmeve">
                   <Button
                     variant="outlinePrimary"
                     size="sm"
@@ -186,7 +187,7 @@ export function NewsArchiveExplorer({ items, className }: NewsArchiveExplorerPro
                     onClick={() => goTo(safePage - 1)}
                   >
                     <MaterialSymbol name="chevron_left" className="text-lg!" />
-                    <span className="sr-only sm:not-sr-only sm:inline">Prev</span>
+                    <span className="sr-only sm:not-sr-only sm:inline">Para</span>
                   </Button>
 
                   <div className="flex flex-wrap items-center justify-center gap-1.5">
@@ -210,7 +211,7 @@ export function NewsArchiveExplorer({ items, className }: NewsArchiveExplorerPro
                               ? "bg-black text-white shadow-(--shadow-euromiti-primary-sm)"
                               : "border border-brand-border-muted bg-background text-brand-body-soft hover:border-brand-red-vivid/40 hover:text-[#0F172A]"
                           )}
-                          aria-label={`Page ${entry}`}
+                          aria-label={`Faqja ${entry}`}
                           aria-current={entry === safePage ? "page" : undefined}
                         >
                           {entry}
@@ -227,7 +228,7 @@ export function NewsArchiveExplorer({ items, className }: NewsArchiveExplorerPro
                     disabled={safePage >= totalPages}
                     onClick={() => goTo(safePage + 1)}
                   >
-                    <span className="sr-only sm:not-sr-only sm:inline">Next</span>
+                    <span className="sr-only sm:not-sr-only sm:inline">Pas</span>
                     <MaterialSymbol name="chevron_right" className="text-lg!" />
                   </Button>
                 </nav>

@@ -69,23 +69,41 @@ export function NewsPostForm({ mode, submitAction, initial, heroPreviewUrl }: Ne
       <input type="hidden" name="status" value={published ? "published" : "draft"} />
 
       {state.ok === true ? (
-        <SuccessMessage title="Post saved">
-          {state.message}
-        </SuccessMessage>
+        <SuccessMessage title="Post saved">{state.message}</SuccessMessage>
       ) : null}
       {state.ok === false && "message" in state ? (
-        <ErrorMessage title="Could not save post">
-          {state.message}
-        </ErrorMessage>
+        <ErrorMessage title="Could not save post">{state.message}</ErrorMessage>
       ) : null}
       {hasFieldErrors ? (
-        <ErrorMessage title="Check the highlighted fields">
-          Fix the highlighted fields and try again.
-        </ErrorMessage>
+        <ErrorMessage title="Check the highlighted fields">Fix the highlighted fields and try again.</ErrorMessage>
       ) : null}
 
-      <AdminSectionCard title="Article details" description="Create the public news card and article page content.">
-        <div className="space-y-5">
+      <AdminSectionCard title="Publishing" description="Draft posts stay hidden from the public News page.">
+        <AdminContentGrid columns={2}>
+          <ToggleInput
+            label="Publish article"
+            checkedLabel="Published"
+            uncheckedLabel="Draft"
+            checked={published}
+            onChange={(event) => setPublished(event.target.checked)}
+            helperText="Published posts appear on /news and their article page."
+          />
+          <TextInput
+            label="Publish date"
+            name="published_at"
+            type="datetime-local"
+            defaultValue={toDatetimeLocal(initial?.published_at)}
+            disabled={!published}
+            helperText={published ? "Leave empty to publish with the current time." : "Enable publishing to set a date."}
+          />
+        </AdminContentGrid>
+      </AdminSectionCard>
+
+      <AdminSectionCard
+        title="Article"
+        description="The list and homepage preview the start of the body. The full article opens on Lexo më shumë."
+      >
+        <div className="space-y-4">
           <TextInput
             label="Title"
             name="title"
@@ -112,22 +130,40 @@ export function NewsPostForm({ mode, submitAction, initial, heroPreviewUrl }: Ne
               error={fieldErrors?.category?.[0]}
             />
           </AdminContentGrid>
-          <TextareaInput
-            label="Excerpt"
-            name="excerpt"
-            required
-            rows={4}
-            defaultValue={initial?.excerpt ?? ""}
-            maxLength={2000}
-            showCharacterCount
-            error={fieldErrors?.excerpt?.[0]}
-          />
           <TextInput
             label="Homepage / archive badge"
             name="teaser_label"
             defaultValue={initial?.teaser_label ?? ""}
             placeholder='e.g. "Network update"'
-            helperText="Optional short label shown on cards."
+            helperText="Optional — rarely shown; leave empty unless needed."
+          />
+          <TextareaInput
+            label="Article body"
+            name="body_paragraphs"
+            required
+            rows={14}
+            defaultValue={bodyDefault}
+            placeholder="First paragraph...\n\nSecond paragraph..."
+            helperText="Separate paragraphs with a blank line."
+            error={fieldErrors?.body_paragraphs?.[0]}
+          />
+        </div>
+      </AdminSectionCard>
+
+      <AdminSectionCard title="Featured image" description="Used on the news archive card and article hero.">
+        <div className="space-y-4">
+          <FileUploadInput
+            label="Image upload"
+            name="hero_image"
+            previewUrl={heroPreviewUrl}
+            previewAlt={initial?.hero_image_alt ?? initial?.title ?? "News featured image"}
+            removeInputName="clear_hero_image"
+          />
+          <TextInput
+            label="Image alt text"
+            name="hero_image_alt"
+            defaultValue={initial?.hero_image_alt ?? ""}
+            placeholder="Describe the featured image"
           />
         </div>
       </AdminSectionCard>
@@ -136,7 +172,7 @@ export function NewsPostForm({ mode, submitAction, initial, heroPreviewUrl }: Ne
         title="SEO (opsionale)"
         description="Lini bosh për të përdorur titullin dhe përshkrimin e artikullit. Përdorni vetëm kur duhet diçka e veçantë për Google dhe rrjetet sociale."
       >
-        <div className="space-y-5">
+        <div className="space-y-4">
           <TextInput
             label="SEO title"
             name="seo_title"
@@ -164,58 +200,6 @@ export function NewsPostForm({ mode, submitAction, initial, heroPreviewUrl }: Ne
             helperText="Kur aktivizohet, artikulli nuk indeksohet në Google (robots noindex)."
           />
         </div>
-      </AdminSectionCard>
-
-      <AdminSectionCard title="Publishing" description="Draft posts stay hidden from the public News page.">
-        <AdminContentGrid columns={2}>
-          <ToggleInput
-            label="Publish article"
-            checkedLabel="Published"
-            uncheckedLabel="Draft"
-            checked={published}
-            onChange={(event) => setPublished(event.target.checked)}
-            helperText="Published posts appear on /news and their article page."
-          />
-          <TextInput
-            label="Publish date"
-            name="published_at"
-            type="datetime-local"
-            defaultValue={toDatetimeLocal(initial?.published_at)}
-            disabled={!published}
-            helperText={published ? "Leave empty to publish with the current time." : "Enable publishing to set a date."}
-          />
-        </AdminContentGrid>
-      </AdminSectionCard>
-
-      <AdminSectionCard title="Featured image" description="Used on the news archive card and article hero.">
-        <div className="space-y-5">
-          <FileUploadInput
-            label="Image upload"
-            name="hero_image"
-            previewUrl={heroPreviewUrl}
-            previewAlt={initial?.hero_image_alt ?? initial?.title ?? "News featured image"}
-            removeInputName="clear_hero_image"
-          />
-          <TextInput
-            label="Image alt text"
-            name="hero_image_alt"
-            defaultValue={initial?.hero_image_alt ?? ""}
-            placeholder="Describe the featured image"
-          />
-        </div>
-      </AdminSectionCard>
-
-      <AdminSectionCard title="Full content" description="The article body shown on the detail page.">
-        <TextareaInput
-          label="Full content"
-          name="body_paragraphs"
-          required
-          rows={16}
-          defaultValue={bodyDefault}
-          placeholder="First paragraph...\n\nSecond paragraph..."
-          helperText="Separate paragraphs with a blank line."
-          error={fieldErrors?.body_paragraphs?.[0]}
-        />
       </AdminSectionCard>
 
       <SaveBar

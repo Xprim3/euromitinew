@@ -30,7 +30,11 @@ export default async function AdminEditNewsPage({ params }: Props) {
     <div className="space-y-6">
       <AdminSectionCard
         title="Edit news post"
-        description={row.status === "published" ? "This post is visible on the public News page." : "This post is currently hidden from the public News page."}
+        description={
+          row.status === "published"
+            ? "This post is visible on the public News page."
+            : "This post is currently hidden from the public News page."
+        }
         headerActions={
           <>
             {previewHref ? (
@@ -47,12 +51,7 @@ export default async function AdminEditNewsPage({ params }: Props) {
       >
         <p className="text-sm text-[var(--admin-text-muted)]">Update the fields below and save to revalidate public News pages.</p>
       </AdminSectionCard>
-      <NewsPostForm
-        mode="edit"
-        submitAction={updateNewsPostAction}
-        initial={row}
-        heroPreviewUrl={heroPreviewUrl}
-      />
+      <NewsPostForm mode="edit" submitAction={updateNewsPostAction} initial={row} heroPreviewUrl={heroPreviewUrl} />
     </div>
   )
 }

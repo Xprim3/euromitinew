@@ -5,6 +5,7 @@ import {
   mockNewsArticles,
   mockNewsSummaries,
 } from "@/data/mock"
+import { excerptFromParagraphs } from "@/lib/news/excerpt-from-body"
 import { createPublicSupabaseServerClient } from "@/lib/supabase/public-server-client"
 import type { NewsArticle, NewsSummary } from "@/types/public"
 import type { NewsPostRow } from "@/types/supabase-cms"
@@ -74,17 +75,22 @@ function rowToSummary(row: NewsPostRow, media: Record<string, { url: string; alt
 
   const category = row.category?.trim() || "Company Updates"
   const teaserLabel = row.teaser_label?.trim() || undefined
+  const paragraphs = bodyParagraphsFromJson(row.body)
+  const bodyPlain = paragraphs.join(" ").replace(/\s+/g, " ").trim()
+  const excerpt =
+    excerptFromParagraphs(paragraphs) || (typeof row.excerpt === "string" ? row.excerpt.trim() : "")
 
   return {
     id: row.id,
     slug: row.slug,
     title: row.title.trim(),
-    excerpt: row.excerpt.trim(),
+    excerpt,
     publishedAt,
     imageSrc: url,
-    imageAlt: alt || "Euromiti news",
+    imageAlt: alt || "Lajme nga Euromiti",
     category,
     ...(teaserLabel ? { teaserLabel } : {}),
+    ...(bodyPlain ? { bodyPlain } : {}),
   }
 }
 
@@ -148,7 +154,7 @@ export const getNewsArticleBySlugPublic = cache(async (slug: string): Promise<Ne
 
   const summary = rowToSummary(row, media, 0)
   const paragraphs = bodyParagraphsFromJson(row.body)
-  const contentParagraphs = paragraphs.length > 0 ? paragraphs : ["This article body is empty."]
+  const contentParagraphs = paragraphs.length > 0 ? paragraphs : ["Trupi i këtij artikulli është bosh."]
 
   return {
     ...summary,

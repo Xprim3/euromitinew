@@ -3,7 +3,11 @@
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 
-import { newsPostAdminFieldsSchema, paragraphsFromAdminBodyText } from "@/lib/validations/news-admin"
+import {
+  excerptForNewsPostSave,
+  newsPostAdminFieldsSchema,
+  paragraphsFromAdminBodyText,
+} from "@/lib/validations/news-admin"
 import { uploadHomepageAssetRow } from "@/lib/server/upload-homepage-asset"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 import type { NewsPostRow } from "@/types/supabase-cms"
@@ -95,7 +99,6 @@ export async function createNewsPostAction(_prev: NewsPostSaveState, formData: F
   const parsed = newsPostAdminFieldsSchema.safeParse({
     slug: formData.get("slug"),
     title: formData.get("title"),
-    excerpt: formData.get("excerpt"),
     category: formData.get("category"),
     teaser_label: teaserVal.length ? teaserVal : undefined,
     status: formData.get("status"),
@@ -116,6 +119,7 @@ export async function createNewsPostAction(_prev: NewsPostSaveState, formData: F
   if (!paragraphs.length) {
     return { ok: false, message: "Add at least one paragraph in the body (separate paragraphs with a blank line)." }
   }
+  const excerpt = excerptForNewsPostSave(paragraphs)
 
   let heroMediaId: string | null = null
   const clearHero = truthyCheckbox(formData.get("clear_hero_image"))
@@ -142,7 +146,7 @@ export async function createNewsPostAction(_prev: NewsPostSaveState, formData: F
       slug: v.slug,
       status: v.status,
       title: v.title,
-      excerpt: v.excerpt,
+      excerpt,
       category: v.category,
       teaser_label: v.teaser_label ?? null,
       published_at,
@@ -187,7 +191,6 @@ export async function updateNewsPostAction(_prev: NewsPostSaveState, formData: F
     const parsed = newsPostAdminFieldsSchema.safeParse({
       slug: formData.get("slug"),
       title: formData.get("title"),
-      excerpt: formData.get("excerpt"),
       category: formData.get("category"),
       teaser_label: teaserVal.length ? teaserVal : undefined,
       status: formData.get("status"),
@@ -208,6 +211,7 @@ export async function updateNewsPostAction(_prev: NewsPostSaveState, formData: F
     if (!paragraphs.length) {
       return { ok: false, message: "Add at least one paragraph in the body (separate paragraphs with a blank line)." }
     }
+    const excerpt = excerptForNewsPostSave(paragraphs)
 
     const { data: existingRow, error: fetchErr } = await supabase.from("news_posts").select("*").eq("id", id).maybeSingle()
 
@@ -224,7 +228,7 @@ export async function updateNewsPostAction(_prev: NewsPostSaveState, formData: F
       slug: v.slug,
       status: v.status,
       title: v.title,
-      excerpt: v.excerpt,
+      excerpt,
       category: v.category,
       teaser_label: v.teaser_label ?? null,
       published_at,

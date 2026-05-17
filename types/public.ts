@@ -52,6 +52,8 @@ export interface NewsSummary {
   category?: string
   /** Homepage / archive badge text from `news_posts.teaser_label`. */
   teaserLabel?: string
+  /** Full body as plain text — used for archive search, not shown in UI. */
+  bodyPlain?: string
 }
 
 /** Full article for `/news/[slug]` (mock/CMS later). */

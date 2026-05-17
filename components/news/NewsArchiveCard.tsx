@@ -2,7 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 
 import { MaterialSymbol } from "@/components/ui/MaterialSymbol"
-import { formatNewsDate } from "@/lib/format-news-date"
+import { formatNewsDateNumeric, formatNewsDateStack } from "@/lib/format-news-date"
 import type { NewsSummary } from "@/types/public"
 import { cn } from "@/lib/utils"
 
@@ -12,53 +12,72 @@ type NewsArchiveCardProps = {
   className?: string
 }
 
-function categoryTone(category: string) {
-  const pill = category === "Innovation" || category === "Sustainability"
-  return pill
-    ? "rounded-md bg-brand-border-accent px-2 py-0.5 text-[0.7rem] font-bold uppercase tracking-wide text-secondary"
-    : "text-[0.7rem] font-bold uppercase tracking-wide text-brand-red-vivid"
-}
-
+/** Horizontal news list row — image + date stack left, story right (no card chrome). */
 export function NewsArchiveCard({ item, href, className }: NewsArchiveCardProps) {
-  const cat = item.category ?? "Company Updates"
+  const dateStack = formatNewsDateStack(item.publishedAt)
+  const dateNumeric = formatNewsDateNumeric(item.publishedAt)
 
   return (
     <article
       className={cn(
-        "group flex flex-col overflow-hidden rounded-xl border border-brand-border-muted bg-background shadow-[0_14px_40px_-28px_rgba(20,27,43,0.35)] transition-shadow duration-300 hover:shadow-[0_22px_50px_-28px_rgba(20,27,43,0.42)]",
+        "group relative flex flex-col gap-5 py-8 transition-colors sm:flex-row sm:items-start sm:gap-0 md:py-10",
         className
       )}
     >
-      <Link href={href} className="relative block h-56 shrink-0 overflow-hidden">
-        <Image
-          src={item.imageSrc}
-          alt={item.imageAlt}
-          fill
-          sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-      </Link>
-      <div className="flex flex-1 flex-col p-5 md:p-6">
-        <div className="mb-4 flex items-center justify-between gap-3">
-          <span className={categoryTone(cat)}>{cat}</span>
-          <time className="shrink-0 text-xs font-medium text-brand-neutrals-mid" dateTime={item.publishedAt}>
-            {formatNewsDate(item.publishedAt)}
-          </time>
-        </div>
-        <h3 className="mb-3 font-heading text-lg font-bold leading-snug tracking-tight text-foreground transition-colors group-hover:text-secondary md:text-xl">
-          <Link href={href} className="text-balance focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+      <div className="flex w-full shrink-0 flex-col sm:w-[min(100%,18.5rem)] md:w-80">
+        <Link
+          href={href}
+          className="relative block aspect-[16/10] w-full overflow-hidden rounded-md bg-brand-border-muted/25 ring-1 ring-brand-border-muted/80 ring-inset"
+        >
+          <Image
+            src={item.imageSrc}
+            alt={item.imageAlt}
+            fill
+            sizes="(max-width: 639px) 100vw, 320px"
+            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+          />
+        </Link>
+
+        {dateStack ? (
+          <div className="mt-3 flex items-stretch justify-end gap-3 sm:mt-4">
+            <div className="text-right">
+              <p className="font-heading text-[2.35rem] font-extrabold leading-none tracking-tight text-foreground tabular-nums sm:text-[2.6rem]">
+                {dateStack.day}
+              </p>
+              <p className="mt-1 text-[0.65rem] font-bold uppercase tracking-[0.22em] text-brand-neutrals-mid">
+                {dateStack.month}
+              </p>
+            </div>
+            <div className="w-px shrink-0 self-stretch bg-brand-border-muted" aria-hidden />
+          </div>
+        ) : null}
+      </div>
+
+      <div className="min-w-0 flex-1 sm:pl-6 md:pl-9 lg:pl-11">
+        <h3 className="font-heading text-xl font-bold leading-snug tracking-tight text-foreground md:text-[1.65rem] md:leading-tight lg:text-[1.75rem]">
+          <Link
+            href={href}
+            className="text-balance transition-colors hover:text-brand-red-vivid focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          >
             {item.title}
           </Link>
         </h3>
-        <p className="mb-6 line-clamp-3 flex-1 text-sm leading-relaxed text-brand-body-soft md:text-[0.9375rem]">
+
+        <p className="mt-2.5 flex items-center gap-2 text-sm text-brand-neutrals-mid">
+          <MaterialSymbol name="schedule" className="text-[1.1rem]! text-brand-red-vivid" aria-hidden />
+          <time dateTime={item.publishedAt}>{dateNumeric}</time>
+        </p>
+
+        <p className="mt-3 line-clamp-4 text-sm leading-relaxed text-brand-body-soft md:mt-4 md:text-[0.9375rem] md:leading-[1.65]">
           {item.excerpt}
         </p>
+
         <Link
           href={href}
-          className="mt-auto inline-flex items-center gap-1 text-sm font-bold text-[#0F172A] transition-transform hover:text-secondary focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring group-hover:translate-x-1"
+          className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-brand-red-vivid hover:text-secondary focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:mt-5"
         >
-          Read more
-          <MaterialSymbol name="chevron_right" className="text-lg!" />
+          Lexo më shumë
+          <MaterialSymbol name="arrow_forward" className="text-[1.05rem]!" />
         </Link>
       </div>
     </article>

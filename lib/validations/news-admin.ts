@@ -1,5 +1,6 @@
 import { z } from "zod"
 
+import { excerptFromParagraphs } from "@/lib/news/excerpt-from-body"
 import type { NewsFilterTab } from "@/lib/constants/news-archive"
 import { NEWS_FILTER_TABS } from "@/lib/constants/news-archive"
 
@@ -19,7 +20,6 @@ const slugSchema = z
 export const newsPostAdminFieldsSchema = z.object({
   slug: slugSchema,
   title: z.string().trim().min(1).max(500),
-  excerpt: z.string().trim().min(1).max(2000),
   category: categorySchema,
   teaser_label: z
     .string()
@@ -58,4 +58,9 @@ export function paragraphsFromAdminBodyText(raw: string): string[] {
     .split(/\n\s*\n/)
     .map((p) => p.trim())
     .filter(Boolean)
+}
+
+/** Persisted `news_posts.excerpt` — always derived from the body on save. */
+export function excerptForNewsPostSave(paragraphs: readonly string[]): string {
+  return excerptFromParagraphs(paragraphs)
 }

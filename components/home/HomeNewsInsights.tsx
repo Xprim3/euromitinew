@@ -6,24 +6,7 @@ import { SectionAccentRule } from "@/components/ui/SectionAccentRule"
 import { MaterialSymbol } from "@/components/ui/MaterialSymbol"
 import { homeNewsInsightsDesign } from "@/data/mock/homepage-visual"
 import { getPublishedNewsSummariesPublic } from "@/lib/data/news-public"
-import type { NewsSummary } from "@/types/public"
 import { cn } from "@/lib/utils"
-
-const BADGE_BY_SLUG: Record<string, { label: string; className: string }> = {
-  "expansion-in-prishtina": { label: "Risi në rrjet", className: "bg-brand-shell-deep text-white" },
-  "path-to-zero-emissions": { label: "Qëndrueshmëri", className: "bg-green-600 text-white" },
-  "premium-diesel-launch": { label: "Inovacion", className: "bg-brand-shell-deep text-white" },
-}
-
-function badgeForHomeNews(item: NewsSummary): { label: string; className: string } {
-  const fromSlug = BADGE_BY_SLUG[item.slug]
-  if (fromSlug) return fromSlug
-  const cat = item.category ?? "Përditësime"
-  const label = item.teaserLabel ?? cat
-  if (cat === "Sustainability") return { label, className: "bg-green-600 text-white" }
-  if (cat === "Innovation" || cat === "Community") return { label, className: "bg-brand-shell-deep text-white" }
-  return { label, className: "bg-white text-brand-shell-deep" }
-}
 
 export async function HomeNewsInsights() {
   const summaries = await getPublishedNewsSummariesPublic()
@@ -60,10 +43,11 @@ export async function HomeNewsInsights() {
     )
   }
 
-  /** Fewer than three posts: keep section hidden (no sparse grid / placeholder CTA). */
-  if (summaries.length <= 2) return null
-
   const previewItems = summaries.slice(0, 2)
+  const gridCols =
+    previewItems.length === 1
+      ? "grid-cols-1 md:grid-cols-2 md:max-w-3xl md:mx-auto"
+      : "grid-cols-1 md:grid-cols-3"
 
   return (
     <section
@@ -83,10 +67,8 @@ export async function HomeNewsInsights() {
           <SectionAccentRule className="mx-auto mt-5 md:mt-6" />
         </div>
 
-        <Stagger once className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
-          {previewItems.map((item) => {
-            const badge = badgeForHomeNews(item)
-            return (
+        <Stagger once className={cn("grid gap-4 md:gap-5", gridCols)}>
+          {previewItems.map((item) => (
               <article
                 key={item.id}
                 className="group overflow-hidden rounded-2xl border border-white/10 bg-white/4 transition duration-300 hover:bg-white/6"
@@ -101,14 +83,6 @@ export async function HomeNewsInsights() {
                   />
                 </div>
                 <div className="space-y-2.5 p-4 md:p-5">
-                  <span
-                    className={cn(
-                      "inline-flex rounded-full px-3 py-1 text-[0.6rem] font-black uppercase tracking-widest",
-                      badge.className
-                    )}
-                  >
-                    {badge.label}
-                  </span>
                   <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/60">
                     {new Date(item.publishedAt).toLocaleDateString("sq-AL")}
                   </p>
@@ -125,8 +99,7 @@ export async function HomeNewsInsights() {
                   </Link>
                 </div>
               </article>
-            )
-          })}
+          ))}
 
           <Link
             href="/news"

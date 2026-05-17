@@ -1,3 +1,4 @@
+import { excerptFromParagraphs } from "@/lib/news/excerpt-from-body"
 import type { NewsArticle, NewsSummary } from "@/types/public"
 
 const articles: NewsArticle[] = [
@@ -5,122 +6,124 @@ const articles: NewsArticle[] = [
     id: "expansion-prishtina",
     slug: "expansion-in-prishtina",
     category: "Company Updates",
-    title: "Expansion in the Heart of Prishtina",
+    title: "Zgjerim në zemër të Prishtinës",
     excerpt:
-      "Euromiti deepens coverage in the capital with renewed forecourt lighting and refreshed retail bays.",
+      "Euromiti forcon praninë në kryeqytet me ndriçim të rinovuar në stacion dhe hapësira të përditësuara retail.",
     publishedAt: "2026-04-18",
     imageSrc:
       "https://images.unsplash.com/photo-1560179707-f14e90ef3623?auto=format&fit=crop&w=960&q=80",
-    imageAlt: "Executive handshake overlooking the city skyline",
+    imageAlt: "Shtrëngim doresh në horizontin e qytetit",
     contentParagraphs: [
-      "Prishtina travellers will notice brighter, safer forecourts as Euromiti completes a capital-wide refresh of LED lighting, canopy refinishing, and modernised pump islands.",
-      "Retail bays are being re-merchandised for faster grab-and-go journeys, with expanded coffee, pastry, and travel essentials tailored to morning commuters.",
-      "The programme keeps operations live 24/7 on our flagship route while teams work in phased night windows to limit disruption for drivers and corporate accounts.",
-      "We extend our thanks to municipal partners and neighbours for their collaboration as we elevate the roadside experience in Kosovo’s economic centre.",
+      "Udhëtarët në Prishtinë do të vërejnë stacione më të ndriçuara dhe më të sigurta, pasi Euromiti përfundon rinovimin e ndriçimit LED, kanopeve dhe ishujve të pompave në kryeqytet.",
+      "Hapësirat retail po riorganizohen për udhëtime më të shpejta grab-and-go, me kafé, pastiçeri dhe artikuj udhëtimi të zgjeruar për komuterët e mëngjesit.",
+      "Programi mbajt operimin 24/7 në linjën kryesore, ndërsa ekipet punojnë në faza natën për të kufizuar ndërprerjet për shoferët dhe llogaritë korporative.",
+      "Faleminderit partnerëve lokalë dhe fqinjëve për bashkëpunimin ndërsa përmirësojmë përvojën rrugore në qendrën ekonomike të Kosovës.",
     ],
   },
   {
     id: "zero-emissions",
     slug: "path-to-zero-emissions",
     category: "Sustainability",
-    title: "Our Path to Cleaner Operations",
+    title: "Rruga jonë drejt operimeve më të pastra",
     excerpt:
-      "Solar readiness studies and efficiency upgrades are rolling out across every Euromiti location.",
+      "Studime për gatishmëri diellore dhe përmirësime efikasiteti po zbatohen në çdo lokacion Euromiti.",
     publishedAt: "2026-03-22",
     imageSrc:
       "https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=960&q=80",
-    imageAlt: "Solar panels with blue sky",
+    imageAlt: "Panele diellore nën qiell të kaltër",
     contentParagraphs: [
-      "Energy efficiency is now an operating priority: we are auditing every location for LED retrofits, refrigeration performance, and optimised HVAC cycles without compromising guest comfort.",
-      "Solar feasibility studies are underway roof-by-roof with local engineers, targeting partial on-site generation before wider battery storage trials.",
-      "Fleet and logistics partners will see consolidated reporting on embodied carbon for major construction packages as we align procurement with EU disclosure norms.",
-      "This roadmap is iterative — we will publish milestone updates as audits complete and pilots go live across Prishtina, Ferizaj, and Gjilan.",
+      "Efikasiteti energjetik është prioritet operativ: po auditohet çdo lokacion për LED, performancën e ftohjes dhe ciklet e optimizuara të HVAC pa ulur komodin e vizitorëve.",
+      "Studimet e fizibilitetit për diell po zhvillohen çati pas çatie me inxhinierë lokalë, me synim gjenerim të pjesshëm në vend para provave më të gjera me bateri.",
+      "Partnerët e flotës dhe logjistikës do të marrin raporte të konsoliduara për karbonin e përfshirë në paketat kryesore të ndërtimit, në përputhje me normat e zbulimit në BE.",
+      "Ky plan është gradual — do të publikojmë përditësime me arritje sapo të përfundojnë auditimet dhe pilotet në Prishtinë, Ferizaj dhe Gjilan.",
     ],
   },
   {
     id: "diesel-launch",
     slug: "premium-diesel-launch",
     category: "Innovation",
-    title: "Premium Diesel Euro 5+ Launch",
+    title: "Lansimi i naftës premium Euro 5+",
     excerpt:
-      "Drivers can now access our latest certified diesel blend tuned for modern EURO engines.",
+      "Shoferët tani mund të përdorin përzierjen tonë më të re të certifikuar, të krijuar për motorët modernë EURO.",
     publishedAt: "2026-02-05",
     imageSrc:
       "https://images.unsplash.com/photo-1581093843351-3c2b14d6d30d?auto=format&fit=crop&w=960&q=80",
-    imageAlt: "Close-up of a fuel dispenser nozzle",
+    imageAlt: "Pompë karburanti nga afër",
     contentParagraphs: [
-      "Euromiti Premium Diesel Euro 5+ is formulated for modern high-pressure common rail engines, helping sustain fuel-system cleanliness alongside everyday performance.",
-      "Dispensers clearly label the new blend; attendants remain on hand nightly to advise hauliers and touring drivers who rely on torque for Kosovo’s motorway grades.",
-      "Quality assurance includes batched certifications with independent labs — traceability slips are archived for corporate fuel partners who audit their supply chains.",
-      "Thank you for choosing Euromiti as your dependable roadside partner — we continue to invest in fuels that reflect European standards and Kosovo’s ambitions.",
+      "Euromiti Premium Diesel Euro 5+ është formuluar për motorët modernë me injektim me presion të lartë, duke ndihmuar pastërtinë e sistemit të karburantit dhe performancën e përditshme.",
+      "Pompat etiketojnë qartë përzierjen e re; stafi mbetet në dispozicion për t’u këshilluar transportuesit dhe udhëtarët që mbështeten në çift rrotullues në autostradat e Kosovës.",
+      "Siguria e cilësisë përfshin certifikime të grupeve me laboratorë të pavarur — dokumentet e gjurmueshmërisë ruhen për partnerët korporativë që auditohen zinxhirin e furnizimit.",
+      "Faleminderit që zgjidhni Euromiti si partner të besueshëm rrugor — vazhdojmë të investojmë në karburante që reflektojnë standardet evropiane dhe ambicionet e Kosovës.",
     ],
   },
   {
     id: "stem-scholarship",
     slug: "stem-scholarship-2026",
     category: "Community",
-    title: "Euromiti STEM Scholarship Programme 2026",
+    title: "Programi i bursave Euromiti STEM 2026",
     excerpt:
-      "Applications are open for students pursuing engineering and energy disciplines — mentoring and awards across our Kosovo network.",
+      "Aplikimet janë hapur për studentë në inxhinieri dhe energji — mentorim dhe shpërblime në rrjetin tonë në Kosovë.",
     publishedAt: "2026-01-28",
     imageSrc:
       "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=960&q=80",
-    imageAlt: "Team collaborating in a bright workspace",
+    imageAlt: "Ekip që bashkëpunon në ambient të ndriçuar",
     contentParagraphs: [
-      "Euromiti is deepening its commitment to young talent through a structured STEM scholarship with mentoring from operations and hospitality leaders.",
-      "Eligible applicants are enrolled in accredited Kosovo universities and demonstrate academic strength alongside community involvement.",
-      "Recipients receive phased awards aligned with semesters, invitations to facility tours, and optional summer placements at Euromiti stations.",
-      "The programme reflects our belief that Kosovo’s corridor economy thrives when technical skills meet practical roadside experience.",
+      "Euromiti thellon angazhimin për talentin e ri përmes një bursë të strukturuar STEM me mentorim nga drejtuesit e operacioneve dhe mikpritjes.",
+      "Aplikuesit e përshtatshëm janë të regjistruar në universitete të akredituara në Kosovë dhe tregojnë forcë akademike së bashku me përfshirje në komunitet.",
+      "Marrësit marrin shpërblime të fazuara sipas semestrave, ftesa për turne në stacione dhe praktika verore opsionale në Euromiti.",
+      "Programi pasqyron bindjen tonë se ekonomia e korridorit në Kosovë lulëzon kur aftësitë teknike takohen me përvojën praktike rrugore.",
     ],
   },
   {
     id: "ferizaj-corridor",
     slug: "ferizaj-route-reliability",
     category: "Company Updates",
-    title: "Ferizaj Corridor Hours & Hospitality Refresh",
+    title: "Orari në korridorin e Ferizajit dhe rifreskim i mikpritjes",
     excerpt:
-      "Extended evening cover and redesigned restaurant pacing keep the central route dependable for fleets and families.",
+      "Mbulesë e zgjeruar në mbrëmje dhe ritëm i ri në restaurant e bën rrugën qendrore të besueshme për flota dhe familje.",
     publishedAt: "2026-01-12",
     imageSrc:
       "https://images.unsplash.com/photo-1578575437130-527eed3edb54?auto=format&fit=crop&w=960&q=80",
-    imageAlt: "Logistics roadway and trucking infrastructure",
+    imageAlt: "Infrastrukturë rrugore dhe logjistike",
     contentParagraphs: [
-      "Fleet managers servicing Prishtina–Gjilan routes will find expanded evening concierge support at Euromiti Ferizaj with clarified pump priority lanes.",
-      "Restaurant seating and kitchen choreography were tuned for faster table turns during peak commuter windows without shortening guest rest time.",
-      "Digital queue boards pilot at the dessert counter minimise crowding — feedback from January guests already shows higher satisfaction scores.",
-      "Operational leadership will publish KPI snapshots quarterly so partners can benchmark dwell time against regional averages.",
+      "Menaxherët e flotës në rrugët Prishtinë–Gjilan do të gjejnë mbështetje të zgjeruar në mbrëmje në Euromiti Ferizaj, me korsi prioritare të qarta për pompën.",
+      "Ulëset dhe ritmi i kuzhinës u rregulluan për kthime më të shpejta të tavolinave në oraret e pikut pa shkurtuar kohën e pushimit të mysafirëve.",
+      "Tabelat dixhitale të radhës në vitrinën e ëmbëlsirave reduktojnë ngjeshjen — reagimet e mysafirëve në janar tregojnë tashmë kënaqësi më të lartë.",
+      "Drejtoria operacionale do të publikojë pamje KPI çerekore që partnerët të krahasojnë kohën e qëndrimit me mesataret rajonale.",
     ],
   },
   {
     id: "contactless-payments",
     slug: "contactless-rollout-complete",
     category: "Innovation",
-    title: "Contactless Payments Across Every Euromiti Pump Lane",
+    title: "Pagesa pa kontakt në çdo korsi pompash Euromiti",
     excerpt:
-      "Tap-to-pay terminals now standard indoor and outdoor, reducing queue friction during winter peaks.",
+      "Terminalet tap-to-pay tani janë standarde brenda dhe jashtë, duke ulur radhët në kulmin e dimrit.",
     publishedAt: "2025-12-08",
     imageSrc:
       "https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=960&q=80",
-    imageAlt: "Payment terminal interaction",
+    imageAlt: "Pagesë me terminal",
     contentParagraphs: [
-      "We completed a network-wide rollout of EMV-certified contactless readers tethered to each dispenser head and cashier island.",
-      "Attendants underwent scenario training for receipt requests, VAT documentation, and corporate account reconciliation.",
-      "Security operations monitor transaction velocity with anomaly alerts while PCI scope remains partitioned from guest Wi-Fi.",
-      "Drivers who prefer prepaid wallet integrations can watch for pilot announcements mid-year as we certify partners.",
+      "Përfunduam zbatimin në të gjithë rrjetin e lexuesve pa kontakt të certifikuar EMV në çdo kokë pompe dhe ishull arkë.",
+      "Stafi u trajnua për kuponë, dokumentacion TVSH dhe barazimin e llogarive korporative.",
+      "Operacionet e sigurisë monitorojnë shpejtësinë e transaksioneve me alarme anomalie, ndërsa fusha PCI mbetet e ndarë nga Wi‑Fi i mysafirëve.",
+      "Shoferët që preferojnë portofolët paraprakisht mund të presin njoftime për pilotet gjatë vitit ndërsa certifikojmë partnerët.",
     ],
   },
 ]
 
 function toSummary(a: NewsArticle): NewsSummary {
+  const bodyPlain = a.contentParagraphs.join(" ").replace(/\s+/g, " ").trim()
   return {
     id: a.id,
     slug: a.slug,
     category: a.category,
     title: a.title,
-    excerpt: a.excerpt,
+    excerpt: excerptFromParagraphs(a.contentParagraphs) || a.excerpt,
     publishedAt: a.publishedAt,
     imageSrc: a.imageSrc,
     imageAlt: a.imageAlt,
+    ...(bodyPlain ? { bodyPlain } : {}),
   }
 }
 
