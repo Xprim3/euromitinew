@@ -360,7 +360,6 @@ const SERVICE_PANEL_SHORT_COPY = {
   market: "Produkte të përditshme, pije dhe artikuj praktikë për rrugën.",
   ev: "Mobiliteti elektrik është pjesë e së ardhmes së gjelbër. Në shumë pika në Kosovë ofrojmë mbushje ultra të shpejtë për vetura elektrike.",
   carwash: "Larje e shpejtë dhe e kujdesshme — veturë e pastër në pak minuta.",
-  playground: "Hapësirë e sigurt ku fëmijët luajnë ndërsa familja pushon.",
 } as const
 
 /** One–two short sentences for color panels (not full CMS intro paragraphs). */
@@ -416,12 +415,6 @@ export function homeServiceColorBlocksFromCMS(
       title: "Autolarje",
       body: shortServicePanelBody(cards.carwash.body, SERVICE_PANEL_SHORT_COPY.carwash),
       icon: "local_car_wash",
-    },
-    {
-      id: "playground",
-      title: "Këndi i lojërave",
-      body: shortServicePanelBody(cards.playground.body, SERVICE_PANEL_SHORT_COPY.playground),
-      icon: "toys",
     },
   ]
 }

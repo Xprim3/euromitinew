@@ -35,8 +35,8 @@ export function HomeServicesIntroSkeleton() {
       </section>
       <section className="w-full bg-brand-surface-tinted">
         <div className="w-full pb-14 pt-5 md:pb-16">
-          <div className="grid w-full animate-pulse grid-cols-1 overflow-hidden sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
-            {[0, 1, 2, 3, 4, 5].map((k) => (
+          <div className="grid w-full animate-pulse grid-cols-1 overflow-hidden sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
+            {[0, 1, 2, 3, 4].map((k) => (
               <div key={k} className="min-h-[590px] bg-brand-shell-deep/12 px-5 py-9">
                 <div className="mx-auto mb-5 size-14 rounded-full bg-brand-shell-deep/10" />
                 <div className="mx-auto h-5 w-24 rounded bg-brand-shell-deep/15" />
